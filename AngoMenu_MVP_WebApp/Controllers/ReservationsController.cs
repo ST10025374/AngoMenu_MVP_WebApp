@@ -1,10 +1,13 @@
 ﻿using AngoMenu_MVP_WebApp.DTOs.Reservation;
 using AngoMenu_MVP_WebApp.Models;
 using AngoMenu_MVP_WebApp.Models.Enums;
+using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using AngoMenu_MVP_WebApp.Common;
+
 
 namespace AngoMenu_MVP_WebApp.Controllers
 {
@@ -12,11 +15,11 @@ namespace AngoMenu_MVP_WebApp.Controllers
     [Route("api/[controller]")]
     public class ReservationsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IReservationService _reservationService;
 
-        public ReservationsController(ApplicationDbContext context)
+        public ReservationsController(IReservationService reservationService)
         {
-            _context = context;
+            _reservationService = reservationService;
         }
 
         // CLIENT: Create reservation
@@ -26,42 +29,12 @@ namespace AngoMenu_MVP_WebApp.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            if (dto.Date < DateOnly.FromDateTime(DateTime.UtcNow))
-                return BadRequest("Reservation date cannot be in the past.");
+            var result = await _reservationService.CreateReservation(userId, dto);
 
-            var restaurant = await _context.Restaurants
-                .FirstOrDefaultAsync(r => r.Id == dto.RestaurantId);
+            if (!result.Success)
+                return BadRequest(result.Message);
 
-            if (restaurant == null)
-                return BadRequest("Restaurant does not exist.");
-
-            if (dto.Time < restaurant.OpeningHour || dto.Time > restaurant.ClosingHour)
-                return BadRequest("Reservation time is outside restaurant opening hours.");
-
-            var existingReservation = await _context.Reservations
-                .AnyAsync(r =>
-                    r.UserId == userId &&
-                    r.Date == dto.Date &&
-                    r.Time == dto.Time &&
-                    r.Status != ReservationStatus.Cancelled);
-
-            if (existingReservation)
-                return BadRequest("You already have a reservation at this time.");
-
-            var reservation = new Reservation
-            {
-                UserId = userId,
-                RestaurantId = dto.RestaurantId,
-                Date = dto.Date,
-                Time = dto.Time,
-                NumberOfPeople = dto.NumberOfPeople,
-                Status = ReservationStatus.Pending
-            };
-
-            _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync();
-
-            return Ok("Reservation created successfully.");
+            return Ok(result.Message);
         }
 
         [Authorize(Roles = "Client")]
@@ -70,22 +43,12 @@ namespace AngoMenu_MVP_WebApp.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var reservations = await _context.Reservations
-                .Include(r => r.Restaurant)
-                .Where(r => r.UserId == userId)
-                .Select(r => new ReservationResponseDto
-                {
-                    Id = r.Id,
-                    RestaurantId = r.RestaurantId,
-                    RestaurantName = r.Restaurant.Name,
-                    Date = r.Date,
-                    Time = r.Time,
-                    NumberOfPeople = r.NumberOfPeople,
-                    Status = r.Status.ToString()
-                })
-                .ToListAsync();
+            var result = await _reservationService.GetUserReservations(userId);
 
-            return Ok(reservations);
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(result.Data);
         }
 
         [Authorize(Roles = "Client")]
@@ -94,55 +57,36 @@ namespace AngoMenu_MVP_WebApp.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var reservation = await _context.Reservations
-                .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+            var result = await _reservationService.CancelReservation(userId, id);
 
-            if (reservation == null)
-                return NotFound();
+            if (!result.Success)
+                return BadRequest(result.Message);
 
-            reservation.Status = ReservationStatus.Cancelled;
-
-            await _context.SaveChangesAsync();
-
-            return Ok("Reservation cancelled.");
+            return Ok(result.Message);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var reservations = await _context.Reservations
-                .Include(r => r.User)
-                .Include(r => r.Restaurant)
-                .Select(r => new
-                {
-                    r.Id,
-                    UserEmail = r.User.Email,
-                    Restaurant = r.Restaurant.Name,
-                    r.Date,
-                    r.Time,
-                    r.NumberOfPeople,
-                    Status = r.Status.ToString()
-                })
-                .ToListAsync();
+            var result = await _reservationService.GetAllReservations();
 
-            return Ok(reservations);
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(result.Data);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, ReservationUpdateStatusDto dto)
         {
-            var reservation = await _context.Reservations.FindAsync(id);
+            var result = await _reservationService.UpdateReservationStatus(id, dto.Status);
 
-            if (reservation == null)
-                return NotFound();
+            if (!result.Success)
+                return BadRequest(result.Message);
 
-            reservation.Status = dto.Status;
-
-            await _context.SaveChangesAsync();
-
-            return Ok("Reservation status updated.");
+            return Ok(result.Message);
         }
     }
 }
