@@ -19,8 +19,20 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
         // Create a new reservation
         public async Task<Result> CreateReservation(int userId, ReservationCreateDto dto)
         {
-            if (dto.Date < DateOnly.FromDateTime(DateTime.UtcNow))
-                return Result.Fail("Reservation date cannot be in the past.");
+            // Normalize time (remove seconds)
+            dto.Time = new TimeOnly(dto.Time.Hour, dto.Time.Minute);
+
+            var reservationDateTime = dto.Date.ToDateTime(dto.Time);
+            var now = DateTime.UtcNow;
+
+            if (dto.NumberOfPeople <= 0)
+                return Result.Fail("Number of people must be greater than zero.");
+
+            if (dto.NumberOfPeople > 20)
+                return Result.Fail("Reservation exceeds maximum allowed group size.");
+
+            if (reservationDateTime <= now)
+                return Result.Fail("Reservation date and time must be in the future.");
 
             var restaurant = await _context.Restaurants
                 .FirstOrDefaultAsync(r => r.Id == dto.RestaurantId);
@@ -28,18 +40,33 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             if (restaurant == null)
                 return Result.Fail("Restaurant does not exist.");
 
-            if (dto.Time < restaurant.OpeningHour || dto.Time > restaurant.ClosingHour)
+            if (dto.Time < restaurant.OpeningHour || dto.Time >= restaurant.ClosingHour)
                 return Result.Fail("Reservation time is outside restaurant opening hours.");
 
-            var existingReservation = await _context.Reservations
+            // Prevent user double booking
+            var userConflict = await _context.Reservations
                 .AnyAsync(r =>
                     r.UserId == userId &&
                     r.Date == dto.Date &&
                     r.Time == dto.Time &&
                     r.Status != ReservationStatus.Cancelled);
 
-            if (existingReservation)
+            if (userConflict)
                 return Result.Fail("You already have a reservation at this time.");
+
+            // Capacity validation
+            var totalReserved = await _context.Reservations
+                .Where(r =>
+                    r.RestaurantId == dto.RestaurantId &&
+                    r.Date == dto.Date &&
+                    r.Time == dto.Time &&
+                    r.Status != ReservationStatus.Cancelled)
+                .SumAsync(r => (int?)r.NumberOfPeople) ?? 0;
+
+            const int maxCapacity = 50;
+
+            if (totalReserved + dto.NumberOfPeople > maxCapacity)
+                return Result.Fail("Restaurant capacity exceeded for this time slot.");
 
             var reservation = new Reservation
             {
@@ -51,8 +78,15 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 Status = ReservationStatus.Pending
             };
 
-            _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Reservations.Add(reservation);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return Result.Fail("You already have a reservation at this time.");
+            }
 
             return Result.Ok("Reservation created successfully.");
         }
