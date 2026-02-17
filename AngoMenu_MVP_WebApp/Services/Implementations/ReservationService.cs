@@ -121,8 +121,21 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             if (reservation == null)
                 return Result.Fail("Reservation not found.");
 
-            reservation.Status = ReservationStatus.Cancelled;
+            if (reservation.Status == ReservationStatus.Cancelled)
+                return Result.Fail("Reservation is already cancelled.");
 
+            // Combine DateOnly + TimeOnly into DateTime (stored as local business time)
+            var reservationDateTime = reservation.Date.ToDateTime(reservation.Time);
+
+            // For MVP you used UTC elsewhere. If your business time is Angola (UTC+1),
+            // you can use DateTime.UtcNow.AddHours(1) instead.
+            var now = DateTime.UtcNow.AddHours(1);
+
+            // Block cancellation if reservation is within 1 hour
+            if (reservationDateTime <= now.AddHours(1))
+                return Result.Fail("You cannot cancel less than 1 hour before the reservation time.");
+
+            reservation.Status = ReservationStatus.Cancelled;
             await _context.SaveChangesAsync();
 
             return Result.Ok("Reservation cancelled.");
