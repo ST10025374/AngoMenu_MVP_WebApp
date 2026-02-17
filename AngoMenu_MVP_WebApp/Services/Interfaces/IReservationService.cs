@@ -1,5 +1,7 @@
 ﻿using AngoMenu_MVP_WebApp.Common;
+using AngoMenu_MVP_WebApp.Common.Pagination;
 using AngoMenu_MVP_WebApp.DTOs.Reservation;
+using AngoMenu_MVP_WebApp.DTOs.Restaurant;
 using AngoMenu_MVP_WebApp.Models.Enums;
 
 namespace AngoMenu_MVP_WebApp.Services.Interfaces

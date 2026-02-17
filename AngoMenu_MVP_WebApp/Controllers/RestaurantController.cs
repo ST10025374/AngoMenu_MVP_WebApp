@@ -1,5 +1,7 @@
-﻿using AngoMenu_MVP_WebApp.DTOs.Restaurant;
+﻿using AngoMenu_MVP_WebApp.Common.Pagination;
+using AngoMenu_MVP_WebApp.DTOs.Restaurant;
 using AngoMenu_MVP_WebApp.Models;
+using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,120 +12,83 @@ namespace AngoMenu_MVP_WebApp.Controllers
     [Route("api/[controller]")]
     public class RestaurantsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IRestaurantService _restaurantService;
 
-        public RestaurantsController(ApplicationDbContext context)
+        public RestaurantsController(IRestaurantService restaurantService)
         {
-            _context = context;
+            _restaurantService = restaurantService;
         }
 
-        // GET: api/restaurants
+        // 🔹 GET: api/restaurants
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] PaginationParams paginationParams,
+            [FromQuery] string? search)
         {
-            var restaurants = await _context.Restaurants
-                .Select(r => new RestaurantResponseDto
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                    Description = r.Description,
-                    Location = r.Location,
-                    Phone = r.Phone,
-                    OpeningHour = r.OpeningHour,
-                    ClosingHour = r.ClosingHour,
-                    ImageUrl = r.ImageUrl
-                })
-                .ToListAsync();
+            var result = await _restaurantService
+                .GetRestaurants(paginationParams, search);
 
-            return Ok(restaurants);
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(result.Data);
         }
 
-        // GET: api/restaurants/{id}
+        // 🔹 GET: api/restaurants/{id}
         [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var restaurant = await _context.Restaurants
-                .Where(r => r.Id == id)
-                .Select(r => new RestaurantResponseDto
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                    Description = r.Description,
-                    Location = r.Location,
-                    Phone = r.Phone,
-                    OpeningHour = r.OpeningHour,
-                    ClosingHour = r.ClosingHour,
-                    ImageUrl = r.ImageUrl
-                })
-                .FirstOrDefaultAsync();
+            var result = await _restaurantService
+                .GetRestaurantById(id);
 
-            if (restaurant == null)
-                return NotFound();
+            if (!result.Success)
+                return NotFound(result.Message);
 
-            return Ok(restaurant);
+            return Ok(result.Data);
         }
 
-        // POST: api/restaurants
+        // 🔹 POST: api/restaurants
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(RestaurantCreateDto dto)
         {
-            var restaurant = new Restaurant
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                Location = dto.Location,
-                Phone = dto.Phone,
-                OpeningHour = dto.OpeningHour,
-                ClosingHour = dto.ClosingHour,
-                ImageUrl = dto.ImageUrl
-            };
+            var result = await _restaurantService
+                .CreateRestaurant(dto);
 
-            _context.Restaurants.Add(restaurant);
-            await _context.SaveChangesAsync();
+            if (!result.Success)
+                return BadRequest(result.Message);
 
-            return CreatedAtAction(nameof(GetById), new { id = restaurant.Id }, restaurant);
+            return Ok(result.Message);
         }
 
-        // PUT: api/restaurants/{id}
+        // 🔹 PUT: api/restaurants/{id}
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, RestaurantUpdateDto dto)
         {
-            var restaurant = await _context.Restaurants.FindAsync(id);
+            var result = await _restaurantService
+                .UpdateRestaurant(id, dto);
 
-            if (restaurant == null)
-                return NotFound();
+            if (!result.Success)
+                return NotFound(result.Message);
 
-            restaurant.Name = dto.Name;
-            restaurant.Description = dto.Description;
-            restaurant.Location = dto.Location;
-            restaurant.Phone = dto.Phone;
-            restaurant.OpeningHour = dto.OpeningHour;
-            restaurant.ClosingHour = dto.ClosingHour;
-            restaurant.ImageUrl = dto.ImageUrl;
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(result.Message);
         }
 
-        // DELETE: api/restaurants/{id}
+        // 🔹 DELETE: api/restaurants/{id}
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var restaurant = await _context.Restaurants.FindAsync(id);
+            var result = await _restaurantService
+                .DeleteRestaurant(id);
 
-            if (restaurant == null)
-                return NotFound();
+            if (!result.Success)
+                return NotFound(result.Message);
 
-            _context.Restaurants.Remove(restaurant);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(result.Message);
         }
     }
 }
