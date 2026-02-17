@@ -16,6 +16,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             _context = context;
         }
 
+        // Create a new reservation
         public async Task<Result> CreateReservation(int userId, ReservationCreateDto dto)
         {
             if (dto.Date < DateOnly.FromDateTime(DateTime.UtcNow))

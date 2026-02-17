@@ -4,21 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace AngoMenu_MVP_WebApp.Controllers
 {
     [ApiController]
-    [Route("api/test")]
+    [Route("api/[controller]")]
     public class TestController : ControllerBase
     {
-        [Authorize]
-        [HttpGet("protected")]
-        public IActionResult Protected()
+        [HttpGet("crash")]
+        public IActionResult Crash()
         {
-            return Ok("Authenticated successfully.");
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("admin-only")]
-        public IActionResult AdminOnly()
-        {
-            return Ok("You are admin.");
+            throw new Exception("Forced test exception.");
         }
     }
 }

@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services
 builder.Services.AddControllers(); // <-- Use API controllers
 builder.Services.AddScoped<IReservationService, ReservationService>();
-
+builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -79,10 +79,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<AngoMenu_MVP_WebApp.Middleware.ExceptionMiddleware>();
 app.UseAuthentication();   // <-- VERY IMPORTANT
 app.UseAuthorization();
-
 app.MapControllers();  // <-- Use API routing
-
 app.Run();
