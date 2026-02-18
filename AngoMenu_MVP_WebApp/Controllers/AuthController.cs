@@ -1,7 +1,9 @@
-﻿using AngoMenu_MVP_WebApp.DTOs;
+﻿using AngoMenu_MVP_WebApp.Common;
+using AngoMenu_MVP_WebApp.DTOs;
 using AngoMenu_MVP_WebApp.Models;
 using AngoMenu_MVP_WebApp.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -46,17 +48,47 @@ namespace AngoMenu_MVP_WebApp.Controllers
             return Ok("User registered successfully.");
         }
 
+        [EnableRateLimiting("loginLimiter")]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            if (user == null)
                 return Unauthorized("Invalid credentials.");
+
+            // 🔒 Check lock
+            if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+            {
+                return BadRequest("Account is temporarily locked. Try again later.");
+            }
+
+            // ❌ Wrong password
+            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            {
+                user.FailedLoginAttempts++;
+
+                if (user.FailedLoginAttempts >= 5)
+                {
+                    user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                    user.FailedLoginAttempts = 0;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Unauthorized("Invalid credentials.");
+            }
+
+            // ✅ Success
+            user.FailedLoginAttempts = 0;
+            user.LockoutEnd = null;
+
+            await _context.SaveChangesAsync();
 
             var token = GenerateJwtToken(user);
 
-            return Ok(new { Token = token });
+            return Ok(new { token });
         }
 
         private string GenerateJwtToken(User user)

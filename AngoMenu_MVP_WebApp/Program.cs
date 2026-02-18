@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +47,26 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // ?? Login limiter (protection brute force)
+    options.AddFixedWindowLimiter("loginLimiter", config =>
+    {
+        config.PermitLimit = 5; // 5 trys
+        config.Window = TimeSpan.FromMinutes(1); // per minute
+        config.QueueLimit = 0;
+    });
+
+    // ?? Reservation limiter (anti spam)
+    options.AddFixedWindowLimiter("reservationLimiter", config =>
+    {
+        config.PermitLimit = 10; // 10 reservations
+        config.Window = TimeSpan.FromMinutes(1);
+        config.QueueLimit = 0;
+    });
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -82,6 +105,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 app.UseMiddleware<AngoMenu_MVP_WebApp.Middleware.ExceptionMiddleware>();
 app.UseAuthentication();   // <-- VERY IMPORTANT
 app.UseAuthorization();

@@ -1,12 +1,13 @@
-﻿using AngoMenu_MVP_WebApp.DTOs.Reservation;
+﻿using AngoMenu_MVP_WebApp.Common;
+using AngoMenu_MVP_WebApp.DTOs.Reservation;
 using AngoMenu_MVP_WebApp.Models;
 using AngoMenu_MVP_WebApp.Models.Enums;
 using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using AngoMenu_MVP_WebApp.Common;
 
 
 namespace AngoMenu_MVP_WebApp.Controllers
@@ -23,6 +24,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
         }
 
         // CLIENT: Create reservation
+        [EnableRateLimiting("reservationLimiter")]
         [Authorize(Roles = "Client")]
         [HttpPost]
         public async Task<IActionResult> Create(ReservationCreateDto dto)

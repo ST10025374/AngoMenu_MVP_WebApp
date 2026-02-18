@@ -26,6 +26,10 @@ namespace AngoMenu_MVP_WebApp.Models
         [Required]
         public UserRole Role { get; set; }
 
+        public int FailedLoginAttempts { get; set; } = 0;
+
+        public DateTime? LockoutEnd { get; set; }
+
         // Navigation
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
