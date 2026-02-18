@@ -1,4 +1,4 @@
-using AngoMenu_MVP_WebApp.Services.Implementations;
+﻿using AngoMenu_MVP_WebApp.Services.Implementations;
 using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -47,11 +47,21 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // React Vite dev server
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-    // ?? Login limiter (protection brute force)
+    // 🔐 Login limiter (protection brute force)
     options.AddFixedWindowLimiter("loginLimiter", config =>
     {
         config.PermitLimit = 5; // 5 trys
@@ -59,7 +69,7 @@ builder.Services.AddRateLimiter(options =>
         config.QueueLimit = 0;
     });
 
-    // ?? Reservation limiter (anti spam)
+    // 📦 Reservation limiter (anti spam)
     options.AddFixedWindowLimiter("reservationLimiter", config =>
     {
         config.PermitLimit = 10; // 10 reservations
@@ -104,7 +114,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<AngoMenu_MVP_WebApp.Middleware.SecurityHeadersMiddleware>();
 app.UseHttpsRedirection();
+app.UseCors("FrontendPolicy");
 app.UseRateLimiter();
 app.UseMiddleware<AngoMenu_MVP_WebApp.Middleware.ExceptionMiddleware>();
 app.UseAuthentication();   // <-- VERY IMPORTANT
