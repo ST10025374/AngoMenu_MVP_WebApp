@@ -127,8 +127,9 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             // Combine DateOnly + TimeOnly into DateTime (stored as local business time)
             var reservationDateTime = reservation.Date.ToDateTime(reservation.Time);
 
-            // For MVP you used UTC elsewhere. If your business time is Angola (UTC+1),
-            // you can use DateTime.UtcNow.AddHours(1) instead.
+            // This Part migth need some improvements later on if it causes problems during production,
+            // but for now it should work fine. We are adding 1 hour to the current time to account for
+            // the fact that the reservation time is stored as local business time, and we want to compare it to the current time in UTC.
             var now = DateTime.UtcNow.AddHours(1);
 
             // Block cancellation if reservation is within 1 hour
