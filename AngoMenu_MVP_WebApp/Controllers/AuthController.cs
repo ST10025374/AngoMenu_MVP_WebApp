@@ -2,6 +2,7 @@
 using AngoMenu_MVP_WebApp.DTOs;
 using AngoMenu_MVP_WebApp.Models;
 using AngoMenu_MVP_WebApp.Models.Enums;
+using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -16,107 +17,40 @@ namespace AngoMenu_MVP_WebApp.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IConfiguration _configuration;
+        private readonly IAuthService _authService;
 
-        public AuthController(ApplicationDbContext context, IConfiguration configuration)
+        public AuthController(IAuthService authService)
         {
-            _context = context;
-            _configuration = configuration;
+            _authService = authService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
-                return BadRequest("Email already exists.");
+            var result = await _authService.RegisterAsync(dto);
 
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            if (!result.Success)
+                return BadRequest(result.Message);
 
-            var user = new User
-            {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Email = dto.Email,
-                PasswordHash = passwordHash,
-                Role = UserRole.Client
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok("User registered successfully.");
+            return Ok(result.Message);
         }
 
         [EnableRateLimiting("loginLimiter")]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == dto.Email);
+            var result = await _authService.LoginAsync(dto);
 
-            if (user == null)
-                return Unauthorized("Invalid credentials.");
-
-            // 🔒 Check lock
-            if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+            if (!result.Success)
             {
-                return BadRequest("Account is temporarily locked. Try again later.");
+                // lockout -> BadRequest; invalid creds -> Unauthorized
+                if (result.Message == "Account is temporarily locked. Try again later.")
+                    return BadRequest(result.Message);
+
+                return Unauthorized(result.Message);
             }
 
-            // ❌ Wrong password
-            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-            {
-                user.FailedLoginAttempts++;
-
-                if (user.FailedLoginAttempts >= 5)
-                {
-                    user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
-                    user.FailedLoginAttempts = 0;
-                }
-
-                await _context.SaveChangesAsync();
-
-                return Unauthorized("Invalid credentials.");
-            }
-
-            // ✅ Success
-            user.FailedLoginAttempts = 0;
-            user.LockoutEnd = null;
-
-            await _context.SaveChangesAsync();
-
-            var token = GenerateJwtToken(user);
-
-            return Ok(new { token });
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-
-            var claims = new[]
-            {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
-        };
-
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings["Key"]));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(
-                    Convert.ToDouble(jwtSettings["DurationInMinutes"])),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return Ok(new { token = result.Data });
         }
     }
 }
