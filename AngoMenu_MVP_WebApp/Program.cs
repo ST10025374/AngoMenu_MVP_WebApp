@@ -42,24 +42,67 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
 
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>() ?? Array.Empty<string>();
+    .Get<string[]>()?
+    .Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .Select(origin => origin.Trim().TrimEnd('/'))
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray() ?? Array.Empty<string>();
+
+var allowCredentials = builder.Configuration.GetValue<bool>("Cors:AllowCredentials");
+var allowedMethods = builder.Configuration
+    .GetSection("Cors:AllowedMethods")
+    .Get<string[]>()?
+    .Where(method => !string.IsNullOrWhiteSpace(method))
+    .ToArray() ?? Array.Empty<string>();
+
+var allowedHeaders = builder.Configuration
+    .GetSection("Cors:AllowedHeaders")
+    .Get<string[]>()?
+    .Where(header => !string.IsNullOrWhiteSpace(header))
+    .ToArray() ?? Array.Empty<string>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        if (allowedOrigins.Length == 0) return;
+        if (allowedOrigins.Length == 0)
+        {
+            return;
+        }
 
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy.WithOrigins(allowedOrigins);
+
+        if (allowedMethods.Length > 0)
+        {
+            policy.WithMethods(allowedMethods);
+        }
+        else
+        {
+            policy.AllowAnyMethod();
+        }
+
+        if (allowedHeaders.Length > 0)
+        {
+            policy.WithHeaders(allowedHeaders);
+        }
+        else
+        {
+            policy.AllowAnyHeader();
+        }
+
+        if (allowCredentials)
+        {
+            policy.AllowCredentials();
+        }
+
+        policy.SetPreflightMaxAge(TimeSpan.FromMinutes(10));
     });
 });
 
@@ -84,8 +127,7 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-var cs =
-    builder.Configuration.GetConnectionString("DefaultConnection");
+var cs = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(cs));
@@ -112,7 +154,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSettings["Key"]))
+            Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
     };
 });
 

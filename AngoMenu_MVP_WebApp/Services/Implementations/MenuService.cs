@@ -54,7 +54,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                     RestaurantId = m.RestaurantId,
                     Name = m.Name,
                     Price = m.Price,
-                    Description = m.Description
+                    Description = m.Description ?? string.Empty
                 })
                 .ToListAsync();
 
