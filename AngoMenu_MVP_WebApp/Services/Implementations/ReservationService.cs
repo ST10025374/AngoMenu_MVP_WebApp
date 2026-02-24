@@ -177,5 +177,19 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
             return Result.Ok("Reservation status updated.");
         }
+
+        // Admin: Delete a reservation
+        public async Task<Result> DeleteReservation(int reservationId)
+        {
+            var reservation = await _context.Reservations.FindAsync(reservationId);
+
+            if (reservation == null)
+                return Result.Fail("Reservation not found.");
+
+            _context.Reservations.Remove(reservation);
+            await _context.SaveChangesAsync();
+
+            return Result.Ok("Reservation deleted.");
+        }
     }
 }

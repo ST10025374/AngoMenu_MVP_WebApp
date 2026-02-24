@@ -90,6 +90,18 @@ namespace AngoMenu_MVP_WebApp.Controllers
 
             return Ok(result.Message);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _reservationService.DeleteReservation(id);
+
+            if (!result.Success)
+                return NotFound(result.Message);
+
+            return Ok(result.Message);
+        }
     }
 }
 

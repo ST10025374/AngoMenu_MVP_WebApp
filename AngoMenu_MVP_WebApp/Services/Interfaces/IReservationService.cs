@@ -13,5 +13,7 @@ namespace AngoMenu_MVP_WebApp.Services.Interfaces
         Task<Result> CancelReservation(int userId, int reservationId);
         Task<Result<List<AdminReservationResponseDto>>> GetAllReservations();
         Task<Result> UpdateReservationStatus(int reservationId, ReservationStatus status);
+        Task<Result> DeleteReservation(int reservationId);
+
     }
 }
