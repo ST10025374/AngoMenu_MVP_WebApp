@@ -1,3 +1,5 @@
+import { getToken } from "./auth";
+
 export type LoginPayload = {
     email: string;
     password: string;
@@ -12,6 +14,24 @@ export type RegisterPayload = {
 
 type LoginResponse = {
     token: string;
+};
+
+export type Restaurant = {
+    id: number;
+    name: string;
+    description?: string | null;
+    location: string;
+    phone: string;
+    openingHour: string;
+    closingHour: string;
+    imageUrl?: string | null;
+};
+
+export type PagedResult<T> = {
+    items: T[];
+    totalCount: number;
+    pageNumber: number;
+    pageSize: number;
 };
 
 async function parseResponse<T>(res: Response): Promise<T> {
@@ -39,6 +59,11 @@ async function parseResponse<T>(res: Response): Promise<T> {
     return data as T;
 }
 
+function authHeaders(): HeadersInit {
+    const token = getToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
     const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -56,6 +81,25 @@ export async function register(payload: RegisterPayload): Promise<string> {
         body: JSON.stringify(payload),
     });
 
-    // backend returns Ok(result.Message) -> plain string
     return parseResponse<string>(res);
+}
+
+export async function getRestaurants(params: {
+    pageNumber?: number;
+    pageSize?: number;
+    search?: string;
+}): Promise<PagedResult<Restaurant>> {
+    const query = new URLSearchParams();
+    if (params.pageNumber) query.set("pageNumber", String(params.pageNumber));
+    if (params.pageSize) query.set("pageSize", String(params.pageSize));
+    if (params.search) query.set("search", params.search);
+
+    const res = await fetch(`/api/restaurants?${query.toString()}`, {
+        method: "GET",
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<PagedResult<Restaurant>>(res);
 }
