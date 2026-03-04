@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getRestaurants, type PagedResult, type Restaurant } from "../lib/api";
 
 export default function RestaurantsPage() {
@@ -68,6 +69,13 @@ export default function RestaurantsPage() {
                                 <p style={{ margin: "4px 0" }}><strong>Location:</strong> {r.location}</p>
                                 <p style={{ margin: "4px 0" }}><strong>Phone:</strong> {r.phone}</p>
                                 {r.description && <p style={{ margin: "4px 0" }}>{r.description}</p>}
+
+                                {/* Added navigation button */}
+                                <div style={{ marginTop: 10 }}>
+                                    <Link to={`/restaurants/${r.id}`}>
+                                        <button>View Details</button>
+                                    </Link>
+                                </div>
                             </li>
                         ))}
                     </ul>
