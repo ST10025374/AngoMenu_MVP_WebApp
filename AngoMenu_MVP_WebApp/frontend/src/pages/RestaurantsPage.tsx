@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getRestaurants, type PagedResult, type Restaurant } from "../lib/Api";
+import { getRestaurants, type PagedResult, type Restaurant } from "../lib/api";
 
 export default function RestaurantsPage() {
     const [data, setData] = useState<PagedResult<Restaurant> | null>(null);

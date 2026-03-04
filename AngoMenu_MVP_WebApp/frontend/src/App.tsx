@@ -6,6 +6,7 @@ import RoleRoute from "./routes/RoleRoute";
 import { clearToken, getToken } from "./lib/auth";
 import { getUserRole } from "./lib/jwt";
 import RestaurantsPage from "./pages/RestaurantsPage";
+import RestaurantDetailsPage from "./pages/RestaurantDetailsPage";
 
 function Home() {
     const token = getToken();
@@ -55,6 +56,11 @@ export default function App() {
 
                 <Route element={<ProtectedRoute />}>
                     <Route path="/restaurants" element={<RestaurantsPage />} />
+                </Route>
+
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/restaurants" element={<RestaurantsPage />} />
+                    <Route path="/restaurants/:id" element={<RestaurantDetailsPage />} />
                 </Route>
 
                 {/* client only */}

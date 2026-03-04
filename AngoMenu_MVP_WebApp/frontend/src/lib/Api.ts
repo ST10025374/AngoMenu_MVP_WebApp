@@ -103,3 +103,33 @@ export async function getRestaurants(params: {
 
     return parseResponse<PagedResult<Restaurant>>(res);
 }
+
+export type MenuItem = {
+    id: number;
+    restaurantId: number;
+    name: string;
+    price: number;
+    description: string;
+};
+
+export async function getRestaurantById(id: number): Promise<Restaurant> {
+    const res = await fetch(`/api/restaurants/${id}`, {
+        method: "GET",
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<Restaurant>(res);
+}
+
+export async function getMenuByRestaurant(restaurantId: number): Promise<MenuItem[]> {
+    const res = await fetch(`/api/menu/restaurant/${restaurantId}`, {
+        method: "GET",
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<MenuItem[]>(res);
+}
