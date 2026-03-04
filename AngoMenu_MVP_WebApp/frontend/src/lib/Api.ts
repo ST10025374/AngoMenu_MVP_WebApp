@@ -15,14 +15,24 @@ type LoginResponse = {
 };
 
 async function parseResponse<T>(res: Response): Promise<T> {
+    const contentType = res.headers.get("content-type") ?? "";
     const raw = await res.text();
-    const data = raw ? JSON.parse(raw) : null;
+
+    let data: unknown = null;
+
+    if (raw) {
+        if (contentType.includes("application/json")) {
+            data = JSON.parse(raw);
+        } else {
+            data = raw; // plain text response
+        }
+    }
 
     if (!res.ok) {
         const message =
             typeof data === "string"
                 ? data
-                : data?.message ?? `Request failed (${res.status})`;
+                : (data as { message?: string } | null)?.message ?? `Request failed (${res.status})`;
         throw new Error(message);
     }
 
