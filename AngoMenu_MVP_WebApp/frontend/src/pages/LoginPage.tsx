@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../lib/api";
+import { login } from "../lib/Api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
