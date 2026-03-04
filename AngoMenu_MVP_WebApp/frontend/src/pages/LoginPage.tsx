@@ -3,6 +3,8 @@ import type { FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "../lib/Api";
 
+import { setToken } from "../lib/auth";
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -17,7 +19,7 @@ export default function LoginPage() {
 
     try {
       const result = await login({ email, password });
-      localStorage.setItem("auth_token", result.token);
+      setToken(result.token);
       navigate("/"); // later you can redirect by role
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
