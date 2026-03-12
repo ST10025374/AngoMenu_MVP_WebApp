@@ -1,31 +1,31 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import {
     getMenuByRestaurant,
     getRestaurantById,
     type MenuItem,
     type Restaurant,
-} from "../lib/api";
+} from '../lib/api';
 
 export default function RestaurantDetailsPage() {
     const { id } = useParams();
     const restaurantId = Number(id);
 
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-    const [menu, setMenu] = useState<MenuItem[]>([]);
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [error, setError] = useState('');
 
     useEffect(() => {
         async function load() {
             if (!restaurantId || Number.isNaN(restaurantId)) {
-                setError("Invalid restaurant id.");
+                setError('Invalid restaurant id.');
                 setLoading(false);
                 return;
             }
 
             setLoading(true);
-            setError("");
+            setError('');
 
             try {
                 const [restaurantData, menuData] = await Promise.all([
@@ -34,64 +34,112 @@ export default function RestaurantDetailsPage() {
                 ]);
 
                 setRestaurant(restaurantData);
-                setMenu(menuData);
+                setMenuItems(menuData);
             } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to load restaurant details");
+                setError(err instanceof Error ? err.message : 'Failed to load restaurant details');
             } finally {
                 setLoading(false);
             }
         }
 
-        load();
+        void load();
     }, [restaurantId]);
 
-    if (loading) return <p style={{ textAlign: "center", marginTop: 40 }}>Loading details...</p>;
-    if (error) return <p style={{ textAlign: "center", marginTop: 40, color: "crimson" }}>{error}</p>;
-    if (!restaurant) return <p style={{ textAlign: "center", marginTop: 40 }}>Restaurant not found.</p>;
+    if (loading) {
+        return (
+            <div className="app-card p-6">
+                <p className="text-sm text-slate-500">Loading restaurant details...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+            </div>
+        );
+    }
+
+    if (!restaurant) {
+        return (
+            <div className="app-card p-6">
+                <p className="text-sm text-slate-600">Restaurant not found.</p>
+            </div>
+        );
+    }
 
     return (
-        <main style={{ maxWidth: 900, margin: "40px auto", fontFamily: "sans-serif" }}>
-            <Link to="/restaurants">? Back to restaurants</Link>
+        <section className="space-y-6">
+            <Link
+                to="/restaurants"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-brand-red transition hover:text-red-700 hover:underline"
+            >
+                ? Back to restaurants
+            </Link>
 
-            <h1 style={{ marginTop: 12 }}>{restaurant.name}</h1>
-            {restaurant.description && <p>{restaurant.description}</p>}
+            <article className="app-card overflow-hidden">
+                <div className="border-b border-slate-200 bg-gradient-to-r from-brand-dark to-slate-900 p-6 text-white">
+                    <h1 className="text-3xl font-black">{restaurant.name}</h1>
+                    <p className="mt-2 max-w-3xl text-sm text-slate-200">
+                        {restaurant.description ?? 'A premium destination for memorable meals and quality service.'}
+                    </p>
+                </div>
 
-            <p><strong>Location:</strong> {restaurant.location}</p>
-            <p><strong>Phone:</strong> {restaurant.phone}</p>
-            <p>
-                <strong>Hours:</strong> {restaurant.openingHour} - {restaurant.closingHour}
-            </p>
+                <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-4">
+                    <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Location</p>
+                        <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.location}</p>
+                    </div>
 
-            {restaurant.imageUrl && (
-                <img
-                    src={restaurant.imageUrl}
-                    alt={restaurant.name}
-                    style={{ width: "100%", maxWidth: 500, borderRadius: 8, margin: "8px 0 20px" }}
-                />
-            )}
+                    <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Phone</p>
+                        <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.phone}</p>
+                    </div>
 
-            <h2>Menu</h2>
-            {menu.length === 0 ? (
-                <p>No menu items found.</p>
-            ) : (
-                <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: 10 }}>
-                    {menu.map((item) => (
-                        <li key={item.id} style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12 }}>
-                            <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                <strong>{item.name}</strong>
-                                <strong>${item.price.toFixed(2)}</strong>
-                            </div>
-                            {item.description && <p style={{ marginTop: 6 }}>{item.description}</p>}
-                        </li>
-                    ))}
-                </ul>
-            )}
+                    <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Opening hour</p>
+                        <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.openingHour}</p>
+                    </div>
 
-            <div style={{ marginTop: 20 }}>
-                <Link to={`/reservations/new?restaurantId=${restaurant.id}`}>
-                    <button>Reserve Now</button>
-                </Link>
-            </div>
-        </main>
+                    <div className="rounded-xl bg-slate-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Closing hour</p>
+                        <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.closingHour}</p>
+                    </div>
+                </div>
+            </article>
+
+            <article className="app-card p-6">
+                <div className="flex items-center justify-between gap-4">
+                    <h2 className="text-2xl font-black text-brand-dark">Menu</h2>
+                    <span className="rounded-full bg-brand-yellow/30 px-3 py-1 text-xs font-semibold text-brand-dark">
+                        {menuItems.length} items
+                    </span>
+                </div>
+
+                {menuItems.length === 0 ? (
+                    <div className="mt-4 rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500">
+                        No menu items available yet.
+                    </div>
+                ) : (
+                    <ul className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {menuItems.map((item) => (
+                            <li key={item.id} className="rounded-xl border border-slate-200 bg-white p-4 transition hover:shadow-md">
+                                <div className="flex items-start justify-between gap-3">
+                                    <h3 className="text-base font-bold text-brand-dark">{item.name}</h3>
+                                    <span className="rounded-full bg-brand-red/10 px-3 py-1 text-sm font-semibold text-brand-red">
+                                        ${item.price.toFixed(2)}
+                                    </span>
+                                </div>
+
+                                <p className="mt-2 text-sm text-slate-600">
+                                    {item.description ?? 'Chef-crafted menu item made with quality ingredients.'}
+                                </p>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </article>
+        </section>
     );
 }

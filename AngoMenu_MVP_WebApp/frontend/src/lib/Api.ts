@@ -1,4 +1,4 @@
-import { getToken } from "./auth";
+import { getToken } from './auth';
 
 export type LoginPayload = {
     email: string;
@@ -34,23 +34,26 @@ export type PagedResult<T> = {
     pageSize: number;
 };
 
+export type MenuItem = {
+    id: number;
+    restaurantId: number;
+    name: string;
+    description?: string | null;
+    price: number;
+};
+
 async function parseResponse<T>(res: Response): Promise<T> {
-    const contentType = res.headers.get("content-type") ?? "";
+    const contentType = res.headers.get('content-type') ?? '';
     const raw = await res.text();
 
     let data: unknown = null;
-
     if (raw) {
-        if (contentType.includes("application/json")) {
-            data = JSON.parse(raw);
-        } else {
-            data = raw; // plain text response
-        }
+        data = contentType.includes('application/json') ? JSON.parse(raw) : raw;
     }
 
     if (!res.ok) {
         const message =
-            typeof data === "string"
+            typeof data === 'string'
                 ? data
                 : (data as { message?: string } | null)?.message ?? `Request failed (${res.status})`;
         throw new Error(message);
@@ -65,9 +68,9 @@ function authHeaders(): HeadersInit {
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
-    const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
     });
 
@@ -75,9 +78,9 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
 }
 
 export async function register(payload: RegisterPayload): Promise<string> {
-    const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
     });
 
@@ -90,12 +93,12 @@ export async function getRestaurants(params: {
     search?: string;
 }): Promise<PagedResult<Restaurant>> {
     const query = new URLSearchParams();
-    if (params.pageNumber) query.set("pageNumber", String(params.pageNumber));
-    if (params.pageSize) query.set("pageSize", String(params.pageSize));
-    if (params.search) query.set("search", params.search);
+    if (params.pageNumber) query.set('pageNumber', String(params.pageNumber));
+    if (params.pageSize) query.set('pageSize', String(params.pageSize));
+    if (params.search) query.set('search', params.search);
 
     const res = await fetch(`/api/restaurants?${query.toString()}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
             ...authHeaders(),
         },
@@ -104,17 +107,9 @@ export async function getRestaurants(params: {
     return parseResponse<PagedResult<Restaurant>>(res);
 }
 
-export type MenuItem = {
-    id: number;
-    restaurantId: number;
-    name: string;
-    price: number;
-    description: string;
-};
-
 export async function getRestaurantById(id: number): Promise<Restaurant> {
     const res = await fetch(`/api/restaurants/${id}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
             ...authHeaders(),
         },
@@ -125,10 +120,7 @@ export async function getRestaurantById(id: number): Promise<Restaurant> {
 
 export async function getMenuByRestaurant(restaurantId: number): Promise<MenuItem[]> {
     const res = await fetch(`/api/menu/restaurant/${restaurantId}`, {
-        method: "GET",
-        headers: {
-            ...authHeaders(),
-        },
+        method: 'GET',
     });
 
     return parseResponse<MenuItem[]>(res);
