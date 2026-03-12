@@ -84,6 +84,14 @@ export default function RestaurantDetailsPage() {
                     <p className="mt-2 max-w-3xl text-sm text-slate-200">
                         {restaurant.description ?? 'A premium destination for memorable meals and quality service.'}
                     </p>
+                    <div className="mt-4">
+                        <Link
+                            to={`/restaurants/${restaurant.id}/reserve`}
+                            className="btn-primary"
+                        >
+                            Reserve Table
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-4">

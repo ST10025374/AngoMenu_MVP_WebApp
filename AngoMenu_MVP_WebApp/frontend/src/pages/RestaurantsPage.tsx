@@ -54,6 +54,12 @@ export default function RestaurantsPage() {
                             className="input"
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                    event.preventDefault();
+                                    void loadRestaurants(1);
+                                }
+                            }}
                             placeholder="Search by name or location"
                             aria-label="Search restaurants"
                         />

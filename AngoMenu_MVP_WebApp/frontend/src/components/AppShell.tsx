@@ -9,6 +9,7 @@ type AppShellProps = {
 const navItems = [
     { to: '/', label: 'Home' },
     { to: '/restaurants', label: 'Restaurants' },
+    { to: "/reservations/my", label: "My Reservations" }
 ];
 
 export default function AppShell({ children }: AppShellProps) {

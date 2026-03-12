@@ -6,6 +6,8 @@ import RegisterPage from './pages/RegisterPage';
 import RestaurantDetailsPage from './pages/RestaurantDetailsPage';
 import RestaurantsPage from './pages/RestaurantsPage';
 import ProtectedRoute from './routes/ProtectedRoute';
+import CreateReservationPage from './pages/CreateReservationPage';
+import MyReservationsPage from './pages/MyReservationsPage';
 
 function HomePage() {
     const isLoggedIn = Boolean(getToken());
@@ -94,6 +96,8 @@ export default function App() {
                     <Route element={<ProtectedRoute />}>
                         <Route path="/restaurants" element={<RestaurantsPage />} />
                         <Route path="/restaurants/:id" element={<RestaurantDetailsPage />} />
+                        <Route path="/restaurants/:id/reserve" element={<CreateReservationPage />} />
+                        <Route path="/reservations/my" element={<MyReservationsPage />} />
                     </Route>
 
                     <Route path="*" element={<Navigate replace to="/" />} />

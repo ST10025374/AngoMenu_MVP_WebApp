@@ -34,12 +34,31 @@ export type PagedResult<T> = {
     pageSize: number;
 };
 
+export type Reservation = {
+    id?: number;
+    restaurantId: number;
+    date: string;
+    time: string;
+    numberOfPeople: number;
+    status?: string;
+};
+
 export type MenuItem = {
     id: number;
     restaurantId: number;
     name: string;
     description?: string | null;
     price: number;
+};
+
+export type UserReservation = {
+    id: number;
+    restaurantId: number;
+    restaurantName: string;
+    date: string;
+    time: string;
+    numberOfPeople: number;
+    status: string;
 };
 
 async function parseResponse<T>(res: Response): Promise<T> {
@@ -124,4 +143,43 @@ export async function getMenuByRestaurant(restaurantId: number): Promise<MenuIte
     });
 
     return parseResponse<MenuItem[]>(res);
+}
+
+export async function createReservation(payload: {
+    restaurantId: number;
+    date: string;
+    time: string;
+    numberOfPeople: number;
+}): Promise<string> {
+    const res = await fetch('/api/reservations', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+        },
+        body: JSON.stringify(payload),
+    });
+
+    return parseResponse<string>(res);
+}
+
+export async function getMyReservations(): Promise<UserReservation[]> {
+    const res = await fetch("/api/reservations/my", {
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<UserReservation[]>(res);
+}
+
+export async function cancelReservation(reservationId: number): Promise<string> {
+    const res = await fetch(`/api/reservations/${reservationId}/cancel`, {
+        method: "PUT",
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<string>(res);
 }
