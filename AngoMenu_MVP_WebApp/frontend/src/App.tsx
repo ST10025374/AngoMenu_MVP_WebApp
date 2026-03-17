@@ -8,6 +8,11 @@ import RestaurantsPage from './pages/RestaurantsPage';
 import ProtectedRoute from './routes/ProtectedRoute';
 import CreateReservationPage from './pages/CreateReservationPage';
 import MyReservationsPage from './pages/MyReservationsPage';
+import AdminReservationsPage from "./pages/admin/AdminReservationsPage";
+import AdminRestaurantsPage from "./pages/admin/AdminRestaurantsPage";
+import AdminMenuPage from "./pages/admin/AdminMenuPage";
+import RoleRoute from "./routes/RoleRoute";
+
 
 function HomePage() {
     const isLoggedIn = Boolean(getToken());
@@ -98,6 +103,12 @@ export default function App() {
                         <Route path="/restaurants/:id" element={<RestaurantDetailsPage />} />
                         <Route path="/restaurants/:id/reserve" element={<CreateReservationPage />} />
                         <Route path="/reservations/my" element={<MyReservationsPage />} />
+                    </Route>
+
+                    <Route element={<RoleRoute allowed={["Admin"]} />}>
+                        <Route path="/admin/reservations" element={<AdminReservationsPage />} />
+                        <Route path="/admin/restaurants" element={<AdminRestaurantsPage />} />
+                        <Route path="/admin/menu" element={<AdminMenuPage />} />
                     </Route>
 
                     <Route path="*" element={<Navigate replace to="/" />} />
