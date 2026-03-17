@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-    deleteReservationAdmin,
+    deleteReservation,
     deleteRestaurant,
-    getAllReservationsAdmin,
+    getAllReservations,
     getRestaurants,
     updateReservationStatus,
     type AdminReservation,
     type ReservationStatus,
     type Restaurant,
-} from "../../lib/api";
+} from '../../lib/api';
 
 export default function AdminDashboardPage() {
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -24,7 +24,7 @@ export default function AdminDashboardPage() {
         try {
             const [restaurantsResponse, reservationsResponse] = await Promise.all([
                 getRestaurants({ pageNumber: 1, pageSize: 50 }),
-                getAllReservationsAdmin(),
+                getAllReservations(),
             ]);
 
             setRestaurants(restaurantsResponse.items);
@@ -72,7 +72,7 @@ export default function AdminDashboardPage() {
         setError('');
         setSuccess('');
         try {
-            const message = await deleteReservationAdmin(id);
+            const message = await deleteReservation(id);
             setSuccess(message || 'Reservation deleted.');
             setReservations((prev) => prev.filter((item) => item.id !== id));
         } catch (err) {
@@ -88,7 +88,9 @@ export default function AdminDashboardPage() {
     return (
         <section className="space-y-6">
             <header className="app-card p-5 sm:p-6">
-                <h1 className="text-2xl font-black text-brand-dark sm:text-3xl">Admin Control Center</h1>
+                <h1 className="text-2xl font-black text-brand-dark sm:text-3xl">
+                    Admin Control Center
+                </h1>
                 <p className="mt-1 text-sm text-slate-600">
                     Manage restaurants and reservations from one place.
                 </p>
@@ -115,7 +117,12 @@ export default function AdminDashboardPage() {
                 </div>
             )}
 
-            {error && <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+            {error && (
+                <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                    {error}
+                </p>
+            )}
+
             {success && (
                 <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
                     {success}
@@ -150,7 +157,9 @@ export default function AdminDashboardPage() {
 
                 <article className="app-card p-5 sm:p-6">
                     <h2 className="text-lg font-bold text-brand-dark">Reservations</h2>
-                    <p className="mt-1 text-sm text-slate-500">Confirm, cancel, or remove reservations.</p>
+                    <p className="mt-1 text-sm text-slate-500">
+                        Confirm, cancel, or remove reservations.
+                    </p>
 
                     <ul className="mt-4 space-y-3">
                         {reservations.map((reservation) => (
@@ -161,7 +170,8 @@ export default function AdminDashboardPage() {
                                             {reservation.restaurant} · {reservation.userEmail}
                                         </p>
                                         <p className="text-sm text-slate-500">
-                                            {reservation.date} at {reservation.time} · {reservation.numberOfPeople} people
+                                            {reservation.date} at {reservation.time} ·{' '}
+                                            {reservation.numberOfPeople} people
                                         </p>
                                         <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
                                             Status: {reservation.status}
@@ -171,13 +181,23 @@ export default function AdminDashboardPage() {
                                     <div className="flex flex-wrap gap-2">
                                         <button
                                             className="btn-secondary"
-                                            onClick={() => void onUpdateReservationStatus(reservation.id, 'Confirmed')}
+                                            onClick={() =>
+                                                void onUpdateReservationStatus(
+                                                    reservation.id,
+                                                    'Confirmed',
+                                                )
+                                            }
                                         >
                                             Confirm
                                         </button>
                                         <button
                                             className="btn-secondary"
-                                            onClick={() => void onUpdateReservationStatus(reservation.id, 'Cancelled')}
+                                            onClick={() =>
+                                                void onUpdateReservationStatus(
+                                                    reservation.id,
+                                                    'Cancelled',
+                                                )
+                                            }
                                         >
                                             Cancel
                                         </button>

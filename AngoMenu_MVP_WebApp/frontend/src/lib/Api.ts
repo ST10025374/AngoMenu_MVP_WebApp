@@ -34,13 +34,15 @@ export type PagedResult<T> = {
     pageSize: number;
 };
 
+export type ReservationStatus = 'Pending' | 'Confirmed' | 'Cancelled';
+
 export type Reservation = {
     id?: number;
     restaurantId: number;
     date: string;
     time: string;
     numberOfPeople: number;
-    status?: string;
+    status?: ReservationStatus;
 };
 
 export type MenuItem = {
@@ -58,7 +60,7 @@ export type UserReservation = {
     date: string;
     time: string;
     numberOfPeople: number;
-    status: string;
+    status: ReservationStatus;
 };
 
 async function parseResponse<T>(res: Response): Promise<T> {
@@ -164,7 +166,7 @@ export async function createReservation(payload: {
 }
 
 export async function getMyReservations(): Promise<UserReservation[]> {
-    const res = await fetch("/api/reservations/my", {
+    const res = await fetch('/api/reservations/my', {
         headers: {
             ...authHeaders(),
         },
@@ -175,7 +177,7 @@ export async function getMyReservations(): Promise<UserReservation[]> {
 
 export async function cancelReservation(reservationId: number): Promise<string> {
     const res = await fetch(`/api/reservations/${reservationId}/cancel`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
             ...authHeaders(),
         },
@@ -191,11 +193,11 @@ export type AdminReservation = {
     date: string;
     time: string;
     numberOfPeople: number;
-    status: string;
+    status: ReservationStatus;
 };
 
 export async function getAllReservations(): Promise<AdminReservation[]> {
-    const res = await fetch("/api/reservations", {
+    const res = await fetch('/api/reservations', {
         headers: {
             ...authHeaders(),
         },
@@ -206,10 +208,10 @@ export async function getAllReservations(): Promise<AdminReservation[]> {
 
 export async function updateReservationStatus(
     id: number,
-    status: string
+    status: ReservationStatus
 ): Promise<string> {
     const res = await fetch(`/api/reservations/${id}/status?status=${status}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
             ...authHeaders(),
         },
@@ -220,7 +222,7 @@ export async function updateReservationStatus(
 
 export async function deleteReservation(id: number): Promise<string> {
     const res = await fetch(`/api/reservations/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
             ...authHeaders(),
         },
@@ -240,7 +242,7 @@ export type AdminRestaurant = {
 };
 
 export async function getAllRestaurantsAdmin(): Promise<AdminRestaurant[]> {
-    const res = await fetch("/api/restaurants", {
+    const res = await fetch('/api/restaurants', {
         headers: {
             ...authHeaders(),
         },
@@ -249,11 +251,11 @@ export async function getAllRestaurantsAdmin(): Promise<AdminRestaurant[]> {
     return parseResponse<AdminRestaurant[]>(res);
 }
 
-export async function createRestaurant(payload: Omit<AdminRestaurant, "id">): Promise<string> {
-    const res = await fetch("/api/restaurants", {
-        method: "POST",
+export async function createRestaurant(payload: Omit<AdminRestaurant, 'id'>): Promise<string> {
+    const res = await fetch('/api/restaurants', {
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             ...authHeaders(),
         },
         body: JSON.stringify(payload),
@@ -262,11 +264,11 @@ export async function createRestaurant(payload: Omit<AdminRestaurant, "id">): Pr
     return parseResponse<string>(res);
 }
 
-export async function updateRestaurant(id: number, payload: Omit<AdminRestaurant, "id">): Promise<string> {
+export async function updateRestaurant(id: number, payload: Omit<AdminRestaurant, 'id'>): Promise<string> {
     const res = await fetch(`/api/restaurants/${id}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             ...authHeaders(),
         },
         body: JSON.stringify(payload),
@@ -277,7 +279,7 @@ export async function updateRestaurant(id: number, payload: Omit<AdminRestaurant
 
 export async function deleteRestaurant(id: number): Promise<string> {
     const res = await fetch(`/api/restaurants/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
             ...authHeaders(),
         },
@@ -304,11 +306,11 @@ export async function getMenuByRestaurantAdmin(restaurantId: number): Promise<Ad
     return parseResponse<AdminMenuItem[]>(res);
 }
 
-export async function createMenuItem(payload: Omit<AdminMenuItem, "id">): Promise<string> {
-    const res = await fetch(`/api/menu`, {
-        method: "POST",
+export async function createMenuItem(payload: Omit<AdminMenuItem, 'id'>): Promise<string> {
+    const res = await fetch('/api/menu', {
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             ...authHeaders(),
         },
         body: JSON.stringify(payload),
@@ -317,11 +319,11 @@ export async function createMenuItem(payload: Omit<AdminMenuItem, "id">): Promis
     return parseResponse<string>(res);
 }
 
-export async function updateMenuItem(id: number, payload: Omit<AdminMenuItem, "id">): Promise<string> {
+export async function updateMenuItem(id: number, payload: Omit<AdminMenuItem, 'id'>): Promise<string> {
     const res = await fetch(`/api/menu/${id}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             ...authHeaders(),
         },
         body: JSON.stringify(payload),
@@ -332,7 +334,7 @@ export async function updateMenuItem(id: number, payload: Omit<AdminMenuItem, "i
 
 export async function deleteMenuItem(id: number): Promise<string> {
     const res = await fetch(`/api/menu/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
             ...authHeaders(),
         },
