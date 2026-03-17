@@ -9,8 +9,6 @@ import {
 
 import { isAdmin } from "../../lib/auth";
 
-
-
 export default function AdminRestaurantsPage() {
     const [restaurants, setRestaurants] = useState<AdminRestaurant[]>([]);
     const [loading, setLoading] = useState(true);
