@@ -1,4 +1,4 @@
-import { getToken } from './auth';
+import { clearToken, getToken } from './auth';
 
 export type LoginPayload = {
     email: string;
@@ -73,6 +73,10 @@ async function parseResponse<T>(res: Response): Promise<T> {
     }
 
     if (!res.ok) {
+        if (res.status === 401) {
+            clearToken();
+        }
+
         const message =
             typeof data === 'string'
                 ? data
@@ -210,11 +214,13 @@ export async function updateReservationStatus(
     id: number,
     status: ReservationStatus
 ): Promise<string> {
-    const res = await fetch(`/api/reservations/${id}/status?status=${status}`, {
+    const res = await fetch(`/api/reservations/${id}/status`, {
         method: 'PUT',
         headers: {
+            'Content-Type': 'application/json',
             ...authHeaders(),
         },
+        body: JSON.stringify({ status }),
     });
 
     return parseResponse<string>(res);
@@ -248,7 +254,8 @@ export async function getAllRestaurantsAdmin(): Promise<AdminRestaurant[]> {
         },
     });
 
-    return parseResponse<AdminRestaurant[]>(res);
+    const paged = await parseResponse<PagedResult<AdminRestaurant>>(res);
+    return paged.items;
 }
 
 export async function createRestaurant(payload: Omit<AdminRestaurant, 'id'>): Promise<string> {

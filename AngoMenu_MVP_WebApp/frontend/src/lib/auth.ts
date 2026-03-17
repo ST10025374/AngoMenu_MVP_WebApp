@@ -1,6 +1,7 @@
 const TOKEN_KEY = 'auth_token';
+const AUTH_CHANGED_EVENT = 'auth:changed';
 
-export type UserRole = 'Admin' | 'Client' | null;
+export type UserRole = 'Admin' | 'Client' | 'User' | null;
 
 type JwtPayload = {
     role?: string;
@@ -15,10 +16,12 @@ export function getToken(): string | null {
 
 export function setToken(token: string): void {
     localStorage.setItem(TOKEN_KEY, token);
+    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 }
 
 export function clearToken(): void {
     localStorage.removeItem(TOKEN_KEY);
+    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 }
 
 // JWT DECODE
@@ -54,7 +57,7 @@ export function getUserRole(): UserRole {
 
     console.log("ROLE DETECTED:", role); // debug
 
-    return role === 'Admin' || role === 'Client' ? role : null;
+    return role === 'Admin' || role === 'Client' || role === 'User' ? role : null;
 }
 
 // EXPIRATION
@@ -83,4 +86,14 @@ export function isAdmin(): boolean {
 // LOGOUT
 export function logout() {
     clearToken();
+}
+
+export function subscribeAuthChanges(handler: () => void): () => void {
+    window.addEventListener(AUTH_CHANGED_EVENT, handler);
+    window.addEventListener('storage', handler);
+
+    return () => {
+        window.removeEventListener(AUTH_CHANGED_EVENT, handler);
+        window.removeEventListener('storage', handler);
+    };
 }

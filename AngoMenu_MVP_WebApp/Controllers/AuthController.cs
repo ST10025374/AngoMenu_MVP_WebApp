@@ -3,6 +3,7 @@ using AngoMenu_MVP_WebApp.DTOs;
 using AngoMenu_MVP_WebApp.Models;
 using AngoMenu_MVP_WebApp.Models.Enums;
 using AngoMenu_MVP_WebApp.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ using System.Text;
 namespace AngoMenu_MVP_WebApp.Controllers
 {
     [ApiController]
+    [AllowAnonymous]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {

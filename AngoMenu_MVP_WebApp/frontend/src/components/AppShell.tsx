@@ -1,10 +1,19 @@
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getUserRole, logout, isAuthenticated } from "../lib/auth";
+import { getUserRole, logout, isAuthenticated, subscribeAuthChanges } from "../lib/auth";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
+    const [, setAuthVersion] = useState(0);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        return subscribeAuthChanges(() => {
+            setAuthVersion((value) => value + 1);
+        });
+    }, []);
+
     const isLoggedIn = isAuthenticated();
     const role = getUserRole();
-    const navigate = useNavigate();
 
     function handleLogout() {
         logout();
