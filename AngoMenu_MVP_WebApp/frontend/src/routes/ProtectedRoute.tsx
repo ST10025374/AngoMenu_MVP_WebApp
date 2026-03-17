@@ -1,13 +1,10 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { getToken, clearToken } from '../lib/auth';
-import { isTokenExpired } from '../lib/jwt';
+import { isAuthenticated } from '../lib/auth';
 
 export default function ProtectedRoute() {
     const location = useLocation();
-    const token = getToken();
 
-    if (!token || isTokenExpired(token)) {
-        clearToken(); // optional but recommended
+    if (!isAuthenticated()) {
         return <Navigate to="/login" replace state={{ from: location.pathname }} />;
     }
 

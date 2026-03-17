@@ -1,22 +1,20 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { clearToken, getToken } from '../lib/auth';
-import { getUserRole } from '../lib/jwt';
+import { clearToken, getToken, getUserRole } from '../lib/auth';
 
 type AppShellProps = {
     children: ReactNode;
 };
 
-const navItems = [
-    { to: '/', label: 'Home' },
-    { to: '/restaurants', label: 'Restaurants' },
-    { to: "/reservations/my", label: "My Reservations" }
-];
-
 export default function AppShell({ children }: AppShellProps) {
     const isLoggedIn = Boolean(getToken());
-    const token = getToken();
-    const role = token ? getUserRole(token) : null;
+    const role = getUserRole();
+
+    const navItems = [
+        { to: '/', label: 'Home' },
+        { to: '/restaurants', label: 'Restaurants' },
+        ...(role === 'Admin' ? [{ to: '/admin', label: 'Admin' }] : []),
+    ];
 
     return (
         <div className="min-h-screen">
@@ -51,46 +49,6 @@ export default function AppShell({ children }: AppShellProps) {
                             </NavLink>
                         ))}
 
-                        {role === "Admin" && (
-                            <>
-                                <NavLink
-                                    to="/admin/reservations"
-                                    className={({ isActive }) =>
-                                        `rounded-lg px-3 py-2 text-sm font-medium transition ${isActive
-                                            ? 'bg-brand-red text-white'
-                                            : 'text-brand-red hover:bg-red-50'
-                                        }`
-                                    }
-                                >
-                                    Admin Reservations
-                                </NavLink>
-
-                                <NavLink
-                                    to="/admin/restaurants"
-                                    className={({ isActive }) =>
-                                        `rounded-lg px-3 py-2 text-sm font-medium transition ${isActive
-                                            ? 'bg-brand-dark text-white'
-                                            : 'text-brand-dark hover:bg-slate-100'
-                                        }`
-                                    }
-                                >
-                                    Admin Restaurants
-                                </NavLink>
-
-                                <NavLink
-                                    to="/admin/menu"
-                                    className={({ isActive }) =>
-                                        `rounded-lg px-3 py-2 text-sm font-medium transition ${isActive
-                                            ? 'bg-brand-yellow text-brand-dark'
-                                            : 'text-brand-dark hover:bg-yellow-100'
-                                        }`
-                                    }
-                                >
-                                    Admin Menu
-                                </NavLink>
-                            </>
-                        )}
-
                         {!isLoggedIn ? (
                             <>
                                 <Link to="/login" className="btn-secondary">
@@ -112,8 +70,6 @@ export default function AppShell({ children }: AppShellProps) {
                                 Logout
                             </button>
                         )}
-
-
                     </nav>
                 </div>
             </header>

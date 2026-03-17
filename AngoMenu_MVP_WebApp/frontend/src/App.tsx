@@ -1,21 +1,17 @@
 import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
 import AppShell from './components/AppShell';
-import { getToken } from './lib/auth';
+import { getToken, getUserRole } from './lib/auth';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import RestaurantDetailsPage from './pages/RestaurantDetailsPage';
 import RestaurantsPage from './pages/RestaurantsPage';
 import ProtectedRoute from './routes/ProtectedRoute';
-import CreateReservationPage from './pages/CreateReservationPage';
-import MyReservationsPage from './pages/MyReservationsPage';
-import AdminReservationsPage from "./pages/admin/AdminReservationsPage";
-import AdminRestaurantsPage from "./pages/admin/AdminRestaurantsPage";
-import AdminMenuPage from "./pages/admin/AdminMenuPage";
-import RoleRoute from "./routes/RoleRoute";
-
+import RoleRoute from './routes/RoleRoute';
 
 function HomePage() {
     const isLoggedIn = Boolean(getToken());
+    const role = getUserRole();
 
     return (
         <section className="space-y-8">
@@ -36,8 +32,13 @@ function HomePage() {
                     </p>
 
                     <div className="mt-7 flex flex-wrap gap-3">
-                        <Link to={isLoggedIn ? '/restaurants' : '/login'} className="btn-primary">
-                            {isLoggedIn ? 'Explore restaurants' : 'Start booking'}
+                        <Link
+                            to={
+                                !isLoggedIn ? '/login' : role === 'Admin' ? '/admin' : '/restaurants'
+                            }
+                            className="btn-primary"
+                        >
+                            {!isLoggedIn ? 'Start booking' : role === 'Admin' ? 'Open admin center' : 'Explore restaurants'}
                         </Link>
                         {!isLoggedIn && (
                             <Link to="/register" className="btn-secondary">
@@ -60,7 +61,7 @@ function HomePage() {
                         </li>
                         <li className="flex items-start gap-2">
                             <span className="mt-1 h-2 w-2 rounded-full bg-brand-dark" />
-                            Open details pages and inspect menu items.
+                            Admins can manage reservations and restaurants.
                         </li>
                     </ul>
                 </div>
@@ -101,14 +102,10 @@ export default function App() {
                     <Route element={<ProtectedRoute />}>
                         <Route path="/restaurants" element={<RestaurantsPage />} />
                         <Route path="/restaurants/:id" element={<RestaurantDetailsPage />} />
-                        <Route path="/restaurants/:id/reserve" element={<CreateReservationPage />} />
-                        <Route path="/reservations/my" element={<MyReservationsPage />} />
                     </Route>
 
-                    <Route element={<RoleRoute allowed={["Admin"]} />}>
-                        <Route path="/admin/reservations" element={<AdminReservationsPage />} />
-                        <Route path="/admin/restaurants" element={<AdminRestaurantsPage />} />
-                        <Route path="/admin/menu" element={<AdminMenuPage />} />
+                    <Route element={<RoleRoute allowedRoles={['Admin']} />}>
+                        <Route path="/admin" element={<AdminDashboardPage />} />
                     </Route>
 
                     <Route path="*" element={<Navigate replace to="/" />} />

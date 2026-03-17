@@ -1,20 +1,17 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { getToken } from "../lib/auth";
-import { getUserRole, type AppRole, isTokenExpired } from "../lib/jwt";
+import { Navigate, Outlet } from 'react-router-dom';
+import { getUserRole, isAuthenticated, type UserRole } from '../lib/auth';
 
 type RoleRouteProps = {
-    allowed: AppRole[];
+    allowedRoles: Exclude<UserRole, null>[];
 };
 
-export default function RoleRoute({ allowed }: RoleRouteProps) {
-    const token = getToken();
-
-    if (!token || isTokenExpired(token)) {
+export default function RoleRoute({ allowedRoles }: RoleRouteProps) {
+    if (!isAuthenticated()) {
         return <Navigate to="/login" replace />;
     }
 
-    const role = getUserRole(token);
-    if (!role || !allowed.includes(role)) {
+    const role = getUserRole();
+    if (!role || !allowedRoles.includes(role)) {
         return <Navigate to="/" replace />;
     }
 

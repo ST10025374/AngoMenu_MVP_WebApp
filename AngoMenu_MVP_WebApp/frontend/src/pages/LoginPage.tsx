@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../lib/api';
-import { setToken } from '../lib/auth';
+import { getUserRole, setToken } from '../lib/auth';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -19,7 +19,13 @@ export default function LoginPage() {
         try {
             const result = await login({ email, password });
             setToken(result.token);
-            navigate('/restaurants');
+
+            const role = getUserRole();
+            if (role === 'Admin') {
+                navigate('/admin');
+            } else {
+                navigate('/restaurants');
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Login failed');
         } finally {
