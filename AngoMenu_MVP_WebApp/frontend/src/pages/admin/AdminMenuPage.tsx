@@ -8,6 +8,7 @@ import {
     type AdminMenuItem,
     type AdminRestaurant
 } from "../../lib/api";
+import { isAdmin } from "../../lib/auth";
 
 export default function AdminMenuPage() {
     const [restaurants, setRestaurants] = useState<AdminRestaurant[]>([]);
@@ -15,6 +16,7 @@ export default function AdminMenuPage() {
 
     const [menuItems, setMenuItems] = useState<AdminMenuItem[]>([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const [form, setForm] = useState<Omit<AdminMenuItem, "id">>({
         restaurantId: 0,
@@ -25,35 +27,64 @@ export default function AdminMenuPage() {
 
     const [editingId, setEditingId] = useState<number | null>(null);
 
+    // ?? Extra safety
+    if (!isAdmin()) {
+        return <p>Unauthorized</p>;
+    }
+
     // Load restaurants
     useEffect(() => {
         async function loadRestaurants() {
-            const data = await getAllRestaurantsAdmin();
-            setRestaurants(data);
+            try {
+                const data = await getAllRestaurantsAdmin();
+                setRestaurants(data);
+            } catch {
+                setError("Failed to load restaurants");
+            }
         }
         loadRestaurants();
     }, []);
 
-    // Load menu items
+    // Load menu
     async function loadMenu(restaurantId: number) {
-        setLoading(true);
-        const data = await getMenuByRestaurantAdmin(restaurantId);
-        setMenuItems(data);
-        setLoading(false);
+        try {
+            setLoading(true);
+            const data = await getMenuByRestaurantAdmin(restaurantId);
+            setMenuItems(data);
+        } catch {
+            setError("Failed to load menu");
+        } finally {
+            setLoading(false);
+        }
     }
 
     function handleSelectRestaurant(id: number) {
         setSelectedRestaurant(id);
-        setForm({ ...form, restaurantId: id });
+
+        setForm({
+            restaurantId: id,
+            name: "",
+            description: "",
+            price: 0
+        });
+
+        setEditingId(null);
         loadMenu(id);
     }
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+
+        setForm(prev => ({
+            ...prev,
+            [name]: name === "price" ? Number(value) : value
+        }));
     }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+        if (!selectedRestaurant) return;
 
         try {
             if (editingId) {
@@ -62,30 +93,43 @@ export default function AdminMenuPage() {
                 await createMenuItem(form);
             }
 
+            // reset form
             setForm({
-                restaurantId: selectedRestaurant!,
+                restaurantId: selectedRestaurant,
                 name: "",
                 description: "",
                 price: 0
             });
 
             setEditingId(null);
-            loadMenu(selectedRestaurant!);
+            loadMenu(selectedRestaurant);
+
         } catch {
             alert("Error saving menu item");
         }
     }
 
     function handleEdit(item: AdminMenuItem) {
-        setForm(item);
+        setForm({
+            restaurantId: item.restaurantId,
+            name: item.name,
+            description: item.description,
+            price: item.price
+        });
+
         setEditingId(item.id);
     }
 
     async function handleDelete(id: number) {
+        if (!selectedRestaurant) return;
         if (!confirm("Delete this item?")) return;
 
-        await deleteMenuItem(id);
-        loadMenu(selectedRestaurant!);
+        try {
+            await deleteMenuItem(id);
+            loadMenu(selectedRestaurant);
+        } catch {
+            alert("Error deleting item");
+        }
     }
 
     return (
@@ -94,11 +138,16 @@ export default function AdminMenuPage() {
                 Admin - Menu Management
             </h1>
 
+            {error && (
+                <div className="text-red-600">{error}</div>
+            )}
+
             {/* Restaurant Selector */}
             <div className="app-card p-4">
                 <label className="label">Select Restaurant</label>
                 <select
                     className="input"
+                    value={selectedRestaurant ?? ""}
                     onChange={(e) => handleSelectRestaurant(Number(e.target.value))}
                 >
                     <option value="">Select...</option>
@@ -113,10 +162,32 @@ export default function AdminMenuPage() {
             {/* Form */}
             {selectedRestaurant && (
                 <form onSubmit={handleSubmit} className="app-card p-6 grid gap-4 md:grid-cols-2">
-                    <input name="name" placeholder="Name" value={form.name} onChange={handleChange} className="input" required />
-                    <input name="price" type="number" placeholder="Price" value={form.price} onChange={handleChange} className="input" required />
+                    <input
+                        name="name"
+                        placeholder="Name"
+                        value={form.name}
+                        onChange={handleChange}
+                        className="input"
+                        required
+                    />
 
-                    <input name="description" placeholder="Description" value={form.description} onChange={handleChange} className="input md:col-span-2" />
+                    <input
+                        name="price"
+                        type="number"
+                        placeholder="Price"
+                        value={form.price}
+                        onChange={handleChange}
+                        className="input"
+                        required
+                    />
+
+                    <input
+                        name="description"
+                        placeholder="Description"
+                        value={form.description}
+                        onChange={handleChange}
+                        className="input md:col-span-2"
+                    />
 
                     <button className="btn-primary md:col-span-2">
                         {editingId ? "Update Item" : "Add Item"}

@@ -3,13 +3,22 @@ import {
     getAllReservations,
     updateReservationStatus,
     deleteReservation,
-    type AdminReservation
+    type AdminReservation,
+    type ReservationStatus
 } from "../../lib/api";
+
+import { isAdmin } from "../../lib/auth";
+
+
 
 export default function AdminReservationsPage() {
     const [reservations, setReservations] = useState<AdminReservation[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    if (!isAdmin()) {
+        return <p>Unauthorized</p>;
+    }
 
     async function load() {
         setLoading(true);
@@ -29,7 +38,7 @@ export default function AdminReservationsPage() {
         load();
     }, []);
 
-    async function handleStatusChange(id: number, status: string) {
+    async function handleStatusChange(id: number, status: ReservationStatus) {
         try {
             await updateReservationStatus(id, status);
 
@@ -107,13 +116,12 @@ export default function AdminReservationsPage() {
                                         <select
                                             value={r.status}
                                             onChange={(e) =>
-                                                handleStatusChange(r.id, e.target.value)
+                                                handleStatusChange(r.id, e.target.value as ReservationStatus)
                                             }
                                             className="input"
                                         >
                                             <option value="Pending">Pending</option>
                                             <option value="Confirmed">Confirmed</option>
-                                            <option value="Completed">Completed</option>
                                             <option value="Cancelled">Cancelled</option>
                                         </select>
                                     </td>

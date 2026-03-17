@@ -8,6 +8,7 @@ type JwtPayload = {
     exp?: number;
 };
 
+// TOKEN HANDLING
 export function getToken(): string | null {
     return localStorage.getItem(TOKEN_KEY);
 }
@@ -20,6 +21,7 @@ export function clearToken(): void {
     localStorage.removeItem(TOKEN_KEY);
 }
 
+// JWT DECODE
 function decodeToken(token: string): JwtPayload | null {
     try {
         const parts = token.split('.');
@@ -27,14 +29,14 @@ function decodeToken(token: string): JwtPayload | null {
 
         const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
         const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
-        const payload = JSON.parse(atob(padded)) as JwtPayload;
 
-        return payload;
+        return JSON.parse(atob(padded)) as JwtPayload;
     } catch {
         return null;
     }
 }
 
+// ROLE
 export function getUserRole(): UserRole {
     const token = getToken();
     if (!token) return null;
@@ -42,14 +44,20 @@ export function getUserRole(): UserRole {
     const payload = decodeToken(token);
     if (!payload) return null;
 
-    const rawRole = payload.role ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-    if (rawRole === 'Admin' || rawRole === 'Client') {
-        return rawRole;
-    }
+    // ?? Handle ALL possible formats
+    const role =
+        payload.role ??
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ??
+        (payload as any).Role ??
+        (payload as any).roles?.[0] ??
+        (payload as any)['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'];
 
-    return null;
+    console.log("ROLE DETECTED:", role); // debug
+
+    return role === 'Admin' || role === 'Client' ? role : null;
 }
 
+// EXPIRATION
 export function isTokenExpired(): boolean {
     const token = getToken();
     if (!token) return true;
@@ -57,15 +65,22 @@ export function isTokenExpired(): boolean {
     const payload = decodeToken(token);
     if (!payload?.exp) return true;
 
-    const nowInSeconds = Math.floor(Date.now() / 1000);
-    return payload.exp <= nowInSeconds;
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp <= now;
 }
 
+// AUTH CHECK
 export function isAuthenticated(): boolean {
     const token = getToken();
     return Boolean(token) && !isTokenExpired();
 }
 
+// ADMIN CHECK
 export function isAdmin(): boolean {
     return getUserRole() === 'Admin';
+}
+
+// LOGOUT
+export function logout() {
+    clearToken();
 }

@@ -7,6 +7,10 @@ import {
     type AdminRestaurant
 } from "../../lib/api";
 
+import { isAdmin } from "../../lib/auth";
+
+
+
 export default function AdminRestaurantsPage() {
     const [restaurants, setRestaurants] = useState<AdminRestaurant[]>([]);
     const [loading, setLoading] = useState(true);
@@ -21,6 +25,10 @@ export default function AdminRestaurantsPage() {
     });
 
     const [editingId, setEditingId] = useState<number | null>(null);
+
+    if (!isAdmin()) {
+        return <p>Unauthorized</p>;
+    }
 
     async function load() {
         const data = await getAllRestaurantsAdmin();
