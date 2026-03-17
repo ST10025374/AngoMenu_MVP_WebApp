@@ -1,7 +1,7 @@
 import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
 import AppShell from './components/AppShell';
 import { getToken, getUserRole } from './lib/auth';
-import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import RestaurantDetailsPage from './pages/RestaurantDetailsPage';
@@ -33,9 +33,7 @@ function HomePage() {
 
                     <div className="mt-7 flex flex-wrap gap-3">
                         <Link
-                            to={
-                                !isLoggedIn ? '/login' : role === 'Admin' ? '/admin' : '/restaurants'
-                            }
+                            to={!isLoggedIn ? '/login' : role === 'Admin' ? '/admin' : '/restaurants'}
                             className="btn-primary"
                         >
                             {!isLoggedIn ? 'Start booking' : role === 'Admin' ? 'Open admin center' : 'Explore restaurants'}

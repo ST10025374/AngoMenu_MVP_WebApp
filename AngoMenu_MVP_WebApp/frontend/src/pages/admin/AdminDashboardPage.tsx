@@ -8,7 +8,7 @@ import {
     type AdminReservation,
     type ReservationStatus,
     type Restaurant,
-} from '../lib/api';
+} from "../lib/api";
 
 export default function AdminDashboardPage() {
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
