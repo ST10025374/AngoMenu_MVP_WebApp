@@ -4,18 +4,21 @@ import {
     updateReservationStatus,
     deleteReservation,
     type AdminReservation,
-    type ReservationStatus
+    type ReservationStatus,
 } from "../../lib/api";
 
 import { isAdmin } from "../../lib/auth";
+
+const statuses: ReservationStatus[] = ["Pending", "Confirmed", "Cancelled"];
 
 export default function AdminReservationsPage() {
     const [reservations, setReservations] = useState<AdminReservation[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     if (!isAdmin()) {
-        return <p>Unauthorized</p>;
+        return <p className="text-sm text-red-600">Unauthorized</p>;
     }
 
     async function load() {
@@ -37,43 +40,50 @@ export default function AdminReservationsPage() {
     }, []);
 
     async function handleStatusChange(id: number, status: ReservationStatus) {
+        setError("");
+        setSuccess("");
+
         try {
             await updateReservationStatus(id, status);
-
-            setReservations(prev =>
-                prev.map(r => (r.id === id ? { ...r, status } : r))
-            );
+            setReservations((prev) => prev.map((item) => (item.id === id ? { ...item, status } : item)));
+            setSuccess(`Reservation #${id} updated to ${status}.`);
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to update status");
+            setError(err instanceof Error ? err.message : "Failed to update status");
         }
     }
 
     async function handleDelete(id: number) {
         if (!confirm("Delete this reservation?")) return;
 
+        setError("");
+        setSuccess("");
+
         try {
             await deleteReservation(id);
-            setReservations(prev => prev.filter(r => r.id !== id));
+            setReservations((prev) => prev.filter((item) => item.id !== id));
+            setSuccess(`Reservation #${id} deleted.`);
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to delete reservation");
+            setError(err instanceof Error ? err.message : "Failed to delete reservation");
         }
     }
 
     return (
         <section className="space-y-6">
-            <h1 className="text-3xl font-black text-brand-dark">
-                Admin - Reservations
-            </h1>
+            <h1 className="text-3xl font-black text-brand-dark">Manage Reservations</h1>
 
-            {loading && (
-                <div className="app-card p-6">
-                    <p className="text-sm text-slate-500">Loading reservations...</p>
+            {success && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                    {success}
                 </div>
             )}
 
             {error && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {error}
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+            )}
+
+            {loading && (
+                <div className="app-card p-6">
+                    <p className="text-sm text-slate-500">Loading reservations...</p>
                 </div>
             )}
 
@@ -91,7 +101,6 @@ export default function AdminReservationsPage() {
                                 <th className="p-3 text-left">User</th>
                                 <th className="p-3 text-left">Restaurant</th>
                                 <th className="p-3 text-left">Date</th>
-                                <th className="p-3 text-left">Time</th>
                                 <th className="p-3 text-left">Guests</th>
                                 <th className="p-3 text-left">Status</th>
                                 <th className="p-3 text-right">Actions</th>
@@ -99,35 +108,34 @@ export default function AdminReservationsPage() {
                         </thead>
 
                         <tbody>
-                            {reservations.map(r => (
-                                <tr key={r.id} className="border-t">
-                                    <td className="p-3 font-semibold text-brand-dark">
-                                        {r.userEmail}
-                                    </td>
-
-                                    <td className="p-3">{r.restaurant}</td>
-                                    <td className="p-3">{r.date}</td>
-                                    <td className="p-3">{r.time}</td>
-                                    <td className="p-3">{r.numberOfPeople}</td>
+                            {reservations.map((reservation) => (
+                                <tr key={reservation.id} className="border-t">
+                                    <td className="p-3 font-semibold text-brand-dark">{reservation.userEmail}</td>
+                                    <td className="p-3">{reservation.restaurant}</td>
+                                    <td className="p-3">{reservation.date}</td>
+                                    <td className="p-3">{reservation.numberOfPeople}</td>
 
                                     <td className="p-3">
                                         <select
-                                            value={r.status}
-                                            onChange={(e) =>
-                                                handleStatusChange(r.id, e.target.value as ReservationStatus)
+                                            value={reservation.status}
+                                            onChange={(event) =>
+                                                handleStatusChange(reservation.id, event.target.value as ReservationStatus)
                                             }
                                             className="input"
                                         >
-                                            <option value="Pending">Pending</option>
-                                            <option value="Confirmed">Confirmed</option>
-                                            <option value="Cancelled">Cancelled</option>
+                                            {statuses.map((status) => (
+                                                <option key={status} value={status}>
+                                                    {status}
+                                                </option>
+                                            ))}
                                         </select>
                                     </td>
 
                                     <td className="p-3 text-right">
                                         <button
-                                            onClick={() => handleDelete(r.id)}
-                                            className="text-red-600 hover:underline"
+                                            type="button"
+                                            onClick={() => handleDelete(reservation.id)}
+                                            className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-50"
                                         >
                                             Delete
                                         </button>

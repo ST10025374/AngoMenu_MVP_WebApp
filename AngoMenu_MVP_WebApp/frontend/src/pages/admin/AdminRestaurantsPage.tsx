@@ -1,150 +1,182 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-    getAllRestaurantsAdmin,
     createRestaurant,
-    updateRestaurant,
     deleteRestaurant,
-    type AdminRestaurant
+    getAllRestaurantsAdmin,
+    updateRestaurant,
+    type AdminRestaurant,
 } from "../../lib/api";
 
 import { isAdmin } from "../../lib/auth";
+import RestaurantForm, { type RestaurantFormValues } from "../../components/admin/RestaurantForm";
+import RestaurantModal from "../../components/admin/RestaurantModal";
+import RestaurantTable from "../../components/admin/RestaurantTable";
+
+const defaultRestaurantForm: RestaurantFormValues = {
+    name: "",
+    description: "",
+    location: "",
+    phone: "",
+    openingHour: "08:00",
+    closingHour: "22:00",
+};
+
 
 export default function AdminRestaurantsPage() {
     const [restaurants, setRestaurants] = useState<AdminRestaurant[]>([]);
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
-    const [form, setForm] = useState<Omit<AdminRestaurant, "id">>({
-        name: "",
-        description: "",
-        location: "",
-        phone: "",
-        openingHour: "08:00",
-        closingHour: "22:00"
-    });
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingRestaurant, setEditingRestaurant] = useState<AdminRestaurant | null>(null);
+    const [formValues, setFormValues] = useState<RestaurantFormValues>(defaultRestaurantForm);
 
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const modalTitle = useMemo(
+        () => (editingRestaurant ? "Edit Restaurant" : "Create Restaurant"),
+        [editingRestaurant],
+    );
 
     if (!isAdmin()) {
-        return <p>Unauthorized</p>;
+        return <p className="text-sm text-red-600">Unauthorized</p>;
     }
 
-    async function load() {
-        const data = await getAllRestaurantsAdmin();
-        setRestaurants(data);
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        load();
-    }, []);
-
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    }
-
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    async function loadRestaurants() {
+        setLoading(true);
+        setError("");
 
         try {
-            if (editingId) {
-                await updateRestaurant(editingId, form);
-            } else {
-                await createRestaurant(form);
-            }
-
-            setForm({
-                name: "",
-                description: "",
-                location: "",
-                phone: "",
-                openingHour: "08:00",
-                closingHour: "22:00"
-            });
-
-            setEditingId(null);
-            load();
+            const data = await getAllRestaurantsAdmin();
+            setRestaurants(data);
         } catch (err) {
-            alert("Error saving restaurant");
+            setError(err instanceof Error ? err.message : "Failed to load restaurants");
+        } finally {
+            setLoading(false);
         }
     }
 
-    function handleEdit(r: AdminRestaurant) {
-        setForm(r);
-        setEditingId(r.id);
+    useEffect(() => {
+        loadRestaurants();
+    }, []);
+
+    function openCreateModal() {
+        setEditingRestaurant(null);
+        setFormValues(defaultRestaurantForm);
+        setSuccess("");
+        setError("");
+        setIsModalOpen(true);
     }
 
-    async function handleDelete(id: number) {
-        if (!confirm("Delete this restaurant?")) return;
+    function openEditModal(restaurant: AdminRestaurant) {
+        setEditingRestaurant(restaurant);
+        setFormValues({
+            name: restaurant.name,
+            description: restaurant.description ?? "",
+            location: restaurant.location,
+            phone: restaurant.phone,
+            openingHour: restaurant.openingHour,
+            closingHour: restaurant.closingHour,
+        });
+        setSuccess("");
+        setError("");
+        setIsModalOpen(true);
+    }
 
-        await deleteRestaurant(id);
-        load();
+    function closeModal() {
+        setIsModalOpen(false);
+        setEditingRestaurant(null);
+        setFormValues(defaultRestaurantForm);
+    }
+
+    function handleFieldChange(field: keyof RestaurantFormValues, value: string) {
+        setFormValues((prev) => ({ ...prev, [field]: value }));
+    }
+
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        setSaving(true);
+        setError("");
+
+        try {
+            if (editingRestaurant) {
+                await updateRestaurant(editingRestaurant.id, formValues);
+                setSuccess("Restaurant updated successfully.");
+            } else {
+                await createRestaurant(formValues);
+                setSuccess("Restaurant created successfully.");
+            }
+
+            closeModal();
+            await loadRestaurants();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to save restaurant.");
+        } finally {
+            setSaving(false);
+        }
+    }
+
+    
+
+    async function handleDelete(restaurant: AdminRestaurant) {
+        if (!confirm(`Delete restaurant \"${restaurant.name}\"?`)) {
+            return;
+        }
+
+        setSuccess("");
+        setError("");
+
+        try {
+            await deleteRestaurant(restaurant.id);
+            setSuccess("Restaurant deleted successfully.");
+            await loadRestaurants();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to delete restaurant.");
+        }
     }
 
     return (
         <section className="space-y-6">
-            <h1 className="text-3xl font-black text-brand-dark">
-                Admin - Restaurants
-            </h1>
-
-            {/* FORM */}
-            <form onSubmit={handleSubmit} className="app-card p-6 grid gap-4 md:grid-cols-2">
-                <input name="name" placeholder="Name" value={form.name} onChange={handleChange} className="input" required />
-                <input name="location" placeholder="Location" value={form.location} onChange={handleChange} className="input" required />
-                <input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} className="input" required />
-
-                <input name="openingHour" type="time" value={form.openingHour} onChange={handleChange} className="input" required />
-                <input name="closingHour" type="time" value={form.closingHour} onChange={handleChange} className="input" required />
-
-                <input name="description" placeholder="Description" value={form.description} onChange={handleChange} className="input md:col-span-2" />
-
-                <button className="btn-primary md:col-span-2">
-                    {editingId ? "Update Restaurant" : "Create Restaurant"}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <h1 className="text-3xl font-black text-brand-dark">Manage Restaurants</h1>
+                <button type="button" className="btn-primary" onClick={openCreateModal}>
+                    Create Restaurant
                 </button>
-            </form>
-
-            {/* LIST */}
-            {loading ? (
-                <p>Loading...</p>
-            ) : (
-                <div className="app-card overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="bg-slate-50">
-                            <tr>
-                                <th className="p-3 text-left">Name</th>
-                                <th className="p-3 text-left">Location</th>
-                                <th className="p-3 text-left">Hours</th>
-                                <th className="p-3 text-right">Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {restaurants.map(r => (
-                                <tr key={r.id} className="border-t">
-                                    <td className="p-3 font-semibold text-brand-dark">{r.name}</td>
-                                    <td className="p-3">{r.location}</td>
-                                    <td className="p-3">{r.openingHour} - {r.closingHour}</td>
-
-                                    <td className="p-3 text-right space-x-3">
-                                        <button
-                                            onClick={() => handleEdit(r)}
-                                            className="text-brand-red hover:underline"
-                                        >
-                                            Edit
-                                        </button>
-
-                                        <button
-                                            onClick={() => handleDelete(r.id)}
-                                            className="text-red-600 hover:underline"
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            </div>
+            {success && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                    {success}
                 </div>
             )}
+
+            {error && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {error}
+                </div>
+            )}
+
+            {loading ? (
+                <div className="app-card p-6">
+                    <p className="text-sm text-slate-500">Loading restaurants...</p>
+                </div>
+            ) : restaurants.length === 0 ? (
+                <div className="app-card p-6 text-center">
+                    <p className="text-sm text-slate-600">No restaurants found. Create your first one.</p>
+                </div>
+            ) : (
+                <RestaurantTable restaurants={restaurants} onEdit={openEditModal} onDelete={handleDelete} />
+            )}
+
+            <RestaurantModal title={modalTitle} isOpen={isModalOpen} onClose={closeModal}>
+                <RestaurantForm
+                    values={formValues}
+                    loading={saving}
+                    submitLabel={editingRestaurant ? "Update Restaurant" : "Create Restaurant"}
+                    onChange={handleFieldChange}
+                    onSubmit={handleSubmit}
+                    onCancel={closeModal}
+                />
+            </RestaurantModal>
         </section>
     );
 }

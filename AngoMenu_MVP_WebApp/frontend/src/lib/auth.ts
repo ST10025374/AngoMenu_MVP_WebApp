@@ -55,8 +55,6 @@ export function getUserRole(): UserRole {
         (payload as any).roles?.[0] ??
         (payload as any)['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'];
 
-    console.log("ROLE DETECTED:", role); // debug
-
     return role === 'Admin' || role === 'Client' || role === 'User' ? role : null;
 }
 
