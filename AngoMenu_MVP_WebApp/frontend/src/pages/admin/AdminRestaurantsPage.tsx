@@ -8,9 +8,9 @@ import {
 } from "../../lib/api";
 
 import { isAdmin } from "../../lib/auth";
-import RestaurantForm, { type RestaurantFormValues } from "../../components/admin/RestaurantForm";
-import RestaurantModal from "../../components/admin/RestaurantModal";
-import RestaurantTable from "../../components/admin/RestaurantTable";
+import RestaurantForm, { type RestaurantFormValues } from "../../pages/admin/RestaurantForm";
+import RestaurantModal from "../../pages/admin/RestaurantModal";
+import RestaurantTable from "../../pages/admin/RestaurantTable";
 
 const defaultRestaurantForm: RestaurantFormValues = {
     name: "",
