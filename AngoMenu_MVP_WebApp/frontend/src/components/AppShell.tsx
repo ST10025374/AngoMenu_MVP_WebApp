@@ -33,9 +33,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 {role === 'Admin' && (
                     <>
                         <Link to="/admin">Dashboard</Link>
-                        <Link to="/admin/restaurants">Restaurants</Link>
-                        <Link to="/admin/reservations">Reservations</Link>
-                        <Link to="/admin/menu">Menu</Link>
+                        <Link to="/admin/restaurants">Manage Restaurants</Link>
+                        <Link to="/admin/reservations">Manage Reservations</Link>
+                        <Link to="/admin/menu">Manage Menu</Link>
                     </>
                 )}
 
