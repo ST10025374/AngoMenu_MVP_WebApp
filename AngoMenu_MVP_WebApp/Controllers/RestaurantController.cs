@@ -52,7 +52,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
         // 🔹 POST: api/restaurants
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create(RestaurantCreateDto dto)
+        public async Task<IActionResult> Create([FromForm] RestaurantCreateDto dto)
         {
             var result = await _restaurantService
                 .CreateRestaurant(dto);
@@ -66,7 +66,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
         // 🔹 PUT: api/restaurants/{id}
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, RestaurantUpdateDto dto)
+        public async Task<IActionResult> Update(int id, [FromForm] RestaurantUpdateDto dto)
         {
             var result = await _restaurantService
                 .UpdateRestaurant(id, dto);

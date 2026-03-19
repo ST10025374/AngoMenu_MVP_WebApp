@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { createReservation } from "../lib/api";
+import { createReservation, getImageUrl, getRestaurantById, type Restaurant } from "../lib/api";
 
 export default function CreateReservationPage() {
     const { id } = useParams();
     const restaurantId = Number(id);
 
     const navigate = useNavigate();
+
+    const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
@@ -16,6 +18,24 @@ export default function CreateReservationPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+
+    useEffect(() => {
+        async function loadRestaurant() {
+            if (!restaurantId || Number.isNaN(restaurantId)) {
+                setError("Invalid restaurant.");
+                return;
+            }
+
+            try {
+                const data = await getRestaurantById(restaurantId);
+                setRestaurant(data);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : "Failed to load restaurant.");
+            }
+        }
+
+        void loadRestaurant();
+    }, [restaurantId]);
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -59,6 +79,18 @@ export default function CreateReservationPage() {
                 ? Back to restaurant
             </Link>
 
+            {restaurant && (
+                <div className="app-card overflow-hidden p-0">
+                    {getImageUrl(restaurant.imageUrl) && (
+                        <img src={getImageUrl(restaurant.imageUrl) ?? ''} alt={restaurant.name} className="h-48 w-full object-cover" />
+                    )}
+                    <div className="p-6">
+                        <h2 className="text-xl font-black text-brand-dark">{restaurant.name}</h2>
+                        <p className="mt-1 text-sm text-slate-600">{restaurant.location}</p>
+                    </div>
+                </div>
+            )}
+
             <div className="app-card p-6 md:p-8">
                 <h1 className="text-2xl font-black text-brand-dark">
                     Reserve a Table
@@ -72,7 +104,6 @@ export default function CreateReservationPage() {
                     onSubmit={handleSubmit}
                     className="mt-6 grid gap-5 sm:grid-cols-2"
                 >
-                    {/* Date */}
                     <div>
                         <label className="label">Date</label>
                         <input
@@ -84,7 +115,6 @@ export default function CreateReservationPage() {
                         />
                     </div>
 
-                    {/* Time */}
                     <div>
                         <label className="label">Time</label>
                         <input
@@ -96,7 +126,6 @@ export default function CreateReservationPage() {
                         />
                     </div>
 
-                    {/* Number of people */}
                     <div className="sm:col-span-2">
                         <label className="label">Number of Guests</label>
 
@@ -111,7 +140,6 @@ export default function CreateReservationPage() {
                         />
                     </div>
 
-                    {/* Messages */}
                     {error && (
                         <div className="sm:col-span-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
                             {error}
@@ -124,7 +152,6 @@ export default function CreateReservationPage() {
                         </div>
                     )}
 
-                    {/* Submit */}
                     <div className="sm:col-span-2 flex justify-end">
                         <button
                             type="submit"

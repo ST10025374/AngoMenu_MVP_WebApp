@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
+    getImageUrl,
     getMenuByRestaurant,
     getRestaurantById,
     type MenuItem,
@@ -79,6 +80,10 @@ export default function RestaurantDetailsPage() {
             </Link>
 
             <article className="app-card overflow-hidden">
+                {getImageUrl(restaurant.imageUrl) && (
+                    <img src={getImageUrl(restaurant.imageUrl) ?? ''} alt={restaurant.name} className="h-64 w-full object-cover" />
+                )}
+
                 <div className="border-b border-slate-200 bg-gradient-to-r from-brand-dark to-slate-900 p-6 text-white">
                     <h1 className="text-3xl font-black">{restaurant.name}</h1>
                     <p className="mt-2 max-w-3xl text-sm text-slate-200">

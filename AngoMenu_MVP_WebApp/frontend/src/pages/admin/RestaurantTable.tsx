@@ -1,4 +1,4 @@
-import type { AdminRestaurant } from "../../lib/api";
+import { getImageUrl, type AdminRestaurant } from "../../lib/api";
 
 export default function RestaurantTable({
     restaurants,
@@ -14,6 +14,7 @@ export default function RestaurantTable({
             <table className="w-full text-sm">
                 <thead className="bg-slate-50">
                     <tr>
+                        <th className="p-3 text-left">Image</th>
                         <th className="p-3 text-left">Name</th>
                         <th className="p-3 text-left">Location</th>
                         <th className="p-3 text-right">Actions</th>
@@ -22,6 +23,17 @@ export default function RestaurantTable({
                 <tbody>
                     {restaurants.map((restaurant) => (
                         <tr key={restaurant.id} className="border-t">
+                            <td className="p-3">
+                                {getImageUrl(restaurant.imageUrl) ? (
+                                    <img
+                                        src={getImageUrl(restaurant.imageUrl) ?? ''}
+                                        alt={restaurant.name}
+                                        className="h-12 w-20 rounded-md object-cover"
+                                    />
+                                ) : (
+                                    <span className="text-xs text-slate-400">No image</span>
+                                )}
+                            </td>
                             <td className="p-3 font-semibold text-brand-dark">{restaurant.name}</td>
                             <td className="p-3 text-slate-700">{restaurant.location}</td>
                             <td className="p-3 text-right">

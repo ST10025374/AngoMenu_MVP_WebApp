@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getRestaurants, type PagedResult, type Restaurant } from '../lib/api';
+import { getImageUrl, getRestaurants, type PagedResult, type Restaurant } from '../lib/api';
 
 export default function RestaurantsPage() {
     const [data, setData] = useState<PagedResult<Restaurant> | null>(null);
@@ -94,6 +94,14 @@ export default function RestaurantsPage() {
                     <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                         {data.items.map((restaurant) => (
                             <li key={restaurant.id} className="app-card overflow-hidden p-5 transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+                                {getImageUrl(restaurant.imageUrl) && (
+                                    <img
+                                        src={getImageUrl(restaurant.imageUrl) ?? ''}
+                                        alt={restaurant.name}
+                                        className="mb-4 h-40 w-full rounded-xl object-cover"
+                                    />
+                                )}
+
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-lg font-bold text-brand-dark">{restaurant.name}</h2>
                                     <span className="rounded-full bg-brand-yellow/30 px-2.5 py-1 text-xs font-semibold text-brand-dark">

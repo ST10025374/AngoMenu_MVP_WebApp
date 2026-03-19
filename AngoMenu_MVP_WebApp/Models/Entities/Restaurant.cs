@@ -25,7 +25,9 @@ namespace AngoMenu_MVP_WebApp.Models
         [Required]
         public TimeOnly ClosingHour { get; set; }
 
-        public string? ImageUrl { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
+
+        public string PublicId { get; set; } = string.Empty;
 
         // Navigation
         public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();

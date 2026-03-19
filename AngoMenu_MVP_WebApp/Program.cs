@@ -1,5 +1,7 @@
-﻿using AngoMenu_MVP_WebApp.Services.Implementations;
+﻿using AngoMenu_MVP_WebApp.Configuration;
+using AngoMenu_MVP_WebApp.Services.Implementations;
 using AngoMenu_MVP_WebApp.Services.Interfaces;
+using AngoMenu_MVP_WebApp.Services.Cloudinary;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +20,9 @@ builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>

@@ -2,6 +2,7 @@
 using AngoMenu_MVP_WebApp.Common.Pagination;
 using AngoMenu_MVP_WebApp.DTOs.Restaurant;
 using AngoMenu_MVP_WebApp.Models;
+using AngoMenu_MVP_WebApp.Services.Cloudinary;
 using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +11,12 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
     public class RestaurantService : IRestaurantService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public RestaurantService(ApplicationDbContext context)
+        public RestaurantService(ApplicationDbContext context, ICloudinaryService cloudinaryService)
         {
             _context = context;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<Result> CreateRestaurant(RestaurantCreateDto dto)
@@ -26,8 +29,20 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 Phone = dto.Phone,
                 OpeningHour = dto.OpeningHour,
                 ClosingHour = dto.ClosingHour,
-                ImageUrl = dto.ImageUrl
+                ImageUrl = dto.ImageUrl ?? string.Empty,
+                PublicId = string.Empty,
             };
+
+            if (dto.Image != null)
+            {
+                var uploadResult = await _cloudinaryService.UploadRestaurantImage(dto.Image);
+
+                if (uploadResult.Error != null)
+                    return Result.Fail(uploadResult.Error.Message);
+
+                restaurant.ImageUrl = uploadResult.SecureUrl.ToString();
+                restaurant.PublicId = uploadResult.PublicId;
+            }
 
             _context.Restaurants.Add(restaurant);
             await _context.SaveChangesAsync();
@@ -48,7 +63,32 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             restaurant.Phone = dto.Phone;
             restaurant.OpeningHour = dto.OpeningHour;
             restaurant.ClosingHour = dto.ClosingHour;
-            restaurant.ImageUrl = dto.ImageUrl;
+
+            if (dto.Image != null)
+            {
+                if (!string.IsNullOrWhiteSpace(restaurant.PublicId))
+                {
+                    await _cloudinaryService.DeleteImage(restaurant.PublicId);
+                }
+
+                var uploadResult = await _cloudinaryService.UploadRestaurantImage(dto.Image);
+
+                if (uploadResult.Error != null)
+                    return Result.Fail(uploadResult.Error.Message);
+
+                restaurant.ImageUrl = uploadResult.SecureUrl.ToString();
+                restaurant.PublicId = uploadResult.PublicId;
+            }
+            else if (!string.IsNullOrWhiteSpace(dto.ImageUrl) && dto.ImageUrl != restaurant.ImageUrl)
+            {
+                if (!string.IsNullOrWhiteSpace(restaurant.PublicId))
+                {
+                    await _cloudinaryService.DeleteImage(restaurant.PublicId);
+                    restaurant.PublicId = string.Empty;
+                }
+
+                restaurant.ImageUrl = dto.ImageUrl;
+            }
 
             await _context.SaveChangesAsync();
 
@@ -61,6 +101,11 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
             if (restaurant == null)
                 return Result.Fail("Restaurant not found.");
+
+            if (!string.IsNullOrWhiteSpace(restaurant.PublicId))
+            {
+                await _cloudinaryService.DeleteImage(restaurant.PublicId);
+            }
 
             _context.Restaurants.Remove(restaurant);
             await _context.SaveChangesAsync();
@@ -95,7 +140,6 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
         {
             var query = _context.Restaurants.AsQueryable();
 
-            // 🔎 Search
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(r =>

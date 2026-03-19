@@ -30,9 +30,10 @@ function AdminDropdown({ onNavigate }: { onNavigate?: () => void }) {
     }, []);
 
     const items = [
-        { to: "/admin", label: "Admin Dashboard" },
+        { to: "/admin", label: "Dashboard" }, ,
         { to: "/admin/restaurants", label: "Manage Restaurants" },
         { to: "/admin/reservations", label: "Manage Reservations" },
+        { to: "/admin/menu", label: "Manage Menu" },
     ];
 
     return (
@@ -172,13 +173,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             {isAdminUser && (
                                 <>
                                     <Link to="/admin" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                        Admin Dashboard
+                                        Dashboard
                                     </Link>
                                     <Link to="/admin/restaurants" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
                                         Manage Restaurants
                                     </Link>
                                     <Link to="/admin/reservations" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
                                         Manage Reservations
+                                    </Link>
+                                    <Link to="/admin/menu" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
+                                        Manage Menu
                                     </Link>
                                 </>
                             )}

@@ -1,12 +1,15 @@
-import type { AdminRestaurant } from "../../lib/api";
+import { getImageUrl, type AdminRestaurant } from "../../lib/api";
 
-export type RestaurantFormValues = Omit<AdminRestaurant, "id">;
+export type RestaurantFormValues = Omit<AdminRestaurant, "id"> & {
+    image?: File | null;
+};
 
 export default function RestaurantForm({
     values,
     loading,
     submitLabel,
     onChange,
+    onImageChange,
     onSubmit,
     onCancel,
 }: {
@@ -14,9 +17,12 @@ export default function RestaurantForm({
     loading: boolean;
     submitLabel: string;
     onChange: (field: keyof RestaurantFormValues, value: string) => void;
+    onImageChange: (file: File | null) => void;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     onCancel: () => void;
-}) {
+    }) {
+    const previewUrl = getImageUrl(values.imageUrl ?? null);
+
     return (
         <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
             <div>
@@ -84,6 +90,23 @@ export default function RestaurantForm({
                     value={values.description ?? ""}
                     onChange={(event) => onChange("description", event.target.value)}
                 />
+            </div>
+
+            <div className="md:col-span-2">
+                <label className="label" htmlFor="restaurant-image">Restaurant Image</label>
+                <input
+                    id="restaurant-image"
+                    type="file"
+                    accept="image/*"
+                    className="input"
+                    onChange={(event) => onImageChange(event.target.files?.[0] ?? null)}
+                />
+                {values.image && (
+                    <p className="mt-2 text-xs text-slate-500">Selected image: {values.image.name}</p>
+                )}
+                {previewUrl && (
+                    <img src={previewUrl} alt="Restaurant preview" className="mt-3 h-40 w-full rounded-xl object-cover" />
+                )}
             </div>
 
             <div className="mt-2 flex flex-wrap justify-end gap-2 md:col-span-2">

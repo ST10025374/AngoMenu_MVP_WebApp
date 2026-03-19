@@ -69,6 +69,39 @@ export type UserReservation = {
     status: ReservationStatus;
 };
 
+export type AdminRestaurant = {
+    id: number;
+    name: string;
+    description?: string;
+    location: string;
+    phone: string;
+    openingHour: string;
+    closingHour: string;
+    imageUrl?: string | null;
+};
+
+export type RestaurantUpsertPayload = Omit<AdminRestaurant, 'id'> & {
+    image?: File | null;
+};
+
+export type AdminMenuItem = {
+    id: number;
+    restaurantId: number;
+    name: string;
+    description?: string;
+    price: number;
+};
+
+export type AdminReservation = {
+    id: number;
+    userEmail: string;
+    restaurant: string;
+    date: string;
+    time: string;
+    numberOfPeople: number;
+    status: ReservationStatus;
+};
+
 async function parseResponse<T>(res: Response): Promise<T> {
     const contentType = res.headers.get('content-type') ?? '';
     const raw = await res.text();
@@ -96,6 +129,36 @@ async function parseResponse<T>(res: Response): Promise<T> {
 function authHeaders(): HeadersInit {
     const token = getToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function buildRestaurantFormData(payload: RestaurantUpsertPayload): FormData {
+    const formData = new FormData();
+
+    formData.append('name', payload.name);
+    formData.append('description', payload.description ?? '');
+    formData.append('location', payload.location);
+    formData.append('phone', payload.phone);
+    formData.append('openingHour', payload.openingHour);
+    formData.append('closingHour', payload.closingHour);
+
+    if (payload.image) {
+        formData.append('image', payload.image);
+    }
+
+    if (payload.imageUrl) {
+        formData.append('imageUrl', payload.imageUrl);
+    }
+
+    return formData;
+}
+
+export function getImageUrl(path?: string | null): string | null {
+    if (!path) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
+
+    return path.startsWith('/') ? path : `/${path}`;
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
@@ -196,16 +259,6 @@ export async function cancelReservation(reservationId: number): Promise<string> 
     return parseResponse<string>(res);
 }
 
-export type AdminReservation = {
-    id: number;
-    userEmail: string;
-    restaurant: string;
-    date: string;
-    time: string;
-    numberOfPeople: number;
-    status: ReservationStatus;
-};
-
 export async function getAllReservations(): Promise<AdminReservation[]> {
     const res = await fetch('/api/reservations', {
         headers: {
@@ -243,16 +296,6 @@ export async function deleteReservation(id: number): Promise<string> {
     return parseResponse<string>(res);
 }
 
-export type AdminRestaurant = {
-    id: number;
-    name: string;
-    description?: string;
-    location: string;
-    phone: string;
-    openingHour: string;
-    closingHour: string;
-};
-
 export async function getAllRestaurantsAdmin(): Promise<AdminRestaurant[]> {
     const res = await fetch('/api/restaurants', {
         headers: {
@@ -264,27 +307,25 @@ export async function getAllRestaurantsAdmin(): Promise<AdminRestaurant[]> {
     return paged.items;
 }
 
-export async function createRestaurant(payload: Omit<AdminRestaurant, 'id'>): Promise<string> {
+export async function createRestaurant(payload: RestaurantUpsertPayload): Promise<string> {
     const res = await fetch('/api/restaurants', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             ...authHeaders(),
         },
-        body: JSON.stringify(payload),
+        body: buildRestaurantFormData(payload),
     });
 
     return parseResponse<string>(res);
 }
 
-export async function updateRestaurant(id: number, payload: Omit<AdminRestaurant, 'id'>): Promise<string> {
+export async function updateRestaurant(id: number, payload: RestaurantUpsertPayload): Promise<string> {
     const res = await fetch(`/api/restaurants/${id}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json',
             ...authHeaders(),
         },
-        body: JSON.stringify(payload),
+        body: buildRestaurantFormData(payload),
     });
 
     return parseResponse<string>(res);
@@ -300,14 +341,6 @@ export async function deleteRestaurant(id: number): Promise<string> {
 
     return parseResponse<string>(res);
 }
-
-export type AdminMenuItem = {
-    id: number;
-    restaurantId: number;
-    name: string;
-    description?: string;
-    price: number;
-};
 
 export async function getMenuByRestaurantAdmin(restaurantId: number): Promise<AdminMenuItem[]> {
     const res = await fetch(`/api/menu/restaurant/${restaurantId}`, {

@@ -1,4 +1,6 @@
-﻿namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
+﻿using Microsoft.AspNetCore.Http;
+
+namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
 {
     public class RestaurantUpdateDto
     {
@@ -8,6 +10,7 @@
         public string Phone { get; set; } = string.Empty;
         public TimeOnly OpeningHour { get; set; }
         public TimeOnly ClosingHour { get; set; }
+        public IFormFile? Image { get; set; }
         public string? ImageUrl { get; set; }
     }
 }

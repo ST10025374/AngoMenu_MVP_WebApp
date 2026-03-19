@@ -19,6 +19,8 @@ const defaultRestaurantForm: RestaurantFormValues = {
     phone: "",
     openingHour: "08:00",
     closingHour: "22:00",
+    imageUrl: "",
+    image: null,
 };
 
 
@@ -77,6 +79,8 @@ export default function AdminRestaurantsPage() {
             phone: restaurant.phone,
             openingHour: restaurant.openingHour,
             closingHour: restaurant.closingHour,
+            imageUrl: restaurant.imageUrl ?? "",
+            image: null,
         });
         setSuccess("");
         setError("");
@@ -91,6 +95,10 @@ export default function AdminRestaurantsPage() {
 
     function handleFieldChange(field: keyof RestaurantFormValues, value: string) {
         setFormValues((prev) => ({ ...prev, [field]: value }));
+    }
+
+    function handleImageChange(file: File | null) {
+        setFormValues((prev) => ({ ...prev, image: file }));
     }
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -115,9 +123,7 @@ export default function AdminRestaurantsPage() {
             setSaving(false);
         }
     }
-
-    
-
+  
     async function handleDelete(restaurant: AdminRestaurant) {
         if (!confirm(`Delete restaurant \"${restaurant.name}\"?`)) {
             return;
@@ -173,6 +179,7 @@ export default function AdminRestaurantsPage() {
                     loading={saving}
                     submitLabel={editingRestaurant ? "Update Restaurant" : "Create Restaurant"}
                     onChange={handleFieldChange}
+                    onImageChange={handleImageChange}
                     onSubmit={handleSubmit}
                     onCancel={closeModal}
                 />
