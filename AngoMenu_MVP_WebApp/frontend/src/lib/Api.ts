@@ -36,6 +36,12 @@ export type PagedResult<T> = {
 
 export type ReservationStatus = 'Pending' | 'Confirmed' | 'Cancelled';
 
+const reservationStatusToApiValue: Record<ReservationStatus, number> = {
+    Pending: 1,
+    Confirmed: 2,
+    Cancelled: 3,
+};
+
 export type Reservation = {
     id?: number;
     restaurantId: number;
@@ -220,7 +226,7 @@ export async function updateReservationStatus(
             'Content-Type': 'application/json',
             ...authHeaders(),
         },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status: reservationStatusToApiValue[status] }),
     });
 
     return parseResponse<string>(res);
