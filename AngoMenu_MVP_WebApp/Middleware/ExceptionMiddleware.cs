@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text;
 using System.Text.Json;
 
 namespace AngoMenu_MVP_WebApp.Middleware
@@ -24,7 +25,7 @@ namespace AngoMenu_MVP_WebApp.Middleware
             {
                 _logger.LogError(ex, "Unhandled exception occurred.");
 
-                context.Response.ContentType = "application/json";
+                context.Response.ContentType = "application/json; charset=utf-8";
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
                 var response = new
@@ -35,7 +36,7 @@ namespace AngoMenu_MVP_WebApp.Middleware
 
                 var json = JsonSerializer.Serialize(response);
 
-                await context.Response.WriteAsync(json);
+                await context.Response.WriteAsync(json, Encoding.UTF8);
             }
         }
     }

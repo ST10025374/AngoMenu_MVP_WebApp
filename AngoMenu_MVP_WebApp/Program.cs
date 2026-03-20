@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using System.Security.Claims;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
@@ -184,6 +183,28 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<AngoMenu_MVP_WebApp.Middleware.SecurityHeadersMiddleware>();
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (!context.Response.Headers.TryGetValue("Content-Type", out var contentTypeValues))
+    {
+        return;
+    }
+
+    var contentType = contentTypeValues.ToString();
+    if (string.IsNullOrWhiteSpace(contentType) || contentType.Contains("charset=", StringComparison.OrdinalIgnoreCase))
+    {
+        return;
+    }
+
+    if (contentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase) ||
+        contentType.StartsWith("text/", StringComparison.OrdinalIgnoreCase) ||
+        contentType.StartsWith("application/javascript", StringComparison.OrdinalIgnoreCase))
+    {
+        context.Response.Headers["Content-Type"] = $"{contentType}; charset=utf-8";
+    }
+});
 app.UseHttpsRedirection();
 app.UseCors("FrontendPolicy");
 app.UseRateLimiter();
