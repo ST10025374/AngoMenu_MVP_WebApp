@@ -79,10 +79,39 @@ export default function AdminMenuPage() {
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target;
 
+        if (name === "price") {
+            const digitsOnly = value.replace(/\D/g, "");
+
+            setForm((prev) => ({
+                ...prev,
+                price: digitsOnly === "" ? 0 : parseInt(digitsOnly, 10),
+            }));
+
+            return;
+        }
+
         setForm((prev) => ({
             ...prev,
-            [name]: name === "price" ? Number(value) : value,
+            [name]: value,
         }));
+    }
+
+    function handlePriceKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+        const allowedKeys = new Set([
+            "Backspace",
+            "Delete",
+            "Tab",
+            "ArrowLeft",
+            "ArrowRight",
+            "Home",
+            "End",
+        ]);
+
+        if (allowedKeys.has(e.key) || (e.ctrlKey || e.metaKey)) return;
+
+        if (!/^\d$/.test(e.key)) {
+            e.preventDefault();
+        }
     }
 
     async function handleSubmit(e: React.FormEvent) {
@@ -190,12 +219,13 @@ export default function AdminMenuPage() {
 
                     <input
                         name="price"
-                        type="number"
-                        step="0.01"
-                        min="0"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         placeholder="Price (AOA)"
                         value={form.price}
                         onChange={handleChange}
+                        onKeyDown={handlePriceKeyDown}
                         className="input"
                         required
                     />
