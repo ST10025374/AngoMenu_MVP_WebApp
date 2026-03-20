@@ -178,6 +178,7 @@ export default function AdminRestaurantsPage() {
                     values={formValues}
                     loading={saving}
                     submitLabel={editingRestaurant ? "Update Restaurant" : "Create Restaurant"}
+                    isEditMode={Boolean(editingRestaurant)}
                     onChange={handleFieldChange}
                     onImageChange={handleImageChange}
                     onSubmit={handleSubmit}

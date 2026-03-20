@@ -1,0 +1,1 @@
+export const formatKwanza = (value: number): string => `Kz ${value.toLocaleString('pt-AO')}`;

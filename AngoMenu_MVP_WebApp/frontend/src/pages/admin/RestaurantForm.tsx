@@ -8,6 +8,7 @@ export default function RestaurantForm({
     values,
     loading,
     submitLabel,
+    isEditMode = false,
     onChange,
     onImageChange,
     onSubmit,
@@ -16,6 +17,7 @@ export default function RestaurantForm({
     values: RestaurantFormValues;
     loading: boolean;
     submitLabel: string;
+    isEditMode?: boolean;
     onChange: (field: keyof RestaurantFormValues, value: string) => void;
     onImageChange: (file: File | null) => void;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -104,7 +106,7 @@ export default function RestaurantForm({
                 {values.image && (
                     <p className="mt-2 text-xs text-slate-500">Selected image: {values.image.name}</p>
                 )}
-                {previewUrl && (
+                {!isEditMode && previewUrl && (
                     <img src={previewUrl} alt="Restaurant preview" className="mt-3 h-40 w-full rounded-xl object-cover" />
                 )}
             </div>

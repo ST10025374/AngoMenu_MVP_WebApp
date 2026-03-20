@@ -30,7 +30,7 @@ function AdminDropdown({ onNavigate }: { onNavigate?: () => void }) {
     }, []);
 
     const items = [
-        { to: "/admin", label: "Dashboard" }, ,
+        { to: "/admin", label: "Dashboard" },
         { to: "/admin/restaurants", label: "Manage Restaurants" },
         { to: "/admin/reservations", label: "Manage Reservations" },
         { to: "/admin/menu", label: "Manage Menu" },

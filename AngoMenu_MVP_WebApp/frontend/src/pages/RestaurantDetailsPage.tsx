@@ -7,6 +7,7 @@ import {
     type MenuItem,
     type Restaurant,
 } from '../lib/api';
+import { formatKwanza } from '../lib/currency';
 
 export default function RestaurantDetailsPage() {
     const { id } = useParams();
@@ -141,7 +142,7 @@ export default function RestaurantDetailsPage() {
                                 <div className="flex items-start justify-between gap-3">
                                     <h3 className="text-base font-bold text-brand-dark">{item.name}</h3>
                                     <span className="rounded-full bg-brand-red/10 px-3 py-1 text-sm font-semibold text-brand-red">
-                                        ${item.price.toFixed(2)}
+                                        {formatKwanza(item.price)}
                                     </span>
                                 </div>
 

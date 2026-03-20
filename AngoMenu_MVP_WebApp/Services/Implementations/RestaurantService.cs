@@ -79,16 +79,6 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 restaurant.ImageUrl = uploadResult.SecureUrl.ToString();
                 restaurant.PublicId = uploadResult.PublicId;
             }
-            else if (!string.IsNullOrWhiteSpace(dto.ImageUrl) && dto.ImageUrl != restaurant.ImageUrl)
-            {
-                if (!string.IsNullOrWhiteSpace(restaurant.PublicId))
-                {
-                    await _cloudinaryService.DeleteImage(restaurant.PublicId);
-                    restaurant.PublicId = string.Empty;
-                }
-
-                restaurant.ImageUrl = dto.ImageUrl;
-            }
 
             await _context.SaveChangesAsync();
 

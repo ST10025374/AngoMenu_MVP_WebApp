@@ -7,6 +7,7 @@ export default function RegisterPage() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -20,7 +21,7 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            const message = await register({ firstName, lastName, email, password });
+            const message = await register({ firstName, lastName, email, phoneNumber, password });
             setSuccess(message || 'Registration successful. Redirecting...');
             setTimeout(() => navigate('/login'), 1000);
         } catch (err) {
@@ -94,6 +95,21 @@ export default function RegisterPage() {
                             value={email}
                             onChange={(event) => setEmail(event.target.value)}
                             autoComplete="email"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="phoneNumber" className="label">
+                            Phone number
+                        </label>
+                        <input
+                            id="phoneNumber"
+                            className="input"
+                            type="tel"
+                            value={phoneNumber}
+                            onChange={(event) => setPhoneNumber(event.target.value)}
+                            autoComplete="tel"
                             required
                         />
                     </div>

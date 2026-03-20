@@ -34,6 +34,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 Email = dto.Email,
+                PhoneNumber = dto.PhoneNumber,
                 PasswordHash = passwordHash,
                 Role = UserRole.Client
             };

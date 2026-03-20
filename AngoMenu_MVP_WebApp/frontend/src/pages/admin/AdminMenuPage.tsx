@@ -9,6 +9,7 @@ import {
     type AdminRestaurant
 } from "../../lib/api";
 import { isAdmin } from "../../lib/auth";
+import { formatKwanza } from "../../lib/currency";
 
 const defaultForm: Omit<AdminMenuItem, "id"> = {
     restaurantId: 0,
@@ -192,7 +193,7 @@ export default function AdminMenuPage() {
                         type="number"
                         step="0.01"
                         min="0"
-                        placeholder="Price"
+                        placeholder="Price (AOA)"
                         value={form.price}
                         onChange={handleChange}
                         className="input"
@@ -236,7 +237,7 @@ export default function AdminMenuPage() {
                                 {menuItems.map((item) => (
                                     <tr key={item.id} className="border-t">
                                         <td className="p-3 font-semibold text-brand-dark">{item.name}</td>
-                                        <td className="p-3">${item.price.toFixed(2)}</td>
+                                        <td className="p-3">{formatKwanza(item.price)}</td>
                                         <td className="p-3">{item.description}</td>
 
                                         <td className="space-x-3 p-3 text-right">

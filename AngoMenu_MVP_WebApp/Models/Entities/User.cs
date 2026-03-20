@@ -24,6 +24,10 @@ namespace AngoMenu_MVP_WebApp.Models
         public string PasswordHash { get; set; } = string.Empty;
 
         [Required]
+        [MaxLength(30)]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [Required]
         public UserRole Role { get; set; }
 
         public int FailedLoginAttempts { get; set; } = 0;
