@@ -18,7 +18,7 @@ export default function HomePage() {
             <div className="grid gap-10 lg:grid-cols-2 items-center">
                 <div>
                     <span className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-red bg-red-50 rounded-full">
-                        Plataforma Inteligente de Restauração
+                        Plataforma Inteligente de Restaurantes
                     </span>
 
                     <h1 className="mt-4 text-4xl md:text-5xl font-black leading-tight text-brand-dark">
