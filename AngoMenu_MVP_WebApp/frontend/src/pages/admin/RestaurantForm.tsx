@@ -28,7 +28,7 @@ export default function RestaurantForm({
     return (
         <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
             <div>
-                <label className="label" htmlFor="restaurant-name">Name</label>
+                <label className="label" htmlFor="restaurant-name">Nome</label>
                 <input
                     id="restaurant-name"
                     className="input"
@@ -39,7 +39,7 @@ export default function RestaurantForm({
             </div>
 
             <div>
-                <label className="label" htmlFor="restaurant-location">Location</label>
+                <label className="label" htmlFor="restaurant-location">Localização</label>
                 <input
                     id="restaurant-location"
                     className="input"
@@ -50,7 +50,7 @@ export default function RestaurantForm({
             </div>
 
             <div>
-                <label className="label" htmlFor="restaurant-phone">Phone</label>
+                <label className="label" htmlFor="restaurant-phone">Telefone</label>
                 <input
                     id="restaurant-phone"
                     className="input"
@@ -61,7 +61,7 @@ export default function RestaurantForm({
             </div>
 
             <div>
-                <label className="label" htmlFor="restaurant-opening">Opening Hour</label>
+                <label className="label" htmlFor="restaurant-opening">Hora de abertura</label>
                 <input
                     id="restaurant-opening"
                     type="time"
@@ -73,7 +73,7 @@ export default function RestaurantForm({
             </div>
 
             <div>
-                <label className="label" htmlFor="restaurant-closing">Closing Hour</label>
+                <label className="label" htmlFor="restaurant-closing">Hora de fecho</label>
                 <input
                     id="restaurant-closing"
                     type="time"
@@ -85,7 +85,7 @@ export default function RestaurantForm({
             </div>
 
             <div className="md:col-span-2">
-                <label className="label" htmlFor="restaurant-description">Description</label>
+                <label className="label" htmlFor="restaurant-description">Descrição</label>
                 <input
                     id="restaurant-description"
                     className="input"
@@ -95,7 +95,7 @@ export default function RestaurantForm({
             </div>
 
             <div className="md:col-span-2">
-                <label className="label" htmlFor="restaurant-image">Restaurant Image</label>
+                <label className="label" htmlFor="restaurant-image">Imagem do restaurante</label>
                 <input
                     id="restaurant-image"
                     type="file"
@@ -104,19 +104,19 @@ export default function RestaurantForm({
                     onChange={(event) => onImageChange(event.target.files?.[0] ?? null)}
                 />
                 {values.image && (
-                    <p className="mt-2 text-xs text-slate-500">Selected image: {values.image.name}</p>
+                    <p className="mt-2 text-xs text-slate-500">Imagem selecionada: {values.image.name}</p>
                 )}
                 {!isEditMode && previewUrl && (
-                    <img src={previewUrl} alt="Restaurant preview" className="mt-3 h-40 w-full rounded-xl object-cover" />
+                    <img src={previewUrl} alt="Pré-visualização do restaurante" className="mt-3 h-40 w-full rounded-xl object-cover" />
                 )}
             </div>
 
             <div className="mt-2 flex flex-wrap justify-end gap-2 md:col-span-2">
                 <button type="button" className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600" onClick={onCancel}>
-                    Cancel
+                    Cancelar
                 </button>
                 <button type="submit" className="btn-primary" disabled={loading}>
-                    {loading ? "Saving..." : submitLabel}
+                    {loading ? "A guardar..." : submitLabel}
                 </button>
             </div>
         </form>

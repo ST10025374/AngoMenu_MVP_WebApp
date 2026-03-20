@@ -21,7 +21,7 @@ export default function RestaurantDetailsPage() {
     useEffect(() => {
         async function load() {
             if (!restaurantId || Number.isNaN(restaurantId)) {
-                setError('Invalid restaurant id.');
+                setError('ID de restaurante inválido.');
                 setLoading(false);
                 return;
             }
@@ -38,7 +38,7 @@ export default function RestaurantDetailsPage() {
                 setRestaurant(restaurantData);
                 setMenuItems(menuData);
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to load restaurant details');
+                setError(err instanceof Error ? err.message : 'Falha ao carregar os detalhes do restaurante');
             } finally {
                 setLoading(false);
             }
@@ -50,7 +50,7 @@ export default function RestaurantDetailsPage() {
     if (loading) {
         return (
             <div className="app-card p-6">
-                <p className="text-sm text-slate-500">Loading restaurant details...</p>
+                <p className="text-sm text-slate-500">A carregar detalhes do restaurante...</p>
             </div>
         );
     }
@@ -66,7 +66,7 @@ export default function RestaurantDetailsPage() {
     if (!restaurant) {
         return (
             <div className="app-card p-6">
-                <p className="text-sm text-slate-600">Restaurant not found.</p>
+                <p className="text-sm text-slate-600">Restaurante não encontrado.</p>
             </div>
         );
     }
@@ -77,7 +77,7 @@ export default function RestaurantDetailsPage() {
                 to="/restaurants"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-brand-red transition hover:text-red-700 hover:underline"
             >
-                ? Back to restaurants
+                Voltar aos restaurantes
             </Link>
 
             <article className="app-card overflow-hidden">
@@ -88,36 +88,36 @@ export default function RestaurantDetailsPage() {
                 <div className="border-b border-slate-200 bg-gradient-to-r from-brand-dark to-slate-900 p-6 text-white">
                     <h1 className="text-3xl font-black">{restaurant.name}</h1>
                     <p className="mt-2 max-w-3xl text-sm text-slate-200">
-                        {restaurant.description ?? 'A premium destination for memorable meals and quality service.'}
+                        {restaurant.description ?? 'Um destino premium para refeições memoráveis e serviço de qualidade.'}
                     </p>
                     <div className="mt-4">
                         <Link
                             to={`/restaurants/${restaurant.id}/reserve`}
                             className="btn-primary"
                         >
-                            Reserve Table
+                            Reserva Mesa
                         </Link>
                     </div>
                 </div>
 
                 <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="rounded-xl bg-slate-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Location</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Localização</p>
                         <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.location}</p>
                     </div>
 
                     <div className="rounded-xl bg-slate-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Phone</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Telefone</p>
                         <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.phone}</p>
                     </div>
 
                     <div className="rounded-xl bg-slate-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Opening hour</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Hora de abertura</p>
                         <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.openingHour}</p>
                     </div>
 
                     <div className="rounded-xl bg-slate-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Closing hour</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Hora de fecho</p>
                         <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.closingHour}</p>
                     </div>
                 </div>
@@ -127,13 +127,13 @@ export default function RestaurantDetailsPage() {
                 <div className="flex items-center justify-between gap-4">
                     <h2 className="text-2xl font-black text-brand-dark">Menu</h2>
                     <span className="rounded-full bg-brand-yellow/30 px-3 py-1 text-xs font-semibold text-brand-dark">
-                        {menuItems.length} items
+                        {menuItems.length} itens
                     </span>
                 </div>
 
                 {menuItems.length === 0 ? (
                     <div className="mt-4 rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500">
-                        No menu items available yet.
+                        Ainda não existem itens de menu disponíveis.
                     </div>
                 ) : (
                     <ul className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -147,7 +147,7 @@ export default function RestaurantDetailsPage() {
                                 </div>
 
                                 <p className="mt-2 text-sm text-slate-600">
-                                    {item.description ?? 'Chef-crafted menu item made with quality ingredients.'}
+                                    {item.description ?? 'Item de menu criado pelo chef com ingredientes de qualidade.'}
                                 </p>
                             </li>
                         ))}

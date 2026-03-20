@@ -7,6 +7,11 @@ import {
 } from "../lib/api";
 
 export default function MyReservationsPage() {
+    const statusLabels: Record<string, string> = {
+        Pending: "Pendente",
+        Confirmed: "Confirmada",
+        Cancelled: "Cancelada",
+    };
     const [reservations, setReservations] = useState<UserReservation[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -19,14 +24,14 @@ export default function MyReservationsPage() {
             const data = await getMyReservations();
             setReservations(data);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to load reservations");
+            setError(err instanceof Error ? err.message : "Falha ao carregar reservas");
         } finally {
             setLoading(false);
         }
     }
 
     async function handleCancel(reservationId: number) {
-        if (!confirm("Cancel this reservation?")) return;
+        if (!confirm("Cancelar esta reserva?")) return;
 
         try {
             await cancelReservation(reservationId);
@@ -37,7 +42,7 @@ export default function MyReservationsPage() {
                 )
             );
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to cancel reservation");
+            alert(err instanceof Error ? err.message : "Falha ao cancelar reserva");
         }
     }
 
@@ -49,18 +54,18 @@ export default function MyReservationsPage() {
         <section className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-black text-brand-dark">
-                    My Reservations
+                    As Minhas Reservas
                 </h1>
 
                 <Link to="/restaurants" className="btn-secondary">
-                    Browse Restaurants
+                    Explorar Restaurantes
                 </Link>
             </div>
 
             {loading && (
                 <div className="app-card p-6">
                     <p className="text-sm text-slate-500">
-                        Loading reservations...
+                        A carregar reservas...
                     </p>
                 </div>
             )}
@@ -74,15 +79,15 @@ export default function MyReservationsPage() {
             {!loading && reservations.length === 0 && (
                 <div className="app-card p-8 text-center">
                     <h2 className="text-lg font-bold text-brand-dark">
-                        No reservations yet
+                        Ainda não existem reservas
                     </h2>
 
                     <p className="mt-2 text-sm text-slate-500">
-                        Start exploring restaurants and reserve your table.
+                        Comece a explorar restaurantes e reserve a sua mesa.
                     </p>
 
                     <Link to="/restaurants" className="btn-primary mt-4">
-                        Find Restaurants
+                        Encontrar Restaurantes
                     </Link>
                 </div>
             )}
@@ -100,15 +105,15 @@ export default function MyReservationsPage() {
                                 </h2>
 
                                 <p className="text-sm text-slate-600">
-                                    {r.date} at {r.time}
+                                    {r.date} às {r.time}
                                 </p>
 
                                 <p className="text-sm text-slate-600">
-                                    Guests: {r.numberOfPeople}
+                                    Pessoas: {r.numberOfPeople}
                                 </p>
 
                                 <p className="mt-1 text-sm font-semibold">
-                                    Status:{" "}
+                                    Estado:{" "}
                                     <span
                                         className={
                                             r.status === "Cancelled"
@@ -116,7 +121,7 @@ export default function MyReservationsPage() {
                                                 : "text-emerald-600"
                                         }
                                     >
-                                        {r.status}
+                                        {statusLabels[r.status] ?? r.status}
                                     </span>
                                 </p>
                             </div>
@@ -126,7 +131,7 @@ export default function MyReservationsPage() {
                                     onClick={() => handleCancel(r.id)}
                                     className="btn-secondary"
                                 >
-                                    Cancel Reservation
+                                    Cancelar reserva
                                 </button>
                             )}
                         </li>

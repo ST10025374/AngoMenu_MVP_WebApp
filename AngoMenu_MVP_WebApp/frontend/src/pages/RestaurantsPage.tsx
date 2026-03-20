@@ -24,7 +24,7 @@ export default function RestaurantsPage() {
             setData(result);
             setPageNumber(targetPage);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load restaurants');
+            setError(err instanceof Error ? err.message : 'Falha ao carregar restaurantes');
         } finally {
             setLoading(false);
         }
@@ -45,8 +45,8 @@ export default function RestaurantsPage() {
             <div className="app-card p-5 sm:p-6">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
-                        <h1 className="text-2xl font-black text-brand-dark sm:text-3xl">Find your next dining spot</h1>
-                        <p className="mt-1 text-sm text-slate-600">Search restaurants by name or location and open details instantly.</p>
+                        <h1 className="text-2xl font-black text-brand-dark sm:text-3xl">Encontre o seu próximo restaurante</h1>
+                        <p className="mt-1 text-sm text-slate-600">Pesquise restaurantes por nome ou localização e abra os detalhes instantaneamente.</p>
                     </div>
 
                     <div className="flex w-full max-w-xl gap-2">
@@ -60,11 +60,11 @@ export default function RestaurantsPage() {
                                     void loadRestaurants(1);
                                 }
                             }}
-                            placeholder="Search by name or location"
-                            aria-label="Search restaurants"
+                            placeholder="Pesquisar por nome ou localização"
+                            aria-label="Pesquisar restaurantes"
                         />
                         <button className="btn-primary shrink-0" onClick={() => void loadRestaurants(1)}>
-                            Search
+                            Pesquisar
                         </button>
                     </div>
                 </div>
@@ -72,7 +72,7 @@ export default function RestaurantsPage() {
 
             {loading && (
                 <div className="app-card p-6">
-                    <p className="text-sm text-slate-500">Loading restaurants...</p>
+                    <p className="text-sm text-slate-500">A carregar restaurantes...</p>
                 </div>
             )}
 
@@ -84,8 +84,8 @@ export default function RestaurantsPage() {
 
             {!loading && !error && data && data.items.length === 0 && (
                 <div className="app-card p-8 text-center">
-                    <h2 className="text-lg font-bold text-brand-dark">No restaurants found</h2>
-                    <p className="mt-2 text-sm text-slate-500">Try a different search term or clear the filter.</p>
+                    <h2 className="text-lg font-bold text-brand-dark">Nenhum restaurante encontrado</h2>
+                    <p className="mt-2 text-sm text-slate-500">Experimente outro termo de pesquisa ou limpe o filtro.</p>
                 </div>
             )}
 
@@ -105,29 +105,29 @@ export default function RestaurantsPage() {
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-lg font-bold text-brand-dark">{restaurant.name}</h2>
                                     <span className="rounded-full bg-brand-yellow/30 px-2.5 py-1 text-xs font-semibold text-brand-dark">
-                                        Open
+                                        Aberto
                                     </span>
                                 </div>
 
                                 <p className="mt-2 min-h-12 text-sm text-slate-600">
-                                    {restaurant.description ?? 'A curated dining experience with quality service and delicious food.'}
+                                    {restaurant.description ?? 'Uma experiência gastronómica selecionada com serviço de qualidade e comida deliciosa.'}
                                 </p>
 
                                 <div className="mt-4 space-y-1 text-sm text-slate-700">
                                     <p>
-                                        <span className="font-semibold text-slate-900">Location:</span> {restaurant.location}
+                                        <span className="font-semibold text-slate-900">Localização:</span> {restaurant.location}
                                     </p>
                                     <p>
-                                        <span className="font-semibold text-slate-900">Phone:</span> {restaurant.phone}
+                                        <span className="font-semibold text-slate-900">Telefone:</span> {restaurant.phone}
                                     </p>
                                     <p>
-                                        <span className="font-semibold text-slate-900">Hours:</span> {restaurant.openingHour} - {restaurant.closingHour}
+                                        <span className="font-semibold text-slate-900">Horário:</span> {restaurant.openingHour} - {restaurant.closingHour}
                                     </p>
                                 </div>
 
                                 <div className="mt-5">
                                     <Link className="btn-secondary w-full" to={`/restaurants/${restaurant.id}`}>
-                                        View details
+                                        Ver detalhes
                                     </Link>
                                 </div>
                             </li>
@@ -136,7 +136,7 @@ export default function RestaurantsPage() {
 
                     <div className="app-card flex flex-wrap items-center justify-center gap-3 p-4 sm:justify-between">
                         <p className="text-sm font-medium text-slate-600">
-                            Showing page <span className="font-bold text-brand-dark">{pageNumber}</span> of{' '}
+                            A mostrar página <span className="font-bold text-brand-dark">{pageNumber}</span> de{' '}
                             <span className="font-bold text-brand-dark">{totalPages}</span>
                         </p>
 
@@ -146,14 +146,14 @@ export default function RestaurantsPage() {
                                 disabled={pageNumber <= 1}
                                 onClick={() => void loadRestaurants(pageNumber - 1)}
                             >
-                                Previous
+                                Anterior
                             </button>
                             <button
                                 className="btn-secondary"
                                 disabled={pageNumber >= totalPages}
                                 onClick={() => void loadRestaurants(pageNumber + 1)}
                             >
-                                Next
+                                Seguinte
                             </button>
                         </div>
                     </div>

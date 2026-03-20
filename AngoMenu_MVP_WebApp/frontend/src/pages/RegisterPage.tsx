@@ -22,10 +22,10 @@ export default function RegisterPage() {
 
         try {
             const message = await register({ firstName, lastName, email, phoneNumber, password });
-            setSuccess(message || 'Registration successful. Redirecting...');
+            setSuccess(message || 'Registo efetuado com sucesso. A redirecionar...');
             setTimeout(() => navigate('/login'), 1000);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Registration failed');
+            setError(err instanceof Error ? err.message : 'Falha no registo');
         } finally {
             setLoading(false);
         }
@@ -35,29 +35,29 @@ export default function RegisterPage() {
         <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2 lg:items-stretch">
             <section className="app-card hidden p-8 lg:block">
                 <span className="inline-flex rounded-full bg-brand-red/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-red">
-                    Join AngoMenu
+                    Junte-se ao AngoMenu
                 </span>
-                <h1 className="mt-4 text-3xl font-black text-brand-dark">Create your account in minutes.</h1>
+                <h1 className="mt-4 text-3xl font-black text-brand-dark">Crie a sua conta em minutos.</h1>
                 <p className="mt-3 text-slate-600">
-                    Get a smoother booking journey with personalized restaurant discovery and faster reservations.
+                    Tenha uma experiência de reserva mais fluida com descoberta personalizada de restaurantes e reservas mais rápidas.
                 </p>
 
                 <div className="mt-8 space-y-4 text-sm text-slate-700">
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Discover restaurants by location and availability</p>
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? View menus before booking</p>
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Manage your dining plans with confidence</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Descubra restaurantes por localização e disponibilidade</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Veja os menus antes de reservar</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Gira os seus planos gastronómicos com confiança</p>
                 </div>
             </section>
 
             <section className="app-card p-6 sm:p-8">
-                <h2 className="text-2xl font-black text-brand-dark">Register</h2>
-                <p className="mt-1 text-sm text-slate-500">Set up your account and start booking.</p>
+                <h2 className="text-2xl font-black text-brand-dark">Registar</h2>
+                <p className="mt-1 text-sm text-slate-500">Configure a sua conta e comece a reservar.</p>
 
                 <form onSubmit={onSubmit} className="mt-6 space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div>
                             <label htmlFor="firstName" className="label">
-                                First name
+                                Primeiro nome
                             </label>
                             <input
                                 id="firstName"
@@ -71,7 +71,7 @@ export default function RegisterPage() {
 
                         <div>
                             <label htmlFor="lastName" className="label">
-                                Last name
+                                Último nome
                             </label>
                             <input
                                 id="lastName"
@@ -101,7 +101,7 @@ export default function RegisterPage() {
 
                     <div>
                         <label htmlFor="phoneNumber" className="label">
-                            Phone number
+                            Número de telefone
                         </label>
                         <input
                             id="phoneNumber"
@@ -116,7 +116,7 @@ export default function RegisterPage() {
 
                     <div>
                         <label htmlFor="password" className="label">
-                            Password
+                            Palavra-passe
                         </label>
                         <input
                             id="password"
@@ -136,14 +136,14 @@ export default function RegisterPage() {
                     )}
 
                     <button type="submit" className="btn-primary w-full" disabled={loading}>
-                        {loading ? 'Creating account...' : 'Create account'}
+                        {loading ? 'A criar conta...' : 'Criar conta'}
                     </button>
                 </form>
 
                 <p className="mt-5 text-sm text-slate-600">
-                    Already registered?{' '}
+                    Já tem conta?{' '}
                     <Link to="/login" className="font-semibold text-brand-red hover:underline">
-                        Sign in
+                        Entrar
                     </Link>
                 </p>
             </section>

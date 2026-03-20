@@ -36,12 +36,12 @@ export default function AdminRestaurantsPage() {
     const [formValues, setFormValues] = useState<RestaurantFormValues>(defaultRestaurantForm);
 
     const modalTitle = useMemo(
-        () => (editingRestaurant ? "Edit Restaurant" : "Create Restaurant"),
+        () => (editingRestaurant ? "Editar Restaurante" : "Criar Restaurante"),
         [editingRestaurant],
     );
 
     if (!isAdmin()) {
-        return <p className="text-sm text-red-600">Unauthorized</p>;
+        return <p className="text-sm text-red-600">Não autorizado</p>
     }
 
     async function loadRestaurants() {
@@ -52,7 +52,7 @@ export default function AdminRestaurantsPage() {
             const data = await getAllRestaurantsAdmin();
             setRestaurants(data);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to load restaurants");
+            setError(err instanceof Error ? err.message : "Falha ao carregar restaurantes");
         } finally {
             setLoading(false);
         }
@@ -109,23 +109,23 @@ export default function AdminRestaurantsPage() {
         try {
             if (editingRestaurant) {
                 await updateRestaurant(editingRestaurant.id, formValues);
-                setSuccess("Restaurant updated successfully.");
+                setSuccess("Restaurante atualizado com sucesso.");
             } else {
                 await createRestaurant(formValues);
-                setSuccess("Restaurant created successfully.");
+                setSuccess("Restaurante criado com sucesso.");
             }
 
             closeModal();
             await loadRestaurants();
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to save restaurant.");
+            setError(err instanceof Error ? err.message : "Falha ao guardar restaurante.");
         } finally {
             setSaving(false);
         }
     }
   
     async function handleDelete(restaurant: AdminRestaurant) {
-        if (!confirm(`Delete restaurant \"${restaurant.name}\"?`)) {
+        if (!confirm(`Eliminar restaurante \"${restaurant.name}\"?`)) {
             return;
         }
 
@@ -134,19 +134,19 @@ export default function AdminRestaurantsPage() {
 
         try {
             await deleteRestaurant(restaurant.id);
-            setSuccess("Restaurant deleted successfully.");
+            setSuccess("Restaurante eliminado com sucesso.");
             await loadRestaurants();
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to delete restaurant.");
+            setError(err instanceof Error ? err.message : "Falha ao eliminar restaurante.");
         }
     }
 
     return (
         <section className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <h1 className="text-3xl font-black text-brand-dark">Manage Restaurants</h1>
+                <h1 className="text-3xl font-black text-brand-dark">Gerir Restaurantes</h1>
                 <button type="button" className="btn-primary" onClick={openCreateModal}>
-                    Create Restaurant
+                    Criar Restaurante
                 </button>
             </div>
             {success && (
@@ -163,11 +163,11 @@ export default function AdminRestaurantsPage() {
 
             {loading ? (
                 <div className="app-card p-6">
-                    <p className="text-sm text-slate-500">Loading restaurants...</p>
+                    <p className="text-sm text-slate-500">A carregar restaurantes...</p>
                 </div>
             ) : restaurants.length === 0 ? (
                 <div className="app-card p-6 text-center">
-                    <p className="text-sm text-slate-600">No restaurants found. Create your first one.</p>
+                        <p className="text-sm text-slate-600">Nenhum restaurante encontrado. Crie o primeiro.</p>
                 </div>
             ) : (
                 <RestaurantTable restaurants={restaurants} onEdit={openEditModal} onDelete={handleDelete} />
@@ -177,7 +177,7 @@ export default function AdminRestaurantsPage() {
                 <RestaurantForm
                     values={formValues}
                     loading={saving}
-                    submitLabel={editingRestaurant ? "Update Restaurant" : "Create Restaurant"}
+                    submitLabel={editingRestaurant ? "Atualizar Restaurante" : "Criar Restaurante"}
                     isEditMode={Boolean(editingRestaurant)}
                     onChange={handleFieldChange}
                     onImageChange={handleImageChange}

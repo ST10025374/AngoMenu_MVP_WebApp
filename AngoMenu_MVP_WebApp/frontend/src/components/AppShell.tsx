@@ -30,10 +30,10 @@ function AdminDropdown({ onNavigate }: { onNavigate?: () => void }) {
     }, []);
 
     const items = [
-        { to: "/admin", label: "Dashboard" },
-        { to: "/admin/restaurants", label: "Manage Restaurants" },
-        { to: "/admin/reservations", label: "Manage Reservations" },
-        { to: "/admin/menu", label: "Manage Menu" },
+        { to: "/admin", label: "Painel" },
+        { to: "/admin/restaurants", label: "Gerir Restaurantes" },
+        { to: "/admin/reservations", label: "Gerir Reservas" },
+        { to: "/admin/menu", label: "Gerir Menu" },
     ];
 
     return (
@@ -45,7 +45,7 @@ function AdminDropdown({ onNavigate }: { onNavigate?: () => void }) {
                 aria-expanded={open}
                 aria-haspopup="menu"
             >
-                Admin
+                Administrador
                 <span className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true">
                     ?
                 </span>
@@ -125,11 +125,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                         {isLoggedIn && (
                             <>
                                 <Link to="/restaurants" className="text-sm font-semibold text-slate-700 transition hover:text-brand-red">
-                                    Restaurants
+                                    Restaurantes
                                 </Link>
                                 {isClientUser && (
                                     <Link to="/reservations/my" className="text-sm font-semibold text-slate-700 transition hover:text-brand-red">
-                                        My Reservations
+                                        As Minhas Reservas
                                     </Link>
                                 )}
                             </>
@@ -140,15 +140,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                         {!isLoggedIn ? (
                             <>
                                 <Link to="/login" className="text-sm font-semibold text-slate-700 transition hover:text-brand-red">
-                                    Login
+                                    Entrar
                                 </Link>
                                 <Link to="/register" className="btn-primary text-sm">
-                                    Register
+                                    Registar
                                 </Link>
                             </>
                         ) : (
                             <button onClick={handleLogout} className="btn-primary text-sm">
-                                Logout
+                                Terminar sessão
                             </button>
                         )}
                     </div>
@@ -160,11 +160,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             {isLoggedIn && (
                                 <>
                                     <Link to="/restaurants" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                        Restaurants
+                                        Restaurantes
                                     </Link>
                                     {isClientUser && (
                                         <Link to="/reservations/my" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                            My Reservations
+                                            As Minhas Reservas
                                         </Link>
                                     )}
                                 </>
@@ -173,16 +173,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             {isAdminUser && (
                                 <>
                                     <Link to="/admin" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                        Dashboard
+                                        Painel
                                     </Link>
                                     <Link to="/admin/restaurants" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                        Manage Restaurants
+                                        Gerir Restaurantes
                                     </Link>
                                     <Link to="/admin/reservations" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                        Manage Reservations
+                                        Gerir Reservas
                                     </Link>
                                     <Link to="/admin/menu" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                        Manage Menu
+                                        Gerir Menu
                                     </Link>
                                 </>
                             )}
@@ -190,15 +190,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             {!isLoggedIn ? (
                                 <>
                                     <Link to="/login" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                        Login
+                                        Entrar
                                     </Link>
                                     <Link to="/register" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                        Register
+                                        Registar
                                     </Link>
                                 </>
                             ) : (
                                 <button onClick={handleLogout} className="btn-primary w-full text-sm">
-                                    Logout
+                                        Terminar sessão
                                 </button>
                             )}
                         </div>

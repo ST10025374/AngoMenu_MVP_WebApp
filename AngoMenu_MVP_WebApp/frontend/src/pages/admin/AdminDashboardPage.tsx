@@ -10,7 +10,7 @@ export default function AdminDashboardPage() {
 
     // ?? EXTRA SAFETY (frontend)
     if (!isAdmin()) {
-        return <p>Unauthorized</p>;
+        return <p>Não autorizado</p>;
     }
 
     useEffect(() => {
@@ -25,7 +25,7 @@ export default function AdminDashboardPage() {
                 setPending(res.filter(x => x.status === 'Pending').length);
             } catch (err) {
                 console.error(err);
-                setError("Failed to load dashboard");
+                setError("Falha ao carregar painel");
             }
         }
 
@@ -35,7 +35,7 @@ export default function AdminDashboardPage() {
     return (
         <section className="space-y-6">
             <h1 className="text-3xl font-black text-brand-dark">
-                Admin Dashboard
+                Painel de Administração
             </h1>
 
             {error && (
@@ -46,17 +46,17 @@ export default function AdminDashboardPage() {
 
             <div className="grid md:grid-cols-3 gap-4">
                 <div className="app-card p-5">
-                    <p>Restaurants</p>
+                    <p>Restaurantes</p>
                     <h2 className="text-xl font-bold">{restaurants}</h2>
                 </div>
 
                 <div className="app-card p-5">
-                    <p>Reservations</p>
+                    <p>Reservas</p>
                     <h2 className="text-xl font-bold">{reservations}</h2>
                 </div>
 
                 <div className="app-card p-5">
-                    <p>Pending</p>
+                    <p>Pendentes</p>
                     <h2 className="text-xl font-bold text-brand-red">{pending}</h2>
                 </div>
             </div>

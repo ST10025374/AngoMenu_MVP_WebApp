@@ -22,7 +22,7 @@ export default function CreateReservationPage() {
     useEffect(() => {
         async function loadRestaurant() {
             if (!restaurantId || Number.isNaN(restaurantId)) {
-                setError("Invalid restaurant.");
+                setError("Restaurante inválido.");
                 return;
             }
 
@@ -30,7 +30,7 @@ export default function CreateReservationPage() {
                 const data = await getRestaurantById(restaurantId);
                 setRestaurant(data);
             } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to load restaurant.");
+                setError(err instanceof Error ? err.message : "Falha ao carregar restaurante.");
             }
         }
 
@@ -41,7 +41,7 @@ export default function CreateReservationPage() {
         e.preventDefault();
 
         if (!restaurantId || Number.isNaN(restaurantId)) {
-            setError("Invalid restaurant.");
+            setError("Restaurante inválido.");
             return;
         }
 
@@ -57,14 +57,14 @@ export default function CreateReservationPage() {
                 numberOfPeople,
             });
 
-            setSuccess(message || "Reservation created successfully.");
+            setSuccess(message || "Reserva criada com sucesso.");
 
             setTimeout(() => {
                 navigate("/reservations/my");
             }, 1200);
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to create reservation.");
+            setError(err instanceof Error ? err.message : "Falha ao criar reserva.");
         } finally {
             setLoading(false);
         }
@@ -76,7 +76,7 @@ export default function CreateReservationPage() {
                 to={`/restaurants/${restaurantId}`}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-brand-red hover:underline"
             >
-                ? Back to restaurant
+                Voltar ao restaurant
             </Link>
 
             {restaurant && (
@@ -93,11 +93,11 @@ export default function CreateReservationPage() {
 
             <div className="app-card p-6 md:p-8">
                 <h1 className="text-2xl font-black text-brand-dark">
-                    Reserve a Table
+                    Reservar uma mesa
                 </h1>
 
                 <p className="mt-1 text-sm text-slate-600">
-                    Select your preferred date, time, and number of guests.
+                    Selecione a data, hora e número de pessoas pretendidos.
                 </p>
 
                 <form
@@ -105,7 +105,7 @@ export default function CreateReservationPage() {
                     className="mt-6 grid gap-5 sm:grid-cols-2"
                 >
                     <div>
-                        <label className="label">Date</label>
+                        <label className="label">Data</label>
                         <input
                             type="date"
                             className="input"
@@ -116,7 +116,7 @@ export default function CreateReservationPage() {
                     </div>
 
                     <div>
-                        <label className="label">Time</label>
+                        <label className="label">Hora</label>
                         <input
                             type="time"
                             className="input"
@@ -127,7 +127,7 @@ export default function CreateReservationPage() {
                     </div>
 
                     <div className="sm:col-span-2">
-                        <label className="label">Number of Guests</label>
+                        <label className="label">Número de pessoas</label>
 
                         <input
                             type="number"
@@ -158,7 +158,7 @@ export default function CreateReservationPage() {
                             className="btn-primary"
                             disabled={loading}
                         >
-                            {loading ? "Creating reservation..." : "Reserve Table"}
+                            {loading ? "A criar reserva..." : "Reservar mesa"}
                         </button>
                     </div>
                 </form>

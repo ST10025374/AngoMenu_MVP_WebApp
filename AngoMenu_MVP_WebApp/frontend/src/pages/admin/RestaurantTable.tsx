@@ -14,10 +14,10 @@ export default function RestaurantTable({
             <table className="w-full text-sm">
                 <thead className="bg-slate-50">
                     <tr>
-                        <th className="p-3 text-left">Image</th>
-                        <th className="p-3 text-left">Name</th>
-                        <th className="p-3 text-left">Location</th>
-                        <th className="p-3 text-right">Actions</th>
+                        <th className="p-3 text-left">Imagem</th>
+                        <th className="p-3 text-left">Nome</th>
+                        <th className="p-3 text-left">Localização</th>
+                        <th className="p-3 text-right">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,7 +31,7 @@ export default function RestaurantTable({
                                         className="h-12 w-20 rounded-md object-cover"
                                     />
                                 ) : (
-                                    <span className="text-xs text-slate-400">No image</span>
+                                   <span className="text-xs text-slate-400">Sem imagem</span>
                                 )}
                             </td>
                             <td className="p-3 font-semibold text-brand-dark">{restaurant.name}</td>
@@ -43,14 +43,14 @@ export default function RestaurantTable({
                                         onClick={() => onEdit(restaurant)}
                                         className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-slate-700 transition hover:border-brand-red hover:text-brand-red"
                                     >
-                                        Edit
+                                        Editar
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => onDelete(restaurant)}
                                         className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-50"
                                     >
-                                        Delete
+                                        Eliminar
                                     </button>
                                 </div>
                             </td>

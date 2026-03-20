@@ -32,7 +32,7 @@ export default function AdminMenuPage() {
     const [editingId, setEditingId] = useState<number | null>(null);
 
     if (!isAdmin()) {
-        return < p className = "text-sm text-red-600" > Unauthorized</p >;
+        return < p className="text-sm text-red-600" > Não autorizado</p >;
     }
 
     useEffect(() => {
@@ -41,7 +41,7 @@ export default function AdminMenuPage() {
                 const data = await getAllRestaurantsAdmin();
                 setRestaurants(data);
             } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to load restaurants");
+                setError(err instanceof Error ? err.message : "Falha ao carregar restaurantes");
             }
         }
 
@@ -56,7 +56,7 @@ export default function AdminMenuPage() {
             const data = await getMenuByRestaurantAdmin(restaurantId);
             setMenuItems(data);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to load menu");
+            setError(err instanceof Error ? err.message : "Falha ao carregar menu");
         } finally {
             setLoading(false);
         }
@@ -126,10 +126,10 @@ export default function AdminMenuPage() {
         try {
             if (editingId) {
                 await updateMenuItem(editingId, form);
-                setSuccess("Menu item updated successfully.");
+                setSuccess("Item do menu atualizado com sucesso.");
             } else {
                 await createMenuItem(form);
-                setSuccess("Menu item created successfully.");
+                setSuccess("Item do menu criado com sucesso.");
             }
 
             setForm({
@@ -140,7 +140,7 @@ export default function AdminMenuPage() {
             setEditingId(null);
             await loadMenu(selectedRestaurant);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Error saving menu item");
+            setError(err instanceof Error ? err.message : "Erro ao guardar item do menu");
         } finally {
             setSaving(false);
         }
@@ -159,7 +159,7 @@ export default function AdminMenuPage() {
 
     async function handleDelete(id: number) {
         if (!selectedRestaurant) return;
-        if (!confirm("Delete this item?")) return;
+        if (!confirm("Eliminar este item?")) return;
 
         setError("");
         setSuccess("");
@@ -168,14 +168,14 @@ export default function AdminMenuPage() {
             await deleteMenuItem(id);
             loadMenu(selectedRestaurant);
         } catch {
-            alert("Error deleting item");
+            alert("Erro ao eliminar item");
         }
     }
 
     return (
         <section className="space-y-6">
             <h1 className="text-3xl font-black text-brand-dark">
-                Manage Menu
+                Gerir Menu
             </h1>
 
             {success && (
@@ -191,13 +191,13 @@ export default function AdminMenuPage() {
             )}
 
             <div className="app-card p-4">
-                <label className="label">Select Restaurant</label>
+                <label className="label">Selecionar Restaurante</label>
                 <select
                     className="input"
                     value={selectedRestaurant ?? ""}
                     onChange={(e) => handleSelectRestaurant(Number(e.target.value))}
                 >
-                    <option value="">Select...</option>
+                    <option value="">Selecionar...</option>
                     {restaurants.map((restaurant) => (
                         <option key={restaurant.id} value={restaurant.id}>
                             {restaurant.name}
@@ -210,7 +210,7 @@ export default function AdminMenuPage() {
                 <form onSubmit={handleSubmit} className="app-card grid gap-4 p-6 md:grid-cols-2">
                     <input
                         name="name"
-                        placeholder="Name"
+                        placeholder="Nome"
                         value={form.name}
                         onChange={handleChange}
                         className="input"
@@ -222,7 +222,7 @@ export default function AdminMenuPage() {
                         type="text"
                         inputMode="numeric"
                         pattern="[0-9]*"
-                        placeholder="Price (AOA)"
+                        placeholder="Preço  (AOA)"
                         value={form.price}
                         onChange={handleChange}
                         onKeyDown={handlePriceKeyDown}
@@ -232,14 +232,14 @@ export default function AdminMenuPage() {
 
                     <input
                         name="description"
-                        placeholder="Description"
+                        placeholder="Descrição"
                         value={form.description}
                         onChange={handleChange}
                         className="input md:col-span-2"
                     />
 
                     <button className="btn-primary md:col-span-2" disabled={saving}>
-                        {saving ? "Saving..." : editingId ? "Update Item" : "Add Item"}
+                        {saving ? "A guardar..." : editingId ? "Atualizar Item" : "Adicionar Item"}
                     </button>
                 </form>
             )}
@@ -247,19 +247,19 @@ export default function AdminMenuPage() {
             {selectedRestaurant && (
                 loading ? (
                     <div className="app-card p-6">
-                        <p className="text-sm text-slate-500">Loading menu items...</p>
+                        <p className="text-sm text-slate-500">A carregar itens do menu...</p>
                     </div>
                 ) : menuItems.length === 0 ? (
-                    <div className="app-card p-6 text-center text-sm text-slate-600">No menu items found for this restaurant.</div>
+                        <div className="app-card p-6 text-center text-sm text-slate-600">Nenhum item de menu encontrado para este restaurante.</div>
                 ) : (
                     <div className="app-card overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead className="bg-slate-50">
                                 <tr>
-                                    <th className="p-3 text-left">Name</th>
-                                    <th className="p-3 text-left">Price</th>
-                                    <th className="p-3 text-left">Description</th>
-                                    <th className="p-3 text-right">Actions</th>
+                                            <th className="p-3 text-left">Nome</th>
+                                            <th className="p-3 text-left">Preço</th>
+                                            <th className="p-3 text-left">Descrição</th>
+                                            <th className="p-3 text-right">Ações</th>
                                 </tr>
                             </thead>
 
@@ -276,7 +276,7 @@ export default function AdminMenuPage() {
                                                 onClick={() => handleEdit(item)}
                                                 className="text-brand-red hover:underline"
                                             >
-                                                Edit
+                                                Editar
                                             </button>
 
                                             <button
@@ -284,7 +284,7 @@ export default function AdminMenuPage() {
                                                 onClick={() => handleDelete(item.id)}
                                                 className="text-red-600 hover:underline"
                                             >
-                                                Delete
+                                                Eliminar
                                             </button>
                                         </td>
                                     </tr>

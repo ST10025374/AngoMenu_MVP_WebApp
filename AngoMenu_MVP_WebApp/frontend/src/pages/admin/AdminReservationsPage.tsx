@@ -10,6 +10,11 @@ import {
 import { isAdmin } from "../../lib/auth";
 
 const statuses: ReservationStatus[] = ["Pending", "Confirmed", "Cancelled"];
+const statusLabels: Record<ReservationStatus, string> = {
+    Pending: "Pendente",
+    Confirmed: "Confirmada",
+    Cancelled: "Cancelada",
+};
 
 export default function AdminReservationsPage() {
     const [reservations, setReservations] = useState<AdminReservation[]>([]);
@@ -18,7 +23,7 @@ export default function AdminReservationsPage() {
     const [success, setSuccess] = useState("");
 
     if (!isAdmin()) {
-        return <p className="text-sm text-red-600">Unauthorized</p>;
+        return <p className="text-sm text-red-600">Não autorizado</p>
     }
 
     async function load() {
@@ -29,7 +34,7 @@ export default function AdminReservationsPage() {
             const data = await getAllReservations();
             setReservations(data);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to load reservations");
+            setError(err instanceof Error ? err.message : "Falha ao carregar reservas");
         } finally {
             setLoading(false);
         }
@@ -46,14 +51,14 @@ export default function AdminReservationsPage() {
         try {
             await updateReservationStatus(id, status);
             setReservations((prev) => prev.map((item) => (item.id === id ? { ...item, status } : item)));
-            setSuccess(`Reservation #${id} updated to ${status}.`);
+            setSuccess(`Reserva #${id} atualizada para ${statusLabels[status]}.`);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to update status");
+            setError(err instanceof Error ? err.message : "Falha ao atualizar estado");
         }
     }
 
     async function handleDelete(id: number) {
-        if (!confirm("Delete this reservation?")) return;
+        if (!confirm("Eliminar esta reserva?")) return;
 
         setError("");
         setSuccess("");
@@ -61,15 +66,15 @@ export default function AdminReservationsPage() {
         try {
             await deleteReservation(id);
             setReservations((prev) => prev.filter((item) => item.id !== id));
-            setSuccess(`Reservation #${id} deleted.`);
+            setSuccess(`Reserva #${id} eliminada.`);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to delete reservation");
+            setError(err instanceof Error ? err.message : "Falha ao eliminar reserva");
         }
     }
 
     return (
         <section className="space-y-6">
-            <h1 className="text-3xl font-black text-brand-dark">Manage Reservations</h1>
+            <h1 className="text-3xl font-black text-brand-dark">Gerir Reservas</h1>
 
             {success && (
                 <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
@@ -83,13 +88,13 @@ export default function AdminReservationsPage() {
 
             {loading && (
                 <div className="app-card p-6">
-                    <p className="text-sm text-slate-500">Loading reservations...</p>
+                    <p className="text-sm text-slate-500">A carregar reservas...</p>
                 </div>
             )}
 
             {!loading && reservations.length === 0 && (
                 <div className="app-card p-6 text-center">
-                    <p className="text-sm text-slate-600">No reservations found.</p>
+                    <p className="text-sm text-slate-600">Nenhuma reserva encontrada.</p>
                 </div>
             )}
 
@@ -98,12 +103,12 @@ export default function AdminReservationsPage() {
                     <table className="w-full text-sm">
                         <thead className="bg-slate-50">
                             <tr>
-                                <th className="p-3 text-left">User</th>
-                                <th className="p-3 text-left">Restaurant</th>
-                                <th className="p-3 text-left">Date</th>
-                                <th className="p-3 text-left">Guests</th>
-                                <th className="p-3 text-left">Status</th>
-                                <th className="p-3 text-right">Actions</th>
+                                <th className="p-3 text-left">Utilizador</th>
+                                <th className="p-3 text-left">Restaurante</th>
+                                <th className="p-3 text-left">Data</th>
+                                <th className="p-3 text-left">Pessoas</th>
+                                <th className="p-3 text-left">Estado</th>
+                                <th className="p-3 text-right">Ações</th>
                             </tr>
                         </thead>
 
@@ -125,7 +130,7 @@ export default function AdminReservationsPage() {
                                         >
                                             {statuses.map((status) => (
                                                 <option key={status} value={status}>
-                                                    {status}
+                                                    {statusLabels[status]}
                                                 </option>
                                             ))}
                                         </select>
@@ -137,7 +142,7 @@ export default function AdminReservationsPage() {
                                             onClick={() => handleDelete(reservation.id)}
                                             className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-red-600 transition hover:bg-red-50"
                                         >
-                                            Delete
+                                            Eliminar
                                         </button>
                                     </td>
                                 </tr>
