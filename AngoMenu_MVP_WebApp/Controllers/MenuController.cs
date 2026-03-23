@@ -75,7 +75,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
         // ADMIN: Update menu item
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, MenuItemCreateDto dto)
+        public async Task<IActionResult> Update(int id, MenuItemUpdateDto dto)
         {
             var result = await _menuService.UpdateMenuItem(id, dto);
 

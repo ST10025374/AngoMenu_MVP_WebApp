@@ -25,12 +25,11 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 return Result.Fail("Restaurant does not exist.");
 
             var menuItem = new MenuItem
-            {
-                RestaurantId = dto.RestaurantId,
-                Name = dto.Name,
-                Price = dto.Price,
-                Description = dto.Description
+            {                
+                RestaurantId = dto.RestaurantId
             };
+
+            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description);
 
             _context.MenuItems.Add(menuItem);
             await _context.SaveChangesAsync();
@@ -52,11 +51,10 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
             var menuItem = new MenuItem
             {
-                RestaurantId = restaurantId,
-                Name = dto.Name,
-                Price = dto.Price,
-                Description = dto.Description
+                RestaurantId = restaurantId
             };
+
+            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description);
 
             _context.MenuItems.Add(menuItem);
             await _context.SaveChangesAsync();
@@ -102,16 +100,17 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             return await GetMenuByRestaurant(restaurantId);
         }
 
-        public Task<Result> UpdateMenuItem(int id, MenuItemCreateDto dto)
+        public async Task<Result> UpdateMenuItem(int id, MenuItemUpdateDto dto)
         {
-            var updateDto = new MenuItemUpdateDto
-            {
-                Name = dto.Name,
-                Price = dto.Price,
-                Description = dto.Description
-            };
+            var menuItem = await _context.MenuItems.FindAsync(id);
 
-            return UpdateMenuItem(id, updateDto);
+            if (menuItem == null)
+                return Result.Fail("Menu item not found.");
+
+            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description);
+            await _context.SaveChangesAsync();
+
+            return Result.Ok("Menu item updated successfully.");
         }
 
         public async Task<Result> UpdateManagerMenuItem(int managerUserId, int id, MenuItemUpdateDto dto)
@@ -159,6 +158,13 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             }
 
             return await DeleteMenuItem(id);
+        }
+
+        private static void ApplyMenuItemChanges(MenuItem menuItem, string name, decimal price, string description)
+        {
+            menuItem.Name = name;
+            menuItem.Price = price;
+            menuItem.Description = description;
         }
     }
 }

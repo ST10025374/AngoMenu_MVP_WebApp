@@ -8,7 +8,6 @@ namespace AngoMenu_MVP_WebApp.Services.Interfaces
         Task<Result> CreateMenuItem(MenuItemCreateDto dto);
         Task<Result<List<MenuItemResponseDto>>> GetMenuByRestaurant(int restaurantId);
         Task<Result<List<MenuItemResponseDto>>> GetManagerMenu(int managerUserId);
-        Task<Result> UpdateMenuItem(int id, MenuItemCreateDto dto);
         Task<Result> UpdateMenuItem(int id, MenuItemUpdateDto dto);
         Task<Result> UpdateManagerMenuItem(int managerUserId, int id, MenuItemUpdateDto dto);
         Task<Result> DeleteMenuItem(int id);
