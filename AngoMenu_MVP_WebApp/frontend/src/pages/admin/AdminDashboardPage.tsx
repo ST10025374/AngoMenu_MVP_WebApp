@@ -10,7 +10,7 @@ export default function AdminDashboardPage() {
 
     // ?? EXTRA SAFETY (frontend)
     if (!isAdmin()) {
-        return <p>Não autorizado</p>;
+        return <p>NÃ£o autorizado</p>;
     }
 
     useEffect(() => {
@@ -35,7 +35,7 @@ export default function AdminDashboardPage() {
     return (
         <section className="space-y-6">
             <h1 className="text-3xl font-black text-brand-dark">
-                Painel de Administração
+                Painel de AdministraÃ§Ã£o
             </h1>
 
             {error && (

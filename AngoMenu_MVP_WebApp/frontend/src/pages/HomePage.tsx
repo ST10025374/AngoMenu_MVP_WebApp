@@ -6,9 +6,9 @@ export default function HomePage() {
     const role = getUserRole();
 
     const primaryAction = !isLoggedIn
-        ? { label: "Começar a reservar", to: "/login" }
+        ? { label: "ComeÃ§ar a reservar", to: "/login" }
         : role === "Admin"
-            ? { label: "Ir para o Painel de Administração", to: "/admin" }
+            ? { label: "Ir para o Painel de AdministraÃ§Ã£o", to: "/admin" }
             : { label: "Explorar Restaurantes", to: "/restaurants" };
 
     return (
@@ -23,13 +23,13 @@ export default function HomePage() {
 
                     <h1 className="mt-4 text-4xl md:text-5xl font-black leading-tight text-brand-dark">
                         Reserve restaurantes
-                        <span className="text-brand-red"> de forma mais inteligente</span>, mais rápido,
-                        e com confiança.
+                        <span className="text-brand-red"> de forma mais inteligente</span>, mais rÃ¡pido,
+                        e com confianÃ§a.
                     </h1>
 
                     <p className="mt-4 text-slate-600 max-w-xl">
                         Descubra os melhores restaurantes, explore menus e reserve a sua mesa em segundos.
-                        Feito para rapidez, simplicidade e uma experiência premium.
+                        Feito para rapidez, simplicidade e uma experiÃªncia premium.
                     </p>
 
                     <div className="mt-6 flex flex-wrap gap-3">
@@ -54,12 +54,12 @@ export default function HomePage() {
                     <ul className="mt-4 space-y-3 text-sm text-slate-600">
                         <li className="flex gap-2">
                             <span className="w-2 h-2 mt-2 rounded-full bg-brand-red" />
-                            Início de sessão seguro e gestão de conta
+                            InÃ­cio de sessÃ£o seguro e gestÃ£o de conta
                         </li>
 
                         <li className="flex gap-2">
                             <span className="w-2 h-2 mt-2 rounded-full bg-brand-yellow" />
-                            Pesquisar restaurantes com busca rápida
+                            Pesquisar restaurantes com busca rÃ¡pida
                         </li>
 
                         <li className="flex gap-2">
@@ -81,10 +81,10 @@ export default function HomePage() {
             <div className="grid gap-6 md:grid-cols-3">
                 <div className="app-card p-5">
                     <p className="text-xs uppercase text-slate-500 font-semibold">
-                        Experiência
+                        ExperiÃªncia
                     </p>
                     <h3 className="mt-1 font-bold text-brand-dark text-lg">
-                        Reserva sem complicações
+                        Reserva sem complicaÃ§Ãµes
                     </h3>
                     <p className="mt-2 text-sm text-slate-600">
                         Reserve uma mesa em segundos com um fluxo simples e intuitivo.
@@ -96,10 +96,10 @@ export default function HomePage() {
                         Rapidez
                     </p>
                     <h3 className="mt-1 font-bold text-brand-dark text-lg">
-                        Rápido e responsivo
+                        RÃ¡pido e responsivo
                     </h3>
                     <p className="mt-2 text-sm text-slate-600">
-                        Desenvolvido com React + Vite para navegação ultrarrápida.
+                        Desenvolvido com React + Vite para navegaÃ§Ã£o ultrarrÃ¡pida.
                     </p>
                 </div>
 
@@ -108,7 +108,7 @@ export default function HomePage() {
                         Controlo
                     </p>
                     <h3 className="mt-1 font-bold text-brand-dark text-lg">
-                        Gestão Administrativa
+                        GestÃ£o Administrativa
                     </h3>
                     <p className="mt-2 text-sm text-slate-600">
                         Controlo total sobre restaurantes, menus e reservas.
@@ -119,11 +119,11 @@ export default function HomePage() {
             {/* CTA */}
             <div className="app-card p-8 text-center">
                 <h2 className="text-2xl font-black text-brand-dark">
-                    Pronto para começar?
+                    Pronto para comeÃ§ar?
                 </h2>
 
                 <p className="mt-2 text-slate-600">
-                    Junte-se agora e comece a reservar a sua próxima experiência gastronómica.
+                    Junte-se agora e comece a reservar a sua prÃ³xima experiÃªncia gastronÃ³mica.
                 </p>
 
                 <div className="mt-5 flex justify-center gap-3">

@@ -16,8 +16,8 @@ export default function RestaurantTable({
                     <tr>
                         <th className="p-3 text-left">Imagem</th>
                         <th className="p-3 text-left">Nome</th>
-                        <th className="p-3 text-left">Localização</th>
-                        <th className="p-3 text-right">Ações</th>
+                        <th className="p-3 text-left">LocalizaÃ§Ã£o</th>
+                        <th className="p-3 text-right">AÃ§Ãµes</th>
                     </tr>
                 </thead>
                 <tbody>

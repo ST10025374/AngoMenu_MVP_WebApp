@@ -32,7 +32,7 @@ export default function AdminMenuPage() {
     const [editingId, setEditingId] = useState<number | null>(null);
 
     if (!isAdmin()) {
-        return < p className="text-sm text-red-600" > Não autorizado</p >;
+        return < p className="text-sm text-red-600" > NÃ£o autorizado</p >;
     }
 
     useEffect(() => {
@@ -222,7 +222,7 @@ export default function AdminMenuPage() {
                         type="text"
                         inputMode="numeric"
                         pattern="[0-9]*"
-                        placeholder="Preço  (AOA)"
+                        placeholder="PreÃ§o  (AOA)"
                         value={form.price}
                         onChange={handleChange}
                         onKeyDown={handlePriceKeyDown}
@@ -232,7 +232,7 @@ export default function AdminMenuPage() {
 
                     <input
                         name="description"
-                        placeholder="Descrição"
+                        placeholder="DescriÃ§Ã£o"
                         value={form.description}
                         onChange={handleChange}
                         className="input md:col-span-2"
@@ -257,9 +257,9 @@ export default function AdminMenuPage() {
                             <thead className="bg-slate-50">
                                 <tr>
                                             <th className="p-3 text-left">Nome</th>
-                                            <th className="p-3 text-left">Preço</th>
-                                            <th className="p-3 text-left">Descrição</th>
-                                            <th className="p-3 text-right">Ações</th>
+                                            <th className="p-3 text-left">PreÃ§o</th>
+                                            <th className="p-3 text-left">DescriÃ§Ã£o</th>
+                                            <th className="p-3 text-right">AÃ§Ãµes</th>
                                 </tr>
                             </thead>
 

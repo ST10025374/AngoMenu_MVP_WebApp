@@ -41,7 +41,7 @@ export default function AdminRestaurantsPage() {
     );
 
     if (!isAdmin()) {
-        return <p className="text-sm text-red-600">Não autorizado</p>
+        return <p className="text-sm text-red-600">NÃ£o autorizado</p>
     }
 
     async function loadRestaurants() {

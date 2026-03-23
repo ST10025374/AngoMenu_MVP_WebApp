@@ -21,7 +21,7 @@ export default function RestaurantDetailsPage() {
     useEffect(() => {
         async function load() {
             if (!restaurantId || Number.isNaN(restaurantId)) {
-                setError('ID de restaurante inválido.');
+                setError('ID de restaurante invÃ¡lido.');
                 setLoading(false);
                 return;
             }
@@ -66,7 +66,7 @@ export default function RestaurantDetailsPage() {
     if (!restaurant) {
         return (
             <div className="app-card p-6">
-                <p className="text-sm text-slate-600">Restaurante não encontrado.</p>
+                <p className="text-sm text-slate-600">Restaurante nÃ£o encontrado.</p>
             </div>
         );
     }
@@ -88,7 +88,7 @@ export default function RestaurantDetailsPage() {
                 <div className="border-b border-slate-200 bg-gradient-to-r from-brand-dark to-slate-900 p-6 text-white">
                     <h1 className="text-3xl font-black">{restaurant.name}</h1>
                     <p className="mt-2 max-w-3xl text-sm text-slate-200">
-                        {restaurant.description ?? 'Um destino premium para refeições memoráveis e serviço de qualidade.'}
+                        {restaurant.description ?? 'Um destino premium para refeiÃ§Ãµes memorÃ¡veis e serviÃ§o de qualidade.'}
                     </p>
                     <div className="mt-4">
                         <Link
@@ -102,7 +102,7 @@ export default function RestaurantDetailsPage() {
 
                 <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="rounded-xl bg-slate-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Localização</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">LocalizaÃ§Ã£o</p>
                         <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.location}</p>
                     </div>
 
@@ -133,7 +133,7 @@ export default function RestaurantDetailsPage() {
 
                 {menuItems.length === 0 ? (
                     <div className="mt-4 rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500">
-                        Ainda não existem itens de menu disponíveis.
+                        Ainda nÃ£o existem itens de menu disponÃ­veis.
                     </div>
                 ) : (
                     <ul className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">

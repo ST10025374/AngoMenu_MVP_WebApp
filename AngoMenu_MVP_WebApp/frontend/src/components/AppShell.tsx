@@ -148,7 +148,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             </>
                         ) : (
                             <button onClick={handleLogout} className="btn-primary text-sm">
-                                Terminar sess„o
+                                Terminar sess√£o
                             </button>
                         )}
                     </div>
@@ -198,7 +198,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                                 </>
                             ) : (
                                 <button onClick={handleLogout} className="btn-primary w-full text-sm">
-                                        Terminar sess„o
+                                        Terminar sess√£o
                                 </button>
                             )}
                         </div>

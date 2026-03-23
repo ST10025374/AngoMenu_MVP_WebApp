@@ -27,7 +27,7 @@ export default function LoginPage() {
                 navigate('/restaurants');
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Falha ao iniciar sess„o');
+            setError(err instanceof Error ? err.message : 'Falha ao iniciar sess√£o');
         } finally {
             setLoading(false);
         }
@@ -45,7 +45,7 @@ export default function LoginPage() {
                 </p>
 
                 <div className="mt-8 space-y-4 text-sm text-slate-700">
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? AutenticaÁ„o r·pida e segura</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Autentica√ß√£o r√°pida e segura</p>
                     <p className="rounded-xl border border-slate-200 bg-white p-4">? Pesquisa de restaurantes em tempo real</p>
                     <p className="rounded-xl border border-slate-200 bg-white p-4">? Interface limpa com layouts responsivos</p>
                 </div>
@@ -94,7 +94,7 @@ export default function LoginPage() {
                 </form>
 
                 <p className="mt-5 text-sm text-slate-600">
-                    Ainda n„o tem conta?{' '}
+                    Ainda n√£o tem conta?{' '}
                     <Link to="/register" className="font-semibold text-brand-red hover:underline">
                         Crie uma conta
                     </Link>
