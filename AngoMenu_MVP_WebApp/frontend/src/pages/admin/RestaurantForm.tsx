@@ -34,8 +34,8 @@ export default function RestaurantForm({
     const previewUrl = getImageUrl(values.imageUrl ?? null);
 
     return (
-        <form onSubmit={onSubmit} className="flex h-full min-h-0 flex-col">
-            <div className="grid min-h-0 flex-1 gap-4 overflow-y-auto pr-1 md:grid-cols-2">
+        <form onSubmit={onSubmit} className="flex flex-col">
+            <div className="grid gap-4 md:grid-cols-2">
                 <div>
                 <label className="label" htmlFor="restaurant-name">Nome</label>
                 <input
@@ -215,7 +215,7 @@ export default function RestaurantForm({
 
             </div>
 
-            <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-slate-100 bg-white pt-4">
+            <div className="sticky bottom-0 mt-6 flex flex-wrap justify-end gap-2 border-t border-slate-100 bg-white pt-4">
                 <button type="button" className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600" onClick={onCancel}>
                     Cancelar
                 </button>
