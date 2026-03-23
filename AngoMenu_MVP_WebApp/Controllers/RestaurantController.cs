@@ -1,10 +1,10 @@
 ﻿using AngoMenu_MVP_WebApp.Common.Pagination;
 using AngoMenu_MVP_WebApp.DTOs.Restaurant;
-using AngoMenu_MVP_WebApp.Models;
 using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace AngoMenu_MVP_WebApp.Controllers
 {
@@ -49,6 +49,21 @@ namespace AngoMenu_MVP_WebApp.Controllers
             return Ok(result.Data);
         }
 
+        [Authorize(Roles = "Manager")]
+        [HttpGet("manager/my-restaurant")]
+        public async Task<IActionResult> GetMyRestaurant()
+        {
+            var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _restaurantService.GetManagerRestaurant(managerId);
+
+            if (!result.Success)
+            {
+                return NotFound(result.Message);
+            }
+
+            return Ok(result.Data);
+        }
+
         // 🔹 POST: api/restaurants
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -76,6 +91,22 @@ namespace AngoMenu_MVP_WebApp.Controllers
 
             return Ok(result.Message);
         }
+
+        [Authorize(Roles = "Manager")]
+        [HttpPut("manager/my-restaurant")]
+        public async Task<IActionResult> UpdateMyRestaurant([FromForm] RestaurantUpdateDto dto)
+        {
+            var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _restaurantService.UpdateManagerRestaurant(managerId, dto);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result.Message);
+        }
+
 
         // 🔹 DELETE: api/restaurants/{id}
         [Authorize(Roles = "Admin")]

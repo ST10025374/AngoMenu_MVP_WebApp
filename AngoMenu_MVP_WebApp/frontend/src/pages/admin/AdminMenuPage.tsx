@@ -6,13 +6,13 @@ import {
     deleteMenuItem,
     getAllRestaurantsAdmin,
     type AdminMenuItem,
-    type AdminRestaurant
+    type AdminRestaurant,
+    type MenuItemUpsertPayload,
 } from "../../lib/api";
 import { isAdmin } from "../../lib/auth";
 import { formatKwanza } from "../../lib/currency";
 
-const defaultForm: Omit<AdminMenuItem, "id"> = {
-    restaurantId: 0,
+const defaultForm: MenuItemUpsertPayload = {
     name: "",
     description: "",
     price: 0,
@@ -28,11 +28,11 @@ export default function AdminMenuPage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    const [form, setForm] = useState<Omit<AdminMenuItem, "id">>(defaultForm);
+    const [form, setForm] = useState<MenuItemUpsertPayload>(defaultForm);
     const [editingId, setEditingId] = useState<number | null>(null);
 
     if (!isAdmin()) {
-        return < p className="text-sm text-red-600" > Não autorizado</p >;
+        return <p className="text-sm text-red-600">Não autorizado</p>;
     }
 
     useEffect(() => {
@@ -66,12 +66,7 @@ export default function AdminMenuPage() {
         setSelectedRestaurant(id);
         setSuccess("");
         setError("");
-
-        setForm({
-            ...defaultForm,
-            restaurantId: id,
-        });
-
+        setForm(defaultForm);
         setEditingId(null);
         void loadMenu(id);
     }
@@ -128,14 +123,11 @@ export default function AdminMenuPage() {
                 await updateMenuItem(editingId, form);
                 setSuccess("Item do menu atualizado com sucesso.");
             } else {
-                await createMenuItem(form);
+                await createMenuItem({ ...form, restaurantId: selectedRestaurant });
                 setSuccess("Item do menu criado com sucesso.");
             }
 
-            setForm({
-                ...defaultForm,
-                restaurantId: selectedRestaurant,
-            });
+            setForm(defaultForm);
 
             setEditingId(null);
             await loadMenu(selectedRestaurant);
@@ -148,10 +140,9 @@ export default function AdminMenuPage() {
 
     function handleEdit(item: AdminMenuItem) {
         setForm({
-            restaurantId: item.restaurantId,
             name: item.name,
-            description: item.description,
             price: item.price,
+            description: item.description ?? "",
         });
 
         setEditingId(item.id);

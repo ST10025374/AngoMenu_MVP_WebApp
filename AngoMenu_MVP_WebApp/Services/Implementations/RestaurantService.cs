@@ -2,9 +2,10 @@
 using AngoMenu_MVP_WebApp.Common.Pagination;
 using AngoMenu_MVP_WebApp.DTOs.Restaurant;
 using AngoMenu_MVP_WebApp.Models;
-using AngoMenu_MVP_WebApp.Services.Cloudinary;
+using AngoMenu_MVP_WebApp.Models.Enums;
 using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace AngoMenu_MVP_WebApp.Services.Implementations
 {
@@ -21,11 +22,27 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
         public async Task<Result> CreateRestaurant(RestaurantCreateDto dto)
         {
+            if (dto.Manager is not null)
+            {
+                var managerEmail = dto.Manager.Email.Trim().ToLowerInvariant();
+                var emailExists = await _context.Users.AnyAsync(u => u.Email == managerEmail);
+
+                if (emailExists)
+                {
+                    return Result.Fail("Email already exists.");
+                }
+            }
+
             var restaurant = new Restaurant
             {
                 Name = dto.Name,
                 Description = dto.Description,
                 Location = dto.Location,
+                City = dto.City,
+                Province = dto.Province,
+                Municipality = dto.Municipality,
+                Neighborhood = dto.Neighborhood,
+                StreetName = dto.StreetName,
                 Phone = dto.Phone,
                 OpeningHour = dto.OpeningHour,
                 ClosingHour = dto.ClosingHour,
@@ -38,10 +55,30 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 var uploadResult = await _cloudinaryService.UploadRestaurantImage(dto.Image);
 
                 if (uploadResult.Error != null)
+                {
                     return Result.Fail(uploadResult.Error.Message);
+                }
 
                 restaurant.ImageUrl = uploadResult.SecureUrl.ToString();
                 restaurant.PublicId = uploadResult.PublicId;
+            }
+
+            if (dto.Manager is not null)
+            {
+                var managerUser = new User
+                {
+                    FirstName = dto.Manager.FirstName,
+                    LastName = dto.Manager.LastName,
+                    Email = dto.Manager.Email.Trim().ToLowerInvariant(),
+                    PhoneNumber = "000000000",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Manager.Password),
+                    Role = UserRole.Manager
+                };
+
+                _context.Users.Add(managerUser);
+                await _context.SaveChangesAsync();
+
+                restaurant.ManagerId = managerUser.Id;
             }
 
             _context.Restaurants.Add(restaurant);
@@ -55,11 +92,48 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             var restaurant = await _context.Restaurants.FindAsync(id);
 
             if (restaurant == null)
+            {
                 return Result.Fail("Restaurant not found.");
+            }
 
+            var updateResult = await ApplyRestaurantUpdate(restaurant, dto);
+            if (!updateResult.Success)
+            {
+                return updateResult;
+            }
+
+            return Result.Ok("Restaurant updated successfully.");
+        }
+
+        public async Task<Result> UpdateManagerRestaurant(int managerUserId, RestaurantUpdateDto dto)
+        {
+            var restaurant = await _context.Restaurants
+                .FirstOrDefaultAsync(r => r.ManagerId == managerUserId);
+
+            if (restaurant == null)
+            {
+                return Result.Fail("Restaurant not found for manager.");
+            }
+
+            var updateResult = await ApplyRestaurantUpdate(restaurant, dto);
+            if (!updateResult.Success)
+            {
+                return updateResult;
+            }
+
+            return Result.Ok("Restaurant updated successfully.");
+        }
+
+        private async Task<Result> ApplyRestaurantUpdate(Restaurant restaurant, RestaurantUpdateDto dto)
+        {
             restaurant.Name = dto.Name;
             restaurant.Description = dto.Description;
             restaurant.Location = dto.Location;
+            restaurant.City = dto.City;
+            restaurant.Province = dto.Province;
+            restaurant.Municipality = dto.Municipality;
+            restaurant.Neighborhood = dto.Neighborhood;
+            restaurant.StreetName = dto.StreetName;
             restaurant.Phone = dto.Phone;
             restaurant.OpeningHour = dto.OpeningHour;
             restaurant.ClosingHour = dto.ClosingHour;
@@ -74,7 +148,9 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 var uploadResult = await _cloudinaryService.UploadRestaurantImage(dto.Image);
 
                 if (uploadResult.Error != null)
+                {
                     return Result.Fail(uploadResult.Error.Message);
+                }
 
                 restaurant.ImageUrl = uploadResult.SecureUrl.ToString();
                 restaurant.PublicId = uploadResult.PublicId;
@@ -82,7 +158,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
             await _context.SaveChangesAsync();
 
-            return Result.Ok("Restaurant updated successfully.");
+            return Result.Ok();
         }
 
         public async Task<Result> DeleteRestaurant(int id)
@@ -105,30 +181,36 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
         public async Task<Result<RestaurantResponseDto>> GetRestaurantById(int id)
         {
-            var restaurant = await _context.Restaurants.FindAsync(id);
+            var restaurant = await _context.Restaurants
+                .Include(r => r.Manager)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (restaurant == null)
                 return Result<RestaurantResponseDto>.Fail("Restaurant not found.");
 
-            var dto = new RestaurantResponseDto
-            {
-                Id = restaurant.Id,
-                Name = restaurant.Name,
-                Description = restaurant.Description,
-                Location = restaurant.Location,
-                Phone = restaurant.Phone,
-                OpeningHour = restaurant.OpeningHour,
-                ClosingHour = restaurant.ClosingHour,
-                ImageUrl = restaurant.ImageUrl
-            };
+            return Result<RestaurantResponseDto>.Ok(MapRestaurantResponse(restaurant));
+        }
 
-            return Result<RestaurantResponseDto>.Ok(dto);
+        public async Task<Result<RestaurantResponseDto>> GetManagerRestaurant(int managerUserId)
+        {
+            var restaurant = await _context.Restaurants
+                .Include(r => r.Manager)
+                .FirstOrDefaultAsync(r => r.ManagerId == managerUserId);
+
+            if (restaurant == null)
+            {            
+                return Result<RestaurantResponseDto>.Fail("Restaurant not found for manager.");
+            }
+
+            return Result<RestaurantResponseDto>.Ok(MapRestaurantResponse(restaurant));
         }
 
         public async Task<Result<PagedResult<RestaurantResponseDto>>>
             GetRestaurants(PaginationParams paginationParams, string? search)
         {
-            var query = _context.Restaurants.AsQueryable();
+            var query = _context.Restaurants
+                .Include(r => r.Manager)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -143,28 +225,40 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 .OrderBy(r => r.Name)
                 .Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize)
                 .Take(paginationParams.PageSize)
-                .Select(r => new RestaurantResponseDto
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                    Description = r.Description,
-                    Location = r.Location,
-                    Phone = r.Phone,
-                    OpeningHour = r.OpeningHour,
-                    ClosingHour = r.ClosingHour,
-                    ImageUrl = r.ImageUrl
-                })
                 .ToListAsync();
 
             var pagedResult = new PagedResult<RestaurantResponseDto>
             {
-                Items = items,
+                Items = items.Select(MapRestaurantResponse).ToList(),
                 TotalCount = totalCount,
                 PageNumber = paginationParams.PageNumber,
                 PageSize = paginationParams.PageSize
             };
 
             return Result<PagedResult<RestaurantResponseDto>>.Ok(pagedResult);
+        }
+
+        private static RestaurantResponseDto MapRestaurantResponse(Restaurant restaurant)
+        {
+            return new RestaurantResponseDto
+            {
+                Id = restaurant.Id,
+                Name = restaurant.Name,
+                Description = restaurant.Description,
+                Location = restaurant.Location,
+                City = restaurant.City,
+                Province = restaurant.Province,
+                Municipality = restaurant.Municipality,
+                Neighborhood = restaurant.Neighborhood,
+                StreetName = restaurant.StreetName,
+                Phone = restaurant.Phone,
+                OpeningHour = restaurant.OpeningHour,
+                ClosingHour = restaurant.ClosingHour,
+                ImageUrl = restaurant.ImageUrl,
+                ManagerId = restaurant.ManagerId,
+                ManagerName = restaurant.Manager is null ? null : $"{restaurant.Manager.FirstName} {restaurant.Manager.LastName}",
+                ManagerEmail = restaurant.Manager?.Email,
+            };
         }
     }
 }

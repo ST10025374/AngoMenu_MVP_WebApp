@@ -17,15 +17,31 @@ type LoginResponse = {
     token: string;
 };
 
+export type ReservationStatus = 'Pending' | 'Confirmed' | 'Cancelled';
+
+const reservationStatusToApiValue: Record<ReservationStatus, number> = {
+    Pending: 1,
+    Confirmed: 2,
+    Cancelled: 3,
+};
+
 export type Restaurant = {
     id: number;
     name: string;
     description?: string | null;
     location: string;
+    city: string;
+    province: string;
+    municipality: string;
+    neighborhood: string;
+    streetName: string;
     phone: string;
     openingHour: string;
     closingHour: string;
     imageUrl?: string | null;
+    managerId?: number | null;
+    managerName?: string | null;
+    managerEmail?: string | null;
 };
 
 export type PagedResult<T> = {
@@ -33,14 +49,6 @@ export type PagedResult<T> = {
     totalCount: number;
     pageNumber: number;
     pageSize: number;
-};
-
-export type ReservationStatus = 'Pending' | 'Confirmed' | 'Cancelled';
-
-const reservationStatusToApiValue: Record<ReservationStatus, number> = {
-    Pending: 1,
-    Confirmed: 2,
-    Cancelled: 3,
 };
 
 export type Reservation = {
@@ -70,28 +78,39 @@ export type UserReservation = {
     status: ReservationStatus;
 };
 
-export type AdminRestaurant = {
-    id: number;
+export type ManagerCreatePayload = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+};
+
+export type RestaurantUpsertPayload = {
     name: string;
     description?: string;
     location: string;
+    city: string;
+    province: string;
+    municipality: string;
+    neighborhood: string;
+    streetName: string;
     phone: string;
     openingHour: string;
     closingHour: string;
     imageUrl?: string | null;
-};
-
-export type RestaurantUpsertPayload = Omit<AdminRestaurant, 'id'> & {
     image?: File | null;
+    manager?: ManagerCreatePayload | null;
 };
 
-export type AdminMenuItem = {
-    id: number;
-    restaurantId: number;
+export type AdminRestaurant = Restaurant;
+
+export type MenuItemUpsertPayload = {
     name: string;
     description?: string;
     price: number;
 };
+
+export type AdminMenuItem = MenuItem;
 
 export type AdminReservation = {
     id: number;
@@ -138,6 +157,11 @@ function buildRestaurantFormData(payload: RestaurantUpsertPayload): FormData {
     formData.append('name', payload.name);
     formData.append('description', payload.description ?? '');
     formData.append('location', payload.location);
+    formData.append('city', payload.city);
+    formData.append('province', payload.province);
+    formData.append('municipality', payload.municipality);
+    formData.append('neighborhood', payload.neighborhood);
+    formData.append('streetName', payload.streetName);
     formData.append('phone', payload.phone);
     formData.append('openingHour', payload.openingHour);
     formData.append('closingHour', payload.closingHour);
@@ -148,6 +172,13 @@ function buildRestaurantFormData(payload: RestaurantUpsertPayload): FormData {
 
     if (payload.imageUrl) {
         formData.append('imageUrl', payload.imageUrl);
+    }
+
+    if (payload.manager) {
+        formData.append('manager.firstName', payload.manager.firstName);
+        formData.append('manager.lastName', payload.manager.lastName);
+        formData.append('manager.email', payload.manager.email);
+        formData.append('manager.password', payload.manager.password);
     }
 
     return formData;
@@ -213,9 +244,41 @@ export async function getRestaurantById(id: number): Promise<Restaurant> {
     return parseResponse<Restaurant>(res);
 }
 
+export async function getManagerRestaurant(): Promise<Restaurant> {
+    const res = await fetch('/api/restaurants/manager/my-restaurant', {
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<Restaurant>(res);
+}
+
+export async function updateManagerRestaurant(payload: RestaurantUpsertPayload): Promise<string> {
+    const res = await fetch('/api/restaurants/manager/my-restaurant', {
+        method: 'PUT',
+        headers: {
+            ...authHeaders(),
+        },
+        body: buildRestaurantFormData(payload),
+    });
+
+    return parseResponse<string>(res);
+}
+
 export async function getMenuByRestaurant(restaurantId: number): Promise<MenuItem[]> {
     const res = await fetch(`/api/menu/restaurant/${restaurantId}`, {
         method: 'GET',
+    });
+
+    return parseResponse<MenuItem[]>(res);
+}
+
+export async function getManagerMenu(): Promise<MenuItem[]> {
+    const res = await fetch('/api/menu/manager', {
+        headers: {
+            ...authHeaders(),
+        },
     });
 
     return parseResponse<MenuItem[]>(res);
@@ -270,11 +333,37 @@ export async function getAllReservations(): Promise<AdminReservation[]> {
     return parseResponse<AdminReservation[]>(res);
 }
 
+export async function getManagerReservations(): Promise<AdminReservation[]> {
+    const res = await fetch('/api/reservations/manager', {
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<AdminReservation[]>(res);
+}
+
 export async function updateReservationStatus(
     id: number,
     status: ReservationStatus
 ): Promise<string> {
     const res = await fetch(`/api/reservations/${id}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+        },
+        body: JSON.stringify({ status: reservationStatusToApiValue[status] }),
+    });
+
+    return parseResponse<string>(res);
+}
+
+export async function updateManagerReservationStatus(
+    id: number,
+    status: ReservationStatus
+): Promise<string> {
+    const res = await fetch(`/api/reservations/manager/${id}/status`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -353,7 +442,7 @@ export async function getMenuByRestaurantAdmin(restaurantId: number): Promise<Ad
     return parseResponse<AdminMenuItem[]>(res);
 }
 
-export async function createMenuItem(payload: Omit<AdminMenuItem, 'id'>): Promise<string> {
+export async function createMenuItem(payload: { restaurantId: number } & MenuItemUpsertPayload): Promise<string> {
     const res = await fetch('/api/menu', {
         method: 'POST',
         headers: {
@@ -366,8 +455,34 @@ export async function createMenuItem(payload: Omit<AdminMenuItem, 'id'>): Promis
     return parseResponse<string>(res);
 }
 
-export async function updateMenuItem(id: number, payload: Omit<AdminMenuItem, 'id'>): Promise<string> {
+export async function createManagerMenuItem(payload: MenuItemUpsertPayload): Promise<string> {
+    const res = await fetch('/api/menu/manager', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+        },
+        body: JSON.stringify(payload),
+    });
+
+    return parseResponse<string>(res);
+}
+
+export async function updateMenuItem(id: number, payload: MenuItemUpsertPayload): Promise<string> {
     const res = await fetch(`/api/menu/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+        },
+        body: JSON.stringify(payload),
+    });
+
+    return parseResponse<string>(res);
+}
+
+export async function updateManagerMenuItem(id: number, payload: MenuItemUpsertPayload): Promise<string> {
+    const res = await fetch(`/api/menu/manager/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -381,6 +496,17 @@ export async function updateMenuItem(id: number, payload: Omit<AdminMenuItem, 'i
 
 export async function deleteMenuItem(id: number): Promise<string> {
     const res = await fetch(`/api/menu/${id}`, {
+        method: 'DELETE',
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<string>(res);
+}
+
+export async function deleteManagerMenuItem(id: number): Promise<string> {
+    const res = await fetch(`/api/menu/manager/${id}`, {
         method: 'DELETE',
         headers: {
             ...authHeaders(),

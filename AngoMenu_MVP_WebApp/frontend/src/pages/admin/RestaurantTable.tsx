@@ -16,7 +16,8 @@ export default function RestaurantTable({
                     <tr>
                         <th className="p-3 text-left">Imagem</th>
                         <th className="p-3 text-left">Nome</th>
-                        <th className="p-3 text-left">Localização</th>
+                        <th className="p-3 text-left">Endereço</th>
+                        <th className="p-3 text-left">Gestor</th>
                         <th className="p-3 text-right">Ações</th>
                     </tr>
                 </thead>
@@ -31,11 +32,12 @@ export default function RestaurantTable({
                                         className="h-12 w-20 rounded-md object-cover"
                                     />
                                 ) : (
-                                   <span className="text-xs text-slate-400">Sem imagem</span>
+                                      <span className="text-xs text-slate-400">Sem imagem</span>
                                 )}
                             </td>
                             <td className="p-3 font-semibold text-brand-dark">{restaurant.name}</td>
-                            <td className="p-3 text-slate-700">{restaurant.location}</td>
+                            <td className="p-3 text-slate-700">{restaurant.streetName}, {restaurant.neighborhood}</td>
+                            <td className="p-3 text-slate-700">{restaurant.managerName ?? "Sem gestor"}</td>
                             <td className="p-3 text-right">
                                 <div className="inline-flex gap-2">
                                     <button

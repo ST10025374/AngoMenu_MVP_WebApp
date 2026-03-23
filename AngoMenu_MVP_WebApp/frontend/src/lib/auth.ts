@@ -1,7 +1,7 @@
 const TOKEN_KEY = 'auth_token';
 const AUTH_CHANGED_EVENT = 'auth:changed';
 
-export type UserRole = 'Admin' | 'Client' | 'User' | null;
+export type UserRole = 'Admin' | 'Client' | 'Manager' | 'User' | null;
 
 type JwtPayload = {
     role?: string;
@@ -55,7 +55,7 @@ export function getUserRole(): UserRole {
         (payload as any).roles?.[0] ??
         (payload as any)['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'];
 
-    return role === 'Admin' || role === 'Client' || role === 'User' ? role : null;
+    return role === 'Admin' || role === 'Client' || role === 'Manager' || role === 'User' ? role : null;
 }
 
 // EXPIRATION

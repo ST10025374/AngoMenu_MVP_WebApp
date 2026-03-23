@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AngoMenu_MVP_WebApp.Models
 {
@@ -17,6 +18,26 @@ namespace AngoMenu_MVP_WebApp.Models
         public string Location { get; set; } = string.Empty;
 
         [Required]
+        [MaxLength(120)]
+        public string City { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(120)]
+        public string Province { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(120)]
+        public string Municipality { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(120)]
+        public string Neighborhood { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(180)]
+        public string StreetName { get; set; } = string.Empty;
+
+        [Required]
         public string Phone { get; set; } = string.Empty;
 
         [Required]
@@ -28,6 +49,11 @@ namespace AngoMenu_MVP_WebApp.Models
         public string ImageUrl { get; set; } = string.Empty;
 
         public string PublicId { get; set; } = string.Empty;
+
+        public int? ManagerId { get; set; }
+
+        [ForeignKey(nameof(ManagerId))]
+        public User? Manager { get; set; }
 
         // Navigation
         public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();

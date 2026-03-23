@@ -12,11 +12,17 @@ namespace AngoMenu_MVP_WebApp.Services.Interfaces
         Task<Result<RestaurantResponseDto>>
             GetRestaurantById(int id);
 
+        Task<Result<RestaurantResponseDto>>
+            GetManagerRestaurant(int managerUserId);
+
         Task<Result>
             CreateRestaurant(RestaurantCreateDto dto);
 
         Task<Result>
             UpdateRestaurant(int id, RestaurantUpdateDto dto);
+
+        Task<Result>
+            UpdateManagerRestaurant(int managerUserId, RestaurantUpdateDto dto);
 
         Task<Result>
             DeleteRestaurant(int id);

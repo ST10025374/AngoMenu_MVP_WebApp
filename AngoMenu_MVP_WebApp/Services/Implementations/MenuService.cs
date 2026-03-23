@@ -38,6 +38,32 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             return Result.Ok("Menu item created successfully.");
         }
 
+        public async Task<Result> CreateManagerMenuItem(int managerUserId, MenuItemUpdateDto dto)
+        {
+            var restaurantId = await _context.Restaurants
+                .Where(r => r.ManagerId == managerUserId)
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            if (restaurantId == 0)
+            {
+                return Result.Fail("Restaurant not found for manager.");
+            }
+
+            var menuItem = new MenuItem
+            {
+                RestaurantId = restaurantId,
+                Name = dto.Name,
+                Price = dto.Price,
+                Description = dto.Description
+            };
+
+            _context.MenuItems.Add(menuItem);
+            await _context.SaveChangesAsync();
+
+            return Result.Ok("Menu item created successfully.");
+        }
+
         public async Task<Result<List<MenuItemResponseDto>>> GetMenuByRestaurant(int restaurantId)
         {
             var exists = await _context.Restaurants
@@ -61,20 +87,48 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             return Result<List<MenuItemResponseDto>>.Ok(items);
         }
 
-        public async Task<Result> UpdateMenuItem(int id, MenuItemCreateDto dto)
+        public async Task<Result<List<MenuItemResponseDto>>> GetManagerMenu(int managerUserId)
         {
-            var menuItem = await _context.MenuItems.FindAsync(id);
+            var restaurantId = await _context.Restaurants
+                .Where(r => r.ManagerId == managerUserId)
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            if (restaurantId == 0)
+            {
+                return Result<List<MenuItemResponseDto>>.Fail("Restaurant not found for manager.");
+            }
+
+            return await GetMenuByRestaurant(restaurantId);
+        }
+
+        public Task<Result> UpdateMenuItem(int id, MenuItemCreateDto dto)
+        {
+            var updateDto = new MenuItemUpdateDto
+            {
+                Name = dto.Name,
+                Price = dto.Price,
+                Description = dto.Description
+            };
+
+            return UpdateMenuItem(id, updateDto);
+        }
+
+        public async Task<Result> UpdateManagerMenuItem(int managerUserId, int id, MenuItemUpdateDto dto)
+        {
+            var menuItem = await _context.MenuItems
+                .Include(m => m.Restaurant)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (menuItem == null)
                 return Result.Fail("Menu item not found.");
 
-            menuItem.Name = dto.Name;
-            menuItem.Price = dto.Price;
-            menuItem.Description = dto.Description;
+            if (menuItem.Restaurant.ManagerId != managerUserId)
+            {
+                return Result.Fail("Not authorized to update this menu item.");
+            }
 
-            await _context.SaveChangesAsync();
-
-            return Result.Ok("Menu item updated successfully.");
+            return await UpdateMenuItem(id, dto);
         }
 
         public async Task<Result> DeleteMenuItem(int id)
@@ -88,6 +142,23 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             await _context.SaveChangesAsync();
 
             return Result.Ok("Menu item deleted successfully.");
+        }
+
+        public async Task<Result> DeleteManagerMenuItem(int managerUserId, int id)
+        {
+            var menuItem = await _context.MenuItems
+                .Include(m => m.Restaurant)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (menuItem == null)
+                return Result.Fail("Menu item not found.");
+
+            if (menuItem.Restaurant.ManagerId != managerUserId)
+            {
+                return Result.Fail("Not authorized to delete this menu item.");
+            }
+
+            return await DeleteMenuItem(id);
         }
     }
 }

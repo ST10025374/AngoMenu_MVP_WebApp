@@ -1,7 +1,4 @@
-﻿using AngoMenu_MVP_WebApp.Common;
-using AngoMenu_MVP_WebApp.DTOs.Reservation;
-using AngoMenu_MVP_WebApp.Models;
-using AngoMenu_MVP_WebApp.Models.Enums;
+﻿using AngoMenu_MVP_WebApp.DTOs.Reservation;
 using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -79,6 +76,21 @@ namespace AngoMenu_MVP_WebApp.Controllers
             return Ok(result.Data);
         }
 
+        [Authorize(Roles = "Manager")]
+        [HttpGet("manager")]
+        public async Task<IActionResult> GetManagerReservations()
+        {
+            var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _reservationService.GetManagerReservations(managerId);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result.Data);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, ReservationUpdateStatusDto dto)
@@ -87,6 +99,21 @@ namespace AngoMenu_MVP_WebApp.Controllers
 
             if (!result.Success)
                 return BadRequest(result.Message);
+
+            return Ok(result.Message);
+        }
+
+        [Authorize(Roles = "Manager")]
+        [HttpPut("manager/{id}/status")]
+        public async Task<IActionResult> UpdateManagerStatus(int id, ReservationUpdateStatusDto dto)
+        {
+            var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _reservationService.UpdateManagerReservationStatus(managerId, id, dto.Status);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
 
             return Ok(result.Message);
         }

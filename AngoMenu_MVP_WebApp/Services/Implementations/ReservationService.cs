@@ -163,6 +163,37 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             return Result<List<AdminReservationResponseDto>>.Ok(reservations);
         }
 
+        public async Task<Result<List<AdminReservationResponseDto>>> GetManagerReservations(int managerUserId)
+        {
+            var restaurantId = await _context.Restaurants
+                .Where(r => r.ManagerId == managerUserId)
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            if (restaurantId == 0)
+            {
+                return Result<List<AdminReservationResponseDto>>.Fail("Restaurant not found for manager.");
+            }
+
+            var reservations = await _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Restaurant)
+                .Where(r => r.RestaurantId == restaurantId)
+                .Select(r => new AdminReservationResponseDto
+                {
+                    Id = r.Id,
+                    UserEmail = r.User.Email,
+                    Restaurant = r.Restaurant.Name,
+                    Date = r.Date,
+                    Time = r.Time,
+                    NumberOfPeople = r.NumberOfPeople,
+                    Status = r.Status.ToString()
+                })
+                .ToListAsync();
+
+            return Result<List<AdminReservationResponseDto>>.Ok(reservations);
+        }
+
         // Admin: Update reservation status
         public async Task<Result> UpdateReservationStatus(int reservationId, ReservationStatus status)
         {
@@ -173,6 +204,28 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
             reservation.Status = status;
 
+            await _context.SaveChangesAsync();
+
+            return Result.Ok("Reservation status updated.");
+        }
+
+        public async Task<Result> UpdateManagerReservationStatus(int managerUserId, int reservationId, ReservationStatus status)
+        {
+            var reservation = await _context.Reservations
+                .Include(r => r.Restaurant)
+                .FirstOrDefaultAsync(r => r.Id == reservationId);
+
+            if (reservation == null)
+            {
+                return Result.Fail("Reservation not found.");
+            }
+
+            if (reservation.Restaurant.ManagerId != managerUserId)
+            {
+                return Result.Fail("Not authorized to update this reservation.");
+            }
+
+            reservation.Status = status;
             await _context.SaveChangesAsync();
 
             return Result.Ok("Reservation status updated.");

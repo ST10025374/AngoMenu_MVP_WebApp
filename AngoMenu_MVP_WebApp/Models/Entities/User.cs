@@ -35,6 +35,7 @@ namespace AngoMenu_MVP_WebApp.Models
         public DateTime? LockoutEnd { get; set; }
 
         // Navigation
+        public Restaurant? ManagedRestaurant { get; set; }
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

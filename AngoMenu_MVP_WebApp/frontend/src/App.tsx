@@ -13,6 +13,11 @@ import AdminRestaurantsPage from './pages/admin/AdminRestaurantsPage';
 import AdminReservationsPage from './pages/admin/AdminReservationsPage';
 import AdminMenuPage from './pages/admin/AdminMenuPage';
 
+import ManagerDashboardPage from './pages/manager/ManagerDashboardPage';
+import ManagerRestaurantPage from './pages/manager/ManagerRestaurantPage';
+import ManagerMenuPage from './pages/manager/ManagerMenuPage';
+import ManagerReservationsPage from './pages/manager/ManagerReservationsPage';
+
 import ProtectedRoute from './routes/ProtectedRoute';
 import RoleRoute from './routes/RoleRoute';
 
@@ -53,7 +58,15 @@ export default function App() {
                         </Route>
                     </Route>
 
-                    {/* FALLBACK */}
+                    <Route element={<ProtectedRoute />}>
+                        <Route element={<RoleRoute allowedRoles={['Manager']} />}>
+                            <Route path="/manager" element={<ManagerDashboardPage />} />
+                            <Route path="/manager/restaurant" element={<ManagerRestaurantPage />} />
+                            <Route path="/manager/menu" element={<ManagerMenuPage />} />
+                            <Route path="/manager/reservations" element={<ManagerReservationsPage />} />
+                        </Route>
+                    </Route>
+
                     <Route path="*" element={<Navigate to="/" replace />} />
 
                 </Routes>

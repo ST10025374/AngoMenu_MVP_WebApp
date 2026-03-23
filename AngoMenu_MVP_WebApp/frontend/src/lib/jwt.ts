@@ -1,4 +1,4 @@
-export type AppRole = "Admin" | "Client";
+export type AppRole = "Admin" | "Client" | "Manager";
 
 export type JwtPayload = {
     sub?: string;
@@ -37,7 +37,7 @@ export function getUserRole(token: string | null): AppRole | null {
         payload.role ??
         payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
 
-    if (role === "Admin" || role === "Client") return role;
+    if (role === "Admin" || role === "Client" || role === "Manager") return role;
     return null;
 }
 

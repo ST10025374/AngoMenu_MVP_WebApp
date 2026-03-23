@@ -1,7 +1,5 @@
 ﻿using AngoMenu_MVP_WebApp.Common;
-using AngoMenu_MVP_WebApp.Common.Pagination;
 using AngoMenu_MVP_WebApp.DTOs.Reservation;
-using AngoMenu_MVP_WebApp.DTOs.Restaurant;
 using AngoMenu_MVP_WebApp.Models.Enums;
 
 namespace AngoMenu_MVP_WebApp.Services.Interfaces
@@ -12,8 +10,9 @@ namespace AngoMenu_MVP_WebApp.Services.Interfaces
         Task<Result<List<ReservationResponseDto>>> GetUserReservations(int userId);
         Task<Result> CancelReservation(int userId, int reservationId);
         Task<Result<List<AdminReservationResponseDto>>> GetAllReservations();
+        Task<Result<List<AdminReservationResponseDto>>> GetManagerReservations(int managerUserId);
         Task<Result> UpdateReservationStatus(int reservationId, ReservationStatus status);
+        Task<Result> UpdateManagerReservationStatus(int managerUserId, int reservationId, ReservationStatus status);
         Task<Result> DeleteReservation(int reservationId);
-
     }
 }

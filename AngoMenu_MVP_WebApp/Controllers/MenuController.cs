@@ -2,6 +2,7 @@
 using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AngoMenu_MVP_WebApp.Controllers
 {
@@ -29,7 +30,21 @@ namespace AngoMenu_MVP_WebApp.Controllers
             return Ok(result.Message);
         }
 
-        // PUBLIC: Get menu by restaurant
+        [Authorize(Roles = "Manager")]
+        [HttpPost("manager")]
+        public async Task<IActionResult> CreateManagerMenuItem(MenuItemUpdateDto dto)
+        {
+            var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _menuService.CreateManagerMenuItem(managerId, dto);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result.Message);
+        }
+
         [AllowAnonymous]
         [HttpGet("restaurant/{restaurantId}")]
         public async Task<IActionResult> GetByRestaurant(int restaurantId)
@@ -38,6 +53,21 @@ namespace AngoMenu_MVP_WebApp.Controllers
 
             if (!result.Success)
                 return BadRequest(result.Message);
+
+            return Ok(result.Data);
+        }
+
+        [Authorize(Roles = "Manager")]
+        [HttpGet("manager")]
+        public async Task<IActionResult> GetManagerMenu()
+        {
+            var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _menuService.GetManagerMenu(managerId);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
 
             return Ok(result.Data);
         }
@@ -55,6 +85,21 @@ namespace AngoMenu_MVP_WebApp.Controllers
             return Ok(result.Message);
         }
 
+        [Authorize(Roles = "Manager")]
+        [HttpPut("manager/{id}")]
+        public async Task<IActionResult> UpdateManagerMenuItem(int id, MenuItemUpdateDto dto)
+        {
+            var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _menuService.UpdateManagerMenuItem(managerId, id, dto);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result.Message);
+        }
+
         // ADMIN: Delete menu item
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
@@ -64,6 +109,21 @@ namespace AngoMenu_MVP_WebApp.Controllers
 
             if (!result.Success)
                 return NotFound(result.Message);
+
+            return Ok(result.Message);
+        }
+
+        [Authorize(Roles = "Manager")]
+        [HttpDelete("manager/{id}")]
+        public async Task<IActionResult> DeleteManagerMenuItem(int id)
+        {
+            var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _menuService.DeleteManagerMenuItem(managerId, id);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
 
             return Ok(result.Message);
         }

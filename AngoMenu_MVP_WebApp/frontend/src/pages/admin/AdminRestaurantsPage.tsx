@@ -5,6 +5,7 @@ import {
     getAllRestaurantsAdmin,
     updateRestaurant,
     type AdminRestaurant,
+    type RestaurantUpsertPayload,
 } from "../../lib/api";
 
 import { isAdmin } from "../../lib/auth";
@@ -16,11 +17,25 @@ const defaultRestaurantForm: RestaurantFormValues = {
     name: "",
     description: "",
     location: "",
+    city: "",
+    province: "",
+    municipality: "",
+    neighborhood: "",
+    streetName: "",
     phone: "",
     openingHour: "08:00",
     closingHour: "22:00",
     imageUrl: "",
+    managerId: null,
+    managerName: null,
+    managerEmail: null,
     image: null,
+    createManager: false,
+    managerFirstName: "",
+    managerLastName: "",
+    managerAccountEmail: "",
+    managerPassword: "",
+    managerConfirmPassword: "",
 };
 
 
@@ -73,13 +88,22 @@ export default function AdminRestaurantsPage() {
     function openEditModal(restaurant: AdminRestaurant) {
         setEditingRestaurant(restaurant);
         setFormValues({
+            ...defaultRestaurantForm,
             name: restaurant.name,
             description: restaurant.description ?? "",
             location: restaurant.location,
+            city: restaurant.city,
+            province: restaurant.province,
+            municipality: restaurant.municipality,
+            neighborhood: restaurant.neighborhood,
+            streetName: restaurant.streetName,
             phone: restaurant.phone,
             openingHour: restaurant.openingHour,
             closingHour: restaurant.closingHour,
             imageUrl: restaurant.imageUrl ?? "",
+            managerId: restaurant.managerId ?? null,
+            managerName: restaurant.managerName ?? null,
+            managerEmail: restaurant.managerEmail ?? null,
             image: null,
         });
         setSuccess("");
@@ -97,21 +121,71 @@ export default function AdminRestaurantsPage() {
         setFormValues((prev) => ({ ...prev, [field]: value }));
     }
 
+    function handleToggleManager(value: boolean) {
+        setFormValues((prev) => ({
+            ...prev,
+            createManager: value,
+            managerFirstName: value ? prev.managerFirstName : "",
+            managerLastName: value ? prev.managerLastName : "",
+            managerAccountEmail: value ? prev.managerAccountEmail : "",
+            managerPassword: value ? prev.managerPassword : "",
+            managerConfirmPassword: value ? prev.managerConfirmPassword : "",
+        }));
+    }
+
     function handleImageChange(file: File | null) {
         setFormValues((prev) => ({ ...prev, image: file }));
     }
 
+    function buildPayload(values: RestaurantFormValues): RestaurantUpsertPayload {
+        const payload: RestaurantUpsertPayload = {
+            name: values.name,
+            description: values.description ?? "",
+            location: values.location,
+            city: values.city,
+            province: values.province,
+            municipality: values.municipality,
+            neighborhood: values.neighborhood,
+            streetName: values.streetName,
+            phone: values.phone,
+            openingHour: values.openingHour,
+            closingHour: values.closingHour,
+            imageUrl: values.imageUrl,
+            image: values.image,
+        };
+
+        if (!editingRestaurant && values.createManager) {
+            payload.manager = {
+                firstName: values.managerFirstName,
+                lastName: values.managerLastName,
+                email: values.managerAccountEmail,
+                password: values.managerPassword,
+            };
+        }
+
+        return payload;
+    }
+
+
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
+        if (!editingRestaurant && formValues.createManager && formValues.managerPassword !== formValues.managerConfirmPassword) {
+            setError("A confirmação da palavra-passe do gestor não coincide.");
+            return;
+        }
+
         setSaving(true);
         setError("");
 
         try {
+            const payload = buildPayload(formValues);
+
             if (editingRestaurant) {
-                await updateRestaurant(editingRestaurant.id, formValues);
+                await updateRestaurant(editingRestaurant.id, payload);
                 setSuccess("Restaurante atualizado com sucesso.");
             } else {
-                await createRestaurant(formValues);
+                await createRestaurant(payload);
                 setSuccess("Restaurante criado com sucesso.");
             }
 
@@ -180,6 +254,7 @@ export default function AdminRestaurantsPage() {
                     submitLabel={editingRestaurant ? "Atualizar Restaurante" : "Criar Restaurante"}
                     isEditMode={Boolean(editingRestaurant)}
                     onChange={handleFieldChange}
+                    onToggleManager={handleToggleManager}
                     onImageChange={handleImageChange}
                     onSubmit={handleSubmit}
                     onCancel={closeModal}

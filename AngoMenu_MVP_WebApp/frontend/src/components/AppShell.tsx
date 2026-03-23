@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getUserRole, logout, isAuthenticated, subscribeAuthChanges } from "../lib/auth";
 
-function AdminDropdown({ onNavigate }: { onNavigate?: () => void }) {
+function Dropdown({ title, items, onNavigate }: { title: string; items: { to: string; label: string }[]; onNavigate?: () => void }) {
     const [open, setOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -29,13 +29,6 @@ function AdminDropdown({ onNavigate }: { onNavigate?: () => void }) {
         };
     }, []);
 
-    const items = [
-        { to: "/admin", label: "Painel" },
-        { to: "/admin/restaurants", label: "Gerir Restaurantes" },
-        { to: "/admin/reservations", label: "Gerir Reservas" },
-        { to: "/admin/menu", label: "Gerir Menu" },
-    ];
-
     return (
         <div ref={containerRef} className="relative">
             <button
@@ -45,10 +38,8 @@ function AdminDropdown({ onNavigate }: { onNavigate?: () => void }) {
                 aria-expanded={open}
                 aria-haspopup="menu"
             >
-                Administrador
-                <span className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true">
-                    ?
-                </span>
+                {title}
+                <span className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true">▼</span>
             </button>
 
             {open && (
@@ -90,6 +81,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const isLoggedIn = isAuthenticated();
     const role = getUserRole();
     const isAdminUser = role === "Admin";
+    const isManagerUser = role === "Manager";
     const isClientUser = role === "Client" || role === "User";
 
     function handleLogout() {
@@ -135,7 +127,29 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             </>
                         )}
 
-                        {isAdminUser && <AdminDropdown />}
+                        {isAdminUser && (
+                            <Dropdown
+                                title="Administrador"
+                                items={[
+                                    { to: "/admin", label: "Painel" },
+                                    { to: "/admin/restaurants", label: "Gerir Restaurantes" },
+                                    { to: "/admin/reservations", label: "Gerir Reservas" },
+                                    { to: "/admin/menu", label: "Gerir Menu" },
+                                ]}
+                            />
+                        )}
+
+                        {isManagerUser && (
+                            <Dropdown
+                                title="Gestor"
+                                items={[
+                                    { to: "/manager", label: "Painel do Gestor" },
+                                    { to: "/manager/restaurant", label: "Meu Restaurante" },
+                                    { to: "/manager/menu", label: "Gerir Menu" },
+                                    { to: "/manager/reservations", label: "Reservas" },
+                                ]}
+                            />
+                        )}
 
                         {!isLoggedIn ? (
                             <>
@@ -159,14 +173,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                         <div className="flex flex-col gap-2">
                             {isLoggedIn && (
                                 <>
-                                    <Link to="/restaurants" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                        Restaurantes
-                                    </Link>
-                                    {isClientUser && (
-                                        <Link to="/reservations/my" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
-                                            As Minhas Reservas
-                                        </Link>
-                                    )}
+                                    <Link to="/admin" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Painel</Link>
+                                    <Link to="/admin/restaurants" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Gerir Restaurantes</Link>
+                                    <Link to="/admin/reservations" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Gerir Reservas</Link>
+                                    <Link to="/admin/menu" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Gerir Menu</Link>
+                                </>
+                            )}
+
+                            {isManagerUser && (
+                                <>
+                                    <Link to="/manager" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Painel do Gestor</Link>
+                                    <Link to="/manager/restaurant" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Meu Restaurante</Link>
+                                    <Link to="/manager/menu" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Gerir Menu</Link>
+                                    <Link to="/manager/reservations" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Reservas</Link>
                                 </>
                             )}
 
