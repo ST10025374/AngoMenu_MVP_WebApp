@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getUserRole, logout, isAuthenticated, subscribeAuthChanges } from "../lib/auth";
+import { getUserRole, isAuthenticated, logout, subscribeAuthChanges } from "../lib/auth";
 
 function Dropdown({ title, items, onNavigate }: { title: string; items: { to: string; label: string }[]; onNavigate?: () => void }) {
     const [open, setOpen] = useState(false);
@@ -114,16 +114,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     </button>
 
                     <div className="hidden items-center gap-3 md:flex">
-                        {isLoggedIn && (
+                        {isClientUser && (
                             <>
                                 <Link to="/restaurants" className="text-sm font-semibold text-slate-700 transition hover:text-brand-red">
                                     Restaurantes
                                 </Link>
-                                {isClientUser && (
-                                    <Link to="/reservations/my" className="text-sm font-semibold text-slate-700 transition hover:text-brand-red">
-                                        As Minhas Reservas
-                                    </Link>
-                                )}
+                                <Link to="/reservations/my" className="text-sm font-semibold text-slate-700 transition hover:text-brand-red">
+                                    As Minhas Reservas
+                                </Link>
                             </>
                         )}
 
@@ -143,10 +141,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             <Dropdown
                                 title="Gestor"
                                 items={[
-                                    { to: "/manager", label: "Painel do Gestor" },
-                                    { to: "/manager/restaurant", label: "Meu Restaurante" },
+                                    { to: "/manager", label: "Painel de Gestor" },
                                     { to: "/manager/menu", label: "Gerir Menu" },
                                     { to: "/manager/reservations", label: "Reservas" },
+                                    { to: "/manager/restaurant", label: "Meu Restaurante" },
                                 ]}
                             />
                         )}
@@ -171,21 +169,31 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 {mobileMenuOpen && (
                     <div className="border-t border-slate-100 px-4 py-3 md:hidden">
                         <div className="flex flex-col gap-2">
-                            {isLoggedIn && (
+                            {isClientUser && (
                                 <>
-                                    <Link to="/admin" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Painel</Link>
-                                    <Link to="/admin/restaurants" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Gerir Restaurantes</Link>
-                                    <Link to="/admin/reservations" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Gerir Reservas</Link>
-                                    <Link to="/admin/menu" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Gerir Menu</Link>
+                                    <Link to="/restaurants" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
+                                        Restaurantes
+                                    </Link>
+                                    <Link to="/reservations/my" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
+                                        As Minhas Reservas
+                                    </Link>
                                 </>
                             )}
 
                             {isManagerUser && (
                                 <>
-                                    <Link to="/manager" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Painel do Gestor</Link>
-                                    <Link to="/manager/restaurant" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Meu Restaurante</Link>
-                                    <Link to="/manager/menu" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Gerir Menu</Link>
-                                    <Link to="/manager/reservations" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>Reservas</Link>
+                                    <Link to="/manager" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
+                                        Painel de Gestor
+                                    </Link>
+                                    <Link to="/manager/menu" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
+                                        Gerir Menu
+                                    </Link>
+                                    <Link to="/manager/reservations" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
+                                        Reservas
+                                    </Link>
+                                    <Link to="/manager/restaurant" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
+                                        Meu Restaurante
+                                    </Link>
                                 </>
                             )}
 

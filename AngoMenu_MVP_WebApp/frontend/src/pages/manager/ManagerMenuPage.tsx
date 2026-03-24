@@ -86,24 +86,24 @@ export default function ManagerMenuPage() {
 
             <form onSubmit={handleSubmit} className="app-card grid gap-4 p-6 md:grid-cols-2">
                 <input className="input" placeholder="Nome do prato" required value={form.name} onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))} />
-                <input className="input" type="number" min={0} placeholder="Preço" required value={form.price} onChange={(event) => setForm((prev) => ({ ...prev, price: Number(event.target.value) }))} />
-                <input className="input md:col-span-2" placeholder="Descrição" value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} />
+                <input className="input" type="number" min={0} placeholder="PreÃ§o" required value={form.price} onChange={(event) => setForm((prev) => ({ ...prev, price: Number(event.target.value) }))} />
+                <input className="input md:col-span-2" placeholder="DescriÃ§Ã£o" value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} />
                 <button className="btn-primary md:col-span-2" disabled={saving}>{saving ? "A guardar..." : editingId ? "Editar Prato" : "Adicionar Prato"}</button>
             </form>
 
             {loading ? (
                 <p className="text-sm text-slate-600">A carregar menu...</p>
             ) : items.length === 0 ? (
-                <p className="text-sm text-slate-600">Nenhum prato disponível.</p>
+                <p className="text-sm text-slate-600">Nenhum prato disponÃ­vel.</p>
             ) : (
                 <div className="app-card overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="bg-slate-50">
                             <tr>
                                 <th className="p-3 text-left">Prato</th>
-                                <th className="p-3 text-left">Preço</th>
-                                <th className="p-3 text-left">Descrição</th>
-                                <th className="p-3 text-right">Ações</th>
+                                <th className="p-3 text-left">PreÃ§o</th>
+                                <th className="p-3 text-left">DescriÃ§Ã£o</th>
+                                <th className="p-3 text-right">AÃ§Ãµes</th>
                             </tr>
                         </thead>
                         <tbody>
