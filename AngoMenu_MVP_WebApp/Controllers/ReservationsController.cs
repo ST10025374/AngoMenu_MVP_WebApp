@@ -22,7 +22,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
 
         // CLIENT: Create reservation
         [EnableRateLimiting("reservationLimiter")]
-        [Authorize(Roles = "Client")]
+        [Authorize(Roles = "Client,Manager")]
         [HttpPost]
         public async Task<IActionResult> Create(ReservationCreateDto dto)
         {
