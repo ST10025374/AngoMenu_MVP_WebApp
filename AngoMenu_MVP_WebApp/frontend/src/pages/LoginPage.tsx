@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../lib/api';
-import { getUserRole, setToken } from '../lib/auth';
+import { getDefaultRouteForRole, getUserRole, setToken } from '../lib/auth';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -21,11 +21,7 @@ export default function LoginPage() {
             setToken(result.token);
 
             const role = getUserRole();
-            if (role === 'Admin') {
-                navigate('/admin');
-            } else {
-                navigate('/restaurants');
-            }
+            navigate(getDefaultRouteForRole(role), { replace: true });
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Falha ao iniciar sessão');
         } finally {

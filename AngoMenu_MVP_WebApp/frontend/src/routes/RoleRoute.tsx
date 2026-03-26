@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { getUserRole } from "../lib/auth";
+import { getDefaultRouteForRole, getUserRole } from "../lib/auth";
 
 export default function RoleRoute({
     allowedRoles,
@@ -9,7 +9,7 @@ export default function RoleRoute({
     const role = getUserRole();
 
     if (!role || !allowedRoles.includes(role)) {
-        return <Navigate to="/" replace />;
+        return <Navigate to={getDefaultRouteForRole(role)} replace />;
     }
     
     return <Outlet />;

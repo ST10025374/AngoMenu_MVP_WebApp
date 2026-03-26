@@ -58,6 +58,13 @@ export function getUserRole(): UserRole {
     return role === 'Admin' || role === 'Client' || role === 'Manager' || role === 'User' ? role : null;
 }
 
+export function getDefaultRouteForRole(role: UserRole): string {
+    if (role === 'Admin') return '/admin';
+    if (role === 'Manager') return '/manager/dashboard';
+    if (role === 'Client' || role === 'User') return '/restaurants';
+    return '/login';
+}
+
 // EXPIRATION
 export function isTokenExpired(): boolean {
     const token = getToken();

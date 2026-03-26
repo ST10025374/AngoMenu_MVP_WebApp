@@ -20,30 +20,33 @@ import ManagerReservationsPage from './pages/manager/ManagerReservationsPage';
 
 import ProtectedRoute from './routes/ProtectedRoute';
 import RoleRoute from './routes/RoleRoute';
+import { getDefaultRouteForRole, getUserRole, isAuthenticated } from './lib/auth';
 
 import HomePage from './pages/HomePage';
 
 export default function App() {
+    const role = getUserRole();
+    const isLoggedIn = isAuthenticated();
+
     return (
         <BrowserRouter>
             <AppShell>
                 <Routes>
 
                     {/* PUBLIC */}
-                    <Route path="/" element={<HomePage />} />
+                    <Route
+                        path="/"
+                        element={isLoggedIn ? <Navigate to={getDefaultRouteForRole(role)} replace /> : <HomePage />}
+                    />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
 
-                    {/* USER */}
-                    <Route element={<ProtectedRoute />}>
-                        <Route path="/restaurants" element={<RestaurantsPage />} />
-                        <Route path="/restaurants/:id" element={<RestaurantDetailsPage />} />
-                        <Route path="/restaurants/:id/reserve" element={<CreateReservationPage />} />
-                    </Route>
-
                     {/* CLIENT */}
                     <Route element={<ProtectedRoute />}>
-                        <Route element={<RoleRoute allowedRoles={["Client", "User"]} />}>
+                        <Route element={<RoleRoute allowedRoles={['Client', 'User']} />}>
+                            <Route path="/restaurants" element={<RestaurantsPage />} />
+                            <Route path="/restaurants/:id" element={<RestaurantDetailsPage />} />
+                            <Route path="/restaurants/:id/reserve" element={<CreateReservationPage />} />
                             <Route path="/reservations/my" element={<MyReservationsPage />} />
                         </Route>
                     </Route>
@@ -60,7 +63,8 @@ export default function App() {
 
                     <Route element={<ProtectedRoute />}>
                         <Route element={<RoleRoute allowedRoles={['Manager']} />}>
-                            <Route path="/manager" element={<ManagerDashboardPage />} />
+                            <Route path="/manager" element={<Navigate to="/manager/dashboard" replace />} />
+                            <Route path="/manager/dashboard" element={<ManagerDashboardPage />} />
                             <Route path="/manager/restaurant" element={<ManagerRestaurantPage />} />
                             <Route path="/manager/menu" element={<ManagerMenuPage />} />
                             <Route path="/manager/reservations" element={<ManagerReservationsPage />} />

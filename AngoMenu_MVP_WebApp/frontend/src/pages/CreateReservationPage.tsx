@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { createReservation, getImageUrl, getRestaurantById, type Restaurant } from "../lib/api";
+import { getUserRole } from "../lib/auth";
 
 export default function CreateReservationPage() {
     const { id } = useParams();
@@ -60,6 +61,12 @@ export default function CreateReservationPage() {
             setSuccess(message || "Reserva criada com sucesso.");
 
             setTimeout(() => {
+                const role = getUserRole();
+                if (role === "Manager") {
+                    navigate("/manager/dashboard");
+                    return;
+                }
+
                 navigate("/reservations/my");
             }, 1200);
 

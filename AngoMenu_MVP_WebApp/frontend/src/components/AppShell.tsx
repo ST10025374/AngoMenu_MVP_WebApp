@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getUserRole, isAuthenticated, logout, subscribeAuthChanges } from "../lib/auth";
+import { getDefaultRouteForRole, getUserRole, isAuthenticated, logout, subscribeAuthChanges } from "../lib/auth";
 
 function Dropdown({ title, items, onNavigate }: { title: string; items: { to: string; label: string }[]; onNavigate?: () => void }) {
     const [open, setOpen] = useState(false);
@@ -94,12 +94,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         setMobileMenuOpen(false);
     }
 
+    const homeLink = getDefaultRouteForRole(role);
+
     return (
         <div>
             <nav className="border-b bg-white/95 backdrop-blur">
                 <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
                     <div className="flex items-center gap-3">
-                        <Link to="/" className="text-sm font-black uppercase tracking-wide text-brand-dark" onClick={closeMobileMenu}>
+                        <Link to={homeLink} className="text-sm font-black uppercase tracking-wide text-brand-dark" onClick={closeMobileMenu}>
                             AngoMenu
                         </Link>
                     </div>
@@ -141,7 +143,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             <Dropdown
                                 title="Gestor"
                                 items={[
-                                    { to: "/manager", label: "Painel de Gestor" },
+                                    { to: "/manager/dashboard", label: "Painel de Gestor" },
                                     { to: "/manager/menu", label: "Gerir Menu" },
                                     { to: "/manager/reservations", label: "Reservas" },
                                     { to: "/manager/restaurant", label: "Meu Restaurante" },
@@ -182,7 +184,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
                             {isManagerUser && (
                                 <>
-                                    <Link to="/manager" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
+                                    <Link to="/manager/dashboard" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
                                         Painel de Gestor
                                     </Link>
                                     <Link to="/manager/menu" className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={closeMobileMenu}>
