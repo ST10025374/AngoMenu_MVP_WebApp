@@ -58,5 +58,6 @@ namespace AngoMenu_MVP_WebApp.Models
         // Navigation
         public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+        public ICollection<RestaurantImage> RestaurantImages { get; set; } = new List<RestaurantImage>();
     }
 }

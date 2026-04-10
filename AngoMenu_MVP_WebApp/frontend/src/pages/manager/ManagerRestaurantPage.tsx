@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { getManagerRestaurant, updateManagerRestaurant, type Restaurant, type RestaurantUpsertPayload } from "../../lib/api";
 
 type FormState = RestaurantUpsertPayload;
@@ -79,7 +80,12 @@ export default function ManagerRestaurantPage() {
 
     return (
         <section className="space-y-6">
-            <h1 className="text-3xl font-black text-brand-dark">{pageTitle}</h1>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <h1 className="text-3xl font-black text-brand-dark">{pageTitle}</h1>
+                {restaurant && (
+                    <Link to={`/manager/restaurants/${restaurant.id}/images`} className="btn-secondary">Gerir Imagens</Link>
+                )}
+            </div>
 
             {success && <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</div>}
             {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}

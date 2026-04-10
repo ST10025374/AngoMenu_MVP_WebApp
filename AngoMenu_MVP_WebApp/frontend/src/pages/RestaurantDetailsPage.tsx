@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
     getImageUrl,
@@ -17,6 +17,7 @@ export default function RestaurantDetailsPage() {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     useEffect(() => {
         async function load() {
@@ -46,6 +47,9 @@ export default function RestaurantDetailsPage() {
 
         void load();
     }, [restaurantId]);
+
+    const galleryImages = useMemo(() => restaurant?.images ?? [], [restaurant?.images]);
+    const heroImage = useMemo(() => getImageUrl(restaurant?.mainImageUrl ?? restaurant?.imageUrl) ?? 'https://placehold.co/1200x600?text=Sem+Imagem', [restaurant?.imageUrl, restaurant?.mainImageUrl]);
 
     if (loading) {
         return (
@@ -81,16 +85,14 @@ export default function RestaurantDetailsPage() {
             </Link>
 
             <article className="app-card overflow-hidden">
-                {getImageUrl(restaurant.imageUrl) && (
-                    <img src={getImageUrl(restaurant.imageUrl) ?? ''} alt={restaurant.name} className="h-64 w-full object-cover" />
-                )}
+                <img src={heroImage} alt={restaurant.name} className="h-64 w-full object-cover" />
 
                 <div className="border-b border-slate-200 bg-gradient-to-r from-brand-dark to-slate-900 p-6 text-white">
                     <h1 className="text-3xl font-black">{restaurant.name}</h1>
                     <p className="mt-2 max-w-3xl text-sm text-slate-200">
                         {restaurant.description ?? 'Um destino premium para refeições memoráveis e serviço de qualidade.'}
                     </p>
-                    <div className="mt-4">
+                    <div className="mt-4 flex flex-wrap gap-2">
                         <Link
                             to={`/restaurants/${restaurant.id}/reserve`}
                             className="btn-primary"
@@ -99,6 +101,19 @@ export default function RestaurantDetailsPage() {
                         </Link>
                     </div>
                 </div>
+
+                {galleryImages.length > 0 && (
+                    <div className="border-b border-slate-100 p-6">
+                        <h2 className="text-base font-bold text-brand-dark">Mais imagens</h2>
+                        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            {galleryImages.map((image) => (
+                                <button key={image.id} type="button" onClick={() => setSelectedImage(getImageUrl(image.imageUrl))} className="overflow-hidden rounded-lg border border-slate-200">
+                                    <img src={getImageUrl(image.imageUrl) ?? ''} alt="Galeria do restaurante" className="h-24 w-full object-cover" />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="rounded-xl bg-slate-50 p-4">
@@ -154,6 +169,12 @@ export default function RestaurantDetailsPage() {
                     </ul>
                 )}
             </article>
+
+            {selectedImage && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setSelectedImage(null)}>
+                    <img src={selectedImage} alt="Visualização da imagem" className="max-h-[90vh] max-w-[90vw] rounded-xl" />
+                </div>
+            )}
         </section>
     );
 }

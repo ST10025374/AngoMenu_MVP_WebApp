@@ -25,6 +25,16 @@ const reservationStatusToApiValue: Record<ReservationStatus, number> = {
     Cancelled: 3,
 };
 
+export type RestaurantImage = {
+    id: number;
+    restaurantId: number;
+    imageUrl: string;
+    publicId?: string | null;
+    isMain: boolean;
+    displayOrder: number;
+    createdAt: string;
+};
+
 export type Restaurant = {
     id: number;
     name: string;
@@ -39,6 +49,8 @@ export type Restaurant = {
     openingHour: string;
     closingHour: string;
     imageUrl?: string | null;
+    mainImageUrl?: string | null;
+    images?: RestaurantImage[];
     managerId?: number | null;
     managerName?: string | null;
     managerEmail?: string | null;
@@ -98,6 +110,8 @@ export type RestaurantUpsertPayload = {
     openingHour: string;
     closingHour: string;
     imageUrl?: string | null;
+    mainImageUrl?: string | null;
+    images?: RestaurantImage[];
     image?: File | null;
     manager?: ManagerCreatePayload | null;
 };
@@ -514,4 +528,71 @@ export async function deleteManagerMenuItem(id: number): Promise<string> {
     });
 
     return parseResponse<string>(res);
+}
+
+export async function getRestaurantImages(restaurantId: number): Promise<RestaurantImage[]> {
+    const res = await fetch(`/api/restaurants/${restaurantId}/images`, {
+        method: 'GET',
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<RestaurantImage[]>(res);
+}
+
+export async function uploadRestaurantImage(
+    restaurantId: number,
+    payload: { image: File; isMain?: boolean }
+): Promise<RestaurantImage[]> {
+    const formData = new FormData();
+    formData.append('image', payload.image);
+    if (payload.isMain) {
+        formData.append('isMain', 'true');
+    }
+
+    const res = await fetch(`/api/restaurants/${restaurantId}/images`, {
+        method: 'POST',
+        headers: {
+            ...authHeaders(),
+        },
+        body: formData,
+    });
+
+    return parseResponse<RestaurantImage[]>(res);
+}
+
+export async function deleteRestaurantImage(restaurantId: number, imageId: number): Promise<RestaurantImage[]> {
+    const res = await fetch(`/api/restaurants/${restaurantId}/images/${imageId}`, {
+        method: 'DELETE',
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<RestaurantImage[]>(res);
+}
+
+export async function setMainRestaurantImage(restaurantId: number, imageId: number): Promise<RestaurantImage[]> {
+    const res = await fetch(`/api/restaurants/${restaurantId}/images/${imageId}/set-main`, {
+        method: 'PUT',
+        headers: {
+            ...authHeaders(),
+        },
+    });
+
+    return parseResponse<RestaurantImage[]>(res);
+}
+
+export async function reorderRestaurantImages(restaurantId: number, orderedImageIds: number[]): Promise<RestaurantImage[]> {
+    const res = await fetch(`/api/restaurants/${restaurantId}/images/reorder`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+        },
+        body: JSON.stringify({ orderedImageIds }),
+    });
+
+    return parseResponse<RestaurantImage[]>(res);
 }

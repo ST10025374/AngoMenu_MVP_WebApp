@@ -1,4 +1,6 @@
-﻿namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
+﻿using AngoMenu_MVP_WebApp.DTOs.RestaurantImage;
+
+namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
 {
     public class RestaurantResponseDto
     {
@@ -15,6 +17,8 @@
         public TimeOnly OpeningHour { get; set; }
         public TimeOnly ClosingHour { get; set; }
         public string? ImageUrl { get; set; }
+        public string? MainImageUrl { get; set; }
+        public List<RestaurantImageResponseDto> Images { get; set; } = new();
         public int? ManagerId { get; set; }
         public string? ManagerName { get; set; }
         public string? ManagerEmail { get; set; }

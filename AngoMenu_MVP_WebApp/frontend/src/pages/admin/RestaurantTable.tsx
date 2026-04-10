@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { getImageUrl, type AdminRestaurant } from "../../lib/api";
 
 export default function RestaurantTable({
@@ -25,14 +26,14 @@ export default function RestaurantTable({
                     {restaurants.map((restaurant) => (
                         <tr key={restaurant.id} className="border-t">
                             <td className="p-3">
-                                {getImageUrl(restaurant.imageUrl) ? (
+                                {getImageUrl(restaurant.mainImageUrl ?? restaurant.imageUrl) ? (
                                     <img
-                                        src={getImageUrl(restaurant.imageUrl) ?? ''}
+                                        src={getImageUrl(restaurant.mainImageUrl ?? restaurant.imageUrl) ?? ''}
                                         alt={restaurant.name}
                                         className="h-12 w-20 rounded-md object-cover"
                                     />
                                 ) : (
-                                      <span className="text-xs text-slate-400">Sem imagem</span>
+                                        <span className="text-xs text-slate-400">Sem imagem</span>
                                 )}
                             </td>
                             <td className="p-3 font-semibold text-brand-dark">{restaurant.name}</td>
@@ -40,6 +41,12 @@ export default function RestaurantTable({
                             <td className="p-3 text-slate-700">{restaurant.managerName ?? "Sem gestor"}</td>
                             <td className="p-3 text-right">
                                 <div className="inline-flex gap-2">
+                                    <Link
+                                        to={`/admin/restaurants/${restaurant.id}/images`}
+                                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-slate-700 transition hover:border-brand-red hover:text-brand-red"
+                                    >
+                                        Imagens
+                                    </Link>
                                     <button
                                         type="button"
                                         onClick={() => onEdit(restaurant)}

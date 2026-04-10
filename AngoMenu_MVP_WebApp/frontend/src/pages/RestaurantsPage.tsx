@@ -94,13 +94,11 @@ export default function RestaurantsPage() {
                     <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                         {data.items.map((restaurant) => (
                             <li key={restaurant.id} className="app-card overflow-hidden p-5 transition duration-200 hover:-translate-y-1 hover:shadow-lg">
-                                {getImageUrl(restaurant.imageUrl) && (
-                                    <img
-                                        src={getImageUrl(restaurant.imageUrl) ?? ''}
-                                        alt={restaurant.name}
-                                        className="mb-4 h-40 w-full rounded-xl object-cover"
-                                    />
-                                )}
+                                <img
+                                    src={getImageUrl(restaurant.mainImageUrl ?? restaurant.imageUrl) ?? "https://placehold.co/600x400?text=Sem+Imagem"}
+                                    alt={restaurant.name}
+                                    className="mb-4 h-40 w-full rounded-xl object-cover"
+                                />
 
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-lg font-bold text-brand-dark">{restaurant.name}</h2>
