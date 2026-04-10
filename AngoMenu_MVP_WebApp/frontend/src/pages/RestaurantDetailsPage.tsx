@@ -48,8 +48,18 @@ export default function RestaurantDetailsPage() {
         void load();
     }, [restaurantId]);
 
-    const galleryImages = useMemo(() => restaurant?.images ?? [], [restaurant?.images]);
-    const heroImage = useMemo(() => getImageUrl(restaurant?.mainImageUrl ?? restaurant?.imageUrl) ?? 'https://placehold.co/1200x600?text=Sem+Imagem', [restaurant?.imageUrl, restaurant?.mainImageUrl]);
+    const heroImage = useMemo(
+        () => getImageUrl(restaurant?.mainImageUrl ?? restaurant?.imageUrl) ?? 'https://placehold.co/1200x600?text=Sem+Imagem',
+        [restaurant?.imageUrl, restaurant?.mainImageUrl]
+    );
+    const galleryImages = useMemo(
+        () =>
+            (restaurant?.images ?? []).filter((image) => {
+                const currentUrl = getImageUrl(image.imageUrl);
+                return Boolean(currentUrl) && currentUrl !== heroImage;
+            }),
+        [restaurant?.images, heroImage]
+    );
 
     if (loading) {
         return (

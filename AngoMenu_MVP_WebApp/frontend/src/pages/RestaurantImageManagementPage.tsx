@@ -15,8 +15,8 @@ import {
 const MAX_IMAGES = 5;
 
 export default function RestaurantImageManagementPage() {
-    const { id } = useParams();
-    const restaurantId = Number(id);
+    const { id, restaurantId: restaurantIdParam } = useParams();
+    const restaurantId = Number(restaurantIdParam ?? id);
 
     const location = useLocation();
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
@@ -186,6 +186,11 @@ export default function RestaurantImageManagementPage() {
                             </div>
                         </article>
                     ))}
+                        {images.length === 0 && (
+                            <div className="app-card p-4 text-sm text-slate-500">
+                                Este restaurante ainda não possui imagens.
+                            </div>
+                        )}
                 </div>
             )}
         </section>

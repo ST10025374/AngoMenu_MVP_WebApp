@@ -17,6 +17,7 @@ import ManagerDashboardPage from './pages/manager/ManagerDashboardPage';
 import ManagerRestaurantPage from './pages/manager/ManagerRestaurantPage';
 import ManagerMenuPage from './pages/manager/ManagerMenuPage';
 import ManagerReservationsPage from './pages/manager/ManagerReservationsPage';
+import RestaurantImageManagementPage from './pages/RestaurantImageManagementPage';
 
 import ProtectedRoute from './routes/ProtectedRoute';
 import RoleRoute from './routes/RoleRoute';
@@ -56,6 +57,7 @@ export default function App() {
                         <Route element={<RoleRoute allowedRoles={['Admin']} />}>
                             <Route path="/admin" element={<AdminDashboardPage />} />
                             <Route path="/admin/restaurants" element={<AdminRestaurantsPage />} />
+                            <Route path="/admin/restaurants/:restaurantId/images" element={<RestaurantImageManagementPage />} />
                             <Route path="/admin/reservations" element={<AdminReservationsPage />} />
                             <Route path="/admin/menu" element={<AdminMenuPage />} />
                         </Route>
@@ -66,6 +68,7 @@ export default function App() {
                             <Route path="/manager" element={<Navigate to="/manager/dashboard" replace />} />
                             <Route path="/manager/dashboard" element={<ManagerDashboardPage />} />
                             <Route path="/manager/restaurant" element={<ManagerRestaurantPage />} />
+                            <Route path="/manager/restaurants/:restaurantId/images" element={<RestaurantImageManagementPage />} />
                             <Route path="/manager/menu" element={<ManagerMenuPage />} />
                             <Route path="/manager/reservations" element={<ManagerReservationsPage />} />
                         </Route>
