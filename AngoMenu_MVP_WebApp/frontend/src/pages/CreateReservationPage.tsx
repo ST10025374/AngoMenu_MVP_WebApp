@@ -19,6 +19,9 @@ export default function CreateReservationPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const role = getUserRole();
+    const backLink = role === "Manager" ? "/manager/dashboard" : `/restaurants/${restaurantId}`;
+    const backLabel = role === "Manager" ? "Voltar ao painel de gestor" : "Voltar ao restaurante";
 
     useEffect(() => {
         async function loadRestaurant() {
@@ -80,10 +83,10 @@ export default function CreateReservationPage() {
     return (
         <section className="space-y-6">
             <Link
-                to={`/restaurants/${restaurantId}`}
+                to={backLink}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-brand-red hover:underline"
             >
-                Voltar ao restaurant
+                {backLabel}
             </Link>
 
             {restaurant && (

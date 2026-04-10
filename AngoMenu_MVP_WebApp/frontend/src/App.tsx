@@ -41,8 +41,14 @@ export default function App() {
                         <Route element={<RoleRoute allowedRoles={['Client', 'User']} />}>
                             <Route path="/restaurants" element={<RestaurantsPage />} />
                             <Route path="/restaurants/:id" element={<RestaurantDetailsPage />} />
-                            <Route path="/restaurants/:id/reserve" element={<CreateReservationPage />} />
                             <Route path="/reservations/my" element={<MyReservationsPage />} />
+                        </Route>
+                    </Route>
+
+                    {/* CLIENT + MANAGER */}
+                    <Route element={<ProtectedRoute />}>
+                        <Route element={<RoleRoute allowedRoles={['Client', 'User', 'Manager']} />}>
+                            <Route path="/restaurants/:id/reserve" element={<CreateReservationPage />} />
                         </Route>
                     </Route>
 
