@@ -21,13 +21,10 @@ import RestaurantImageManagementPage from './pages/RestaurantImageManagementPage
 
 import ProtectedRoute from './routes/ProtectedRoute';
 import RoleRoute from './routes/RoleRoute';
-import { getDefaultRouteForRole, getUserRole, isAuthenticated } from './lib/auth';
 
 import HomePage from './pages/HomePage';
 
-export default function App() {
-    const role = getUserRole();
-    const isLoggedIn = isAuthenticated();
+export default function App() {  
 
     return (
         <BrowserRouter>
@@ -35,10 +32,7 @@ export default function App() {
                 <Routes>
 
                     {/* PUBLIC */}
-                    <Route
-                        path="/"
-                        element={isLoggedIn ? <Navigate to={getDefaultRouteForRole(role)} replace /> : <HomePage />}
-                    />
+                    <Route path="/" element={<HomePage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
 
