@@ -62,14 +62,6 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
             var shouldBeMain = dto.IsMain || images.Count == 0;
 
-            if (shouldBeMain)
-            {
-                foreach (var image in images)
-                {
-                    image.IsMain = false;
-                }
-            }
-
             var entity = new RestaurantImage
             {
                 RestaurantId = restaurantId,
@@ -80,8 +72,27 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.RestaurantImages.Add(entity);
-            await _context.SaveChangesAsync();
+            if (shouldBeMain && images.Any(i => i.IsMain))
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                foreach (var image in images.Where(i => i.IsMain))
+                {
+                    image.IsMain = false;
+                }
+
+                await _context.SaveChangesAsync();
+
+                _context.RestaurantImages.Add(entity);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            else
+            {
+                _context.RestaurantImages.Add(entity);
+                await _context.SaveChangesAsync();
+            }
 
             await EnsureMainImageAndLegacyFields(restaurant);
             return await BuildResponse(restaurantId);
@@ -108,10 +119,18 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 await _cloudinaryService.DeleteImage(image.PublicId);
             }
 
+            var deletedMainImage = image.IsMain;
+
             _context.RestaurantImages.Remove(image);
             await _context.SaveChangesAsync();
 
             await NormalizeDisplayOrder(restaurantId);
+
+            if (deletedMainImage)
+            {
+                await PromoteFirstImageToMainIfMissing(restaurantId);
+            }
+
             await EnsureMainImageAndLegacyFields(restaurant);
 
             return await BuildResponse(restaurantId);
@@ -136,15 +155,16 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 return Result<List<RestaurantImageResponseDto>>.Fail("Image not found.");
             }
 
-            foreach (var image in images)
+            if (selected.IsMain)
             {
-                image.IsMain = image.Id == imageId;
+                return Result<List<RestaurantImageResponseDto>>.Ok(images.OrderBy(i => i.DisplayOrder).Select(Map).ToList());
             }
 
-            await _context.SaveChangesAsync();
+            await SetMainImageSafely(images, selected);
             await EnsureMainImageAndLegacyFields(restaurant);
 
-            return Result<List<RestaurantImageResponseDto>>.Ok(images.OrderBy(i => i.DisplayOrder).Select(Map).ToList());
+            var ordered = await GetOrderedImages(restaurantId);
+            return Result<List<RestaurantImageResponseDto>>.Ok(ordered.Select(Map).ToList());
         }
 
         public async Task<Result<List<RestaurantImageResponseDto>>> ReorderImages(int restaurantId, int requesterUserId, string requesterRole, RestaurantImageReorderRequestDto dto)
@@ -258,6 +278,45 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 .OrderBy(i => i.DisplayOrder)
                 .ThenBy(i => i.Id)
                 .ToListAsync();
+        }
+
+        private async Task SetMainImageSafely(List<RestaurantImage> images, RestaurantImage targetImage)
+        {
+            var currentMain = images.FirstOrDefault(i => i.IsMain);
+            if (currentMain?.Id == targetImage.Id)
+            {
+                return;
+            }
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            if (currentMain is not null)
+            {
+                currentMain.IsMain = false;
+                await _context.SaveChangesAsync();
+            }
+
+            targetImage.IsMain = true;
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+
+        private async Task PromoteFirstImageToMainIfMissing(int restaurantId)
+        {
+            var images = await _context.RestaurantImages
+                .Where(i => i.RestaurantId == restaurantId)
+                .OrderBy(i => i.DisplayOrder)
+                .ThenBy(i => i.Id)
+                .ToListAsync();
+
+            if (images.Count == 0 || images.Any(i => i.IsMain))
+            {
+                return;
+            }
+
+            images[0].IsMain = true;
+            await _context.SaveChangesAsync();
         }
 
         private async Task<Result<List<RestaurantImageResponseDto>>> BuildResponse(int restaurantId)
