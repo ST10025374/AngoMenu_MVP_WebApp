@@ -46,22 +46,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 Phone = dto.Phone,
                 OpeningHour = dto.OpeningHour,
                 ClosingHour = dto.ClosingHour,
-                ImageUrl = dto.ImageUrl ?? string.Empty,
-                PublicId = string.Empty,
             };
-
-            if (dto.Image != null)
-            {
-                var uploadResult = await _cloudinaryService.UploadRestaurantImage(dto.Image);
-
-                if (uploadResult.Error != null)
-                {
-                    return Result.Fail(uploadResult.Error.Message);
-                }
-
-                restaurant.ImageUrl = uploadResult.SecureUrl.ToString();
-                restaurant.PublicId = uploadResult.PublicId;
-            }
 
             if (dto.Manager is not null)
             {
@@ -84,28 +69,12 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             _context.Restaurants.Add(restaurant);
             await _context.SaveChangesAsync();
 
-            if (!string.IsNullOrWhiteSpace(restaurant.ImageUrl))
-            {
-                _context.RestaurantImages.Add(new RestaurantImage
-                {
-                    RestaurantId = restaurant.Id,
-                    ImageUrl = restaurant.ImageUrl,
-                    PublicId = string.IsNullOrWhiteSpace(restaurant.PublicId) ? null : restaurant.PublicId,
-                    IsMain = true,
-                    DisplayOrder = 0,
-                    CreatedAt = DateTime.UtcNow
-                });
-
-                await _context.SaveChangesAsync();
-            }
-
             return Result.Ok("Restaurant created successfully.");
         }
 
         public async Task<Result> UpdateRestaurant(int id, RestaurantUpdateDto dto)
         {
             var restaurant = await _context.Restaurants
-                .Include(r => r.RestaurantImages)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (restaurant == null)
@@ -113,19 +82,12 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 return Result.Fail("Restaurant not found.");
             }
 
-            var updateResult = await ApplyRestaurantUpdate(restaurant, dto);
-            if (!updateResult.Success)
-            {
-                return updateResult;
-            }
-
-            return Result.Ok("Restaurant updated successfully.");
+            return await ApplyRestaurantUpdate(restaurant, dto);
         }
 
         public async Task<Result> UpdateManagerRestaurant(int managerUserId, RestaurantUpdateDto dto)
         {
             var restaurant = await _context.Restaurants
-                .Include(r => r.RestaurantImages)
                 .FirstOrDefaultAsync(r => r.ManagerId == managerUserId);
 
             if (restaurant == null)
@@ -133,13 +95,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 return Result.Fail("Restaurant not found for manager.");
             }
 
-            var updateResult = await ApplyRestaurantUpdate(restaurant, dto);
-            if (!updateResult.Success)
-            {
-                return updateResult;
-            }
-
-            return Result.Ok("Restaurant updated successfully.");
+            return await ApplyRestaurantUpdate(restaurant, dto);
         }
 
         private async Task<Result> ApplyRestaurantUpdate(Restaurant restaurant, RestaurantUpdateDto dto)
@@ -155,55 +111,10 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             restaurant.Phone = dto.Phone;
             restaurant.OpeningHour = dto.OpeningHour;
             restaurant.ClosingHour = dto.ClosingHour;
-
-            if (dto.Image != null)
-            {
-                var uploadResult = await _cloudinaryService.UploadRestaurantImage(dto.Image);
-                if (uploadResult.Error != null)
-                {
-                    return Result.Fail(uploadResult.Error.Message);
-                }
-
-                var currentMain = restaurant.RestaurantImages
-                    .OrderBy(i => i.DisplayOrder)
-                    .FirstOrDefault(i => i.IsMain) ?? restaurant.RestaurantImages.OrderBy(i => i.DisplayOrder).FirstOrDefault();
-
-                if (currentMain != null)
-                {
-                    if (!string.IsNullOrWhiteSpace(currentMain.PublicId))
-                    {
-                        await _cloudinaryService.DeleteImage(currentMain.PublicId);
-                    }
-
-                    currentMain.ImageUrl = uploadResult.SecureUrl.ToString();
-                    currentMain.PublicId = uploadResult.PublicId;
-                    currentMain.IsMain = true;
-                }
-                else
-                {
-                    restaurant.RestaurantImages.Add(new RestaurantImage
-                    {
-                        RestaurantId = restaurant.Id,
-                        ImageUrl = uploadResult.SecureUrl.ToString(),
-                        PublicId = uploadResult.PublicId,
-                        IsMain = true,
-                        DisplayOrder = 0,
-                        CreatedAt = DateTime.UtcNow,
-                    });
-                }
-
-                foreach (var image in restaurant.RestaurantImages.Where(i => currentMain == null || i.Id != currentMain.Id))
-                {
-                    image.IsMain = false;
-                }
-
-                restaurant.ImageUrl = uploadResult.SecureUrl.ToString();
-                restaurant.PublicId = uploadResult.PublicId;
-            }
-
+            
             await _context.SaveChangesAsync();
 
-            return Result.Ok();
+            return Result.Ok("Restaurant updated successfully.");
         }
 
         public async Task<Result> DeleteRestaurant(int id)
@@ -222,11 +133,6 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 {
                     await _cloudinaryService.DeleteImage(image.PublicId);
                 }
-            }
-
-            if (!string.IsNullOrWhiteSpace(restaurant.PublicId))
-            {
-                await _cloudinaryService.DeleteImage(restaurant.PublicId);
             }
 
             _context.Restaurants.Remove(restaurant);
@@ -305,7 +211,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 .ToList();
 
             var mainImage = orderedImages.FirstOrDefault(i => i.IsMain) ?? orderedImages.FirstOrDefault();
-            var mainImageUrl = mainImage?.ImageUrl ?? restaurant.ImageUrl;
+            var mainImageUrl = mainImage?.ImageUrl;
 
             return new RestaurantResponseDto
             {
@@ -321,7 +227,6 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 Phone = restaurant.Phone,
                 OpeningHour = restaurant.OpeningHour,
                 ClosingHour = restaurant.ClosingHour,
-                ImageUrl = mainImageUrl,
                 MainImageUrl = mainImageUrl,
                 Images = orderedImages.Select(i => new RestaurantImageResponseDto
                 {

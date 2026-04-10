@@ -94,7 +94,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 await _context.SaveChangesAsync();
             }
 
-            await EnsureMainImageAndLegacyFields(restaurant);
+            await EnsureMainImageConsistency(restaurant);
             return await BuildResponse(restaurantId);
         }
 
@@ -131,7 +131,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 await PromoteFirstImageToMainIfMissing(restaurantId);
             }
 
-            await EnsureMainImageAndLegacyFields(restaurant);
+            await EnsureMainImageConsistency(restaurant);
 
             return await BuildResponse(restaurantId);
         }
@@ -161,7 +161,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             }
 
             await SetMainImageSafely(images, selected);
-            await EnsureMainImageAndLegacyFields(restaurant);
+            await EnsureMainImageConsistency(restaurant);
 
             var ordered = await GetOrderedImages(restaurantId);
             return Result<List<RestaurantImageResponseDto>>.Ok(ordered.Select(Map).ToList());
@@ -198,7 +198,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             }
 
             await _context.SaveChangesAsync();
-            await EnsureMainImageAndLegacyFields(restaurant);
+            await EnsureMainImageConsistency(restaurant);
 
             var ordered = await GetOrderedImages(restaurantId);
             return Result<List<RestaurantImageResponseDto>>.Ok(ordered.Select(Map).ToList());
@@ -219,37 +219,31 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             return null;
         }
 
-        private async Task EnsureMainImageAndLegacyFields(Restaurant restaurant)
+        private async Task EnsureMainImageConsistency(Restaurant restaurant)
         {
             var images = await _context.RestaurantImages
                 .Where(i => i.RestaurantId == restaurant.Id)
                 .OrderBy(i => i.DisplayOrder)
                 .ToListAsync();
 
-            if (images.Count > 0)
+            if (images.Count == 0)
             {
-                if (images.All(i => !i.IsMain))
-                {
-                    images[0].IsMain = true;
-                }
-
-                if (images.Count(i => i.IsMain) > 1)
-                {
-                    var firstMain = images.First(i => i.IsMain);
-                    foreach (var image in images.Where(i => i.Id != firstMain.Id))
-                    {
-                        image.IsMain = false;
-                    }
-                }
-
-                var main = images.First(i => i.IsMain);
-                restaurant.ImageUrl = main.ImageUrl;
-                restaurant.PublicId = main.PublicId ?? string.Empty;
+                await _context.SaveChangesAsync();
+                return;
             }
-            else
+
+            if (images.All(i => !i.IsMain))
             {
-                restaurant.ImageUrl = string.Empty;
-                restaurant.PublicId = string.Empty;
+                images[0].IsMain = true;
+            }
+
+            if (images.Count(i => i.IsMain) > 1)
+            {
+                var firstMain = images.First(i => i.IsMain);
+                foreach (var image in images.Where(i => i.Id != firstMain.Id))
+                {
+                    image.IsMain = false;
+                }
             }
 
             await _context.SaveChangesAsync();

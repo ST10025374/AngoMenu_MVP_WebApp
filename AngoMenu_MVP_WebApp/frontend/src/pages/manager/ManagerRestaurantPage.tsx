@@ -17,8 +17,6 @@ function mapRestaurantToForm(restaurant: Restaurant): FormState {
         phone: restaurant.phone,
         openingHour: restaurant.openingHour,
         closingHour: restaurant.closingHour,
-        imageUrl: restaurant.imageUrl,
-        image: null,
     };
 }
 
@@ -112,11 +110,6 @@ export default function ManagerRestaurantPage() {
                 <div className="md:col-span-2">
                     <label className="label">Descrição</label>
                     <input className="input" value={form.description ?? ""} onChange={(event) => setForm((prev) => prev ? { ...prev, description: event.target.value } : prev)} />
-                </div>
-
-                <div className="md:col-span-2">
-                    <label className="label">Imagem</label>
-                    <input type="file" accept="image/*" className="input" onChange={(event) => setForm((prev) => prev ? { ...prev, image: event.target.files?.[0] ?? null } : prev)} />
                 </div>
 
                 <button className="btn-primary md:col-span-2" disabled={saving}>{saving ? "A guardar..." : "Atualizar Restaurante"}</button>

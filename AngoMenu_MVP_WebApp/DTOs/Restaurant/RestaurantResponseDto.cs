@@ -16,7 +16,6 @@ namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
         public string Phone { get; set; } = string.Empty;
         public TimeOnly OpeningHour { get; set; }
         public TimeOnly ClosingHour { get; set; }
-        public string? ImageUrl { get; set; }
         public string? MainImageUrl { get; set; }
         public List<RestaurantImageResponseDto> Images { get; set; } = new();
         public int? ManagerId { get; set; }

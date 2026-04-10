@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
 {
@@ -32,8 +31,7 @@ namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
         public string Phone { get; set; } = string.Empty;
 
         public TimeOnly OpeningHour { get; set; }
+
         public TimeOnly ClosingHour { get; set; }
-        public IFormFile? Image { get; set; }
-        public string? ImageUrl { get; set; }
     }
 }

@@ -1,7 +1,6 @@
-import { getImageUrl, type AdminRestaurant } from "../../lib/api";
+import type { AdminRestaurant } from "../../lib/api";
 
 export type RestaurantFormValues = Omit<AdminRestaurant, "id"> & {
-    image?: File | null;
     createManager: boolean;
     managerFirstName: string;
     managerLastName: string;
@@ -17,7 +16,6 @@ export default function RestaurantForm({
     isEditMode = false,
     onChange,
     onToggleManager,
-    onImageChange,
     onSubmit,
     onCancel,
 }: {
@@ -27,11 +25,9 @@ export default function RestaurantForm({
     isEditMode?: boolean;
     onChange: (field: keyof RestaurantFormValues, value: string) => void;
     onToggleManager: (value: boolean) => void;
-    onImageChange: (file: File | null) => void;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     onCancel: () => void;
     }) {
-    const previewUrl = getImageUrl(values.imageUrl ?? null);
 
     return (
         <form onSubmit={onSubmit} className="flex flex-col">
@@ -156,23 +152,6 @@ export default function RestaurantForm({
                     value={values.description ?? ""}
                     onChange={(event) => onChange("description", event.target.value)}
                 />
-            </div>
-
-            <div className="md:col-span-2">
-                <label className="label" htmlFor="restaurant-image">Imagem do restaurante</label>
-                <input
-                    id="restaurant-image"
-                    type="file"
-                    accept="image/*"
-                    className="input"
-                    onChange={(event) => onImageChange(event.target.files?.[0] ?? null)}
-                />
-                {values.image && (
-                    <p className="mt-2 text-xs text-slate-500">Imagem selecionada: {values.image.name}</p>
-                )}
-                {!isEditMode && previewUrl && (
-                    <img src={previewUrl} alt="Pré-visualização do restaurante" className="mt-3 h-40 w-full rounded-xl object-cover" />
-                )}
             </div>
 
             {!isEditMode && (

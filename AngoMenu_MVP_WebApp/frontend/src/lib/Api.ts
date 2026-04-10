@@ -48,7 +48,6 @@ export type Restaurant = {
     phone: string;
     openingHour: string;
     closingHour: string;
-    imageUrl?: string | null;
     mainImageUrl?: string | null;
     images?: RestaurantImage[];
     managerId?: number | null;
@@ -109,10 +108,6 @@ export type RestaurantUpsertPayload = {
     phone: string;
     openingHour: string;
     closingHour: string;
-    imageUrl?: string | null;
-    mainImageUrl?: string | null;
-    images?: RestaurantImage[];
-    image?: File | null;
     manager?: ManagerCreatePayload | null;
 };
 
@@ -179,14 +174,6 @@ function buildRestaurantFormData(payload: RestaurantUpsertPayload): FormData {
     formData.append('phone', payload.phone);
     formData.append('openingHour', payload.openingHour);
     formData.append('closingHour', payload.closingHour);
-
-    if (payload.image) {
-        formData.append('image', payload.image);
-    }
-
-    if (payload.imageUrl) {
-        formData.append('imageUrl', payload.imageUrl);
-    }
 
     if (payload.manager) {
         formData.append('manager.firstName', payload.manager.firstName);

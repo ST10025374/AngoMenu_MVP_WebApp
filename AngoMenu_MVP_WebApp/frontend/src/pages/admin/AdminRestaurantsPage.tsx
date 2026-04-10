@@ -25,11 +25,9 @@ const defaultRestaurantForm: RestaurantFormValues = {
     phone: "",
     openingHour: "08:00",
     closingHour: "22:00",
-    imageUrl: "",
     managerId: null,
     managerName: null,
     managerEmail: null,
-    image: null,
     createManager: false,
     managerFirstName: "",
     managerLastName: "",
@@ -100,11 +98,9 @@ export default function AdminRestaurantsPage() {
             phone: restaurant.phone,
             openingHour: restaurant.openingHour,
             closingHour: restaurant.closingHour,
-            imageUrl: restaurant.imageUrl ?? "",
             managerId: restaurant.managerId ?? null,
             managerName: restaurant.managerName ?? null,
             managerEmail: restaurant.managerEmail ?? null,
-            image: null,
         });
         setSuccess("");
         setError("");
@@ -133,10 +129,6 @@ export default function AdminRestaurantsPage() {
         }));
     }
 
-    function handleImageChange(file: File | null) {
-        setFormValues((prev) => ({ ...prev, image: file }));
-    }
-
     function buildPayload(values: RestaurantFormValues): RestaurantUpsertPayload {
         const payload: RestaurantUpsertPayload = {
             name: values.name,
@@ -150,8 +142,6 @@ export default function AdminRestaurantsPage() {
             phone: values.phone,
             openingHour: values.openingHour,
             closingHour: values.closingHour,
-            imageUrl: values.imageUrl,
-            image: values.image,
         };
 
         if (!editingRestaurant && values.createManager) {
@@ -255,7 +245,6 @@ export default function AdminRestaurantsPage() {
                     isEditMode={Boolean(editingRestaurant)}
                     onChange={handleFieldChange}
                     onToggleManager={handleToggleManager}
-                    onImageChange={handleImageChange}
                     onSubmit={handleSubmit}
                     onCancel={closeModal}
                 />

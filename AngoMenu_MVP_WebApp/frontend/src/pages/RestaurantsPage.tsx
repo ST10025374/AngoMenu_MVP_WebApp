@@ -95,7 +95,7 @@ export default function RestaurantsPage() {
                         {data.items.map((restaurant) => (
                             <li key={restaurant.id} className="app-card overflow-hidden p-5 transition duration-200 hover:-translate-y-1 hover:shadow-lg">
                                 <img
-                                    src={getImageUrl(restaurant.mainImageUrl ?? restaurant.imageUrl) ?? "https://placehold.co/600x400?text=Sem+Imagem"}
+                                    src={getImageUrl(restaurant.mainImageUrl) ?? "https://placehold.co/600x400?text=Sem+Imagem"}
                                     alt={restaurant.name}
                                     className="mb-4 h-40 w-full rounded-xl object-cover"
                                 />

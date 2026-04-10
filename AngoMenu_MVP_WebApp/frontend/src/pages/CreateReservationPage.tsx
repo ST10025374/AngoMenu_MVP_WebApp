@@ -88,8 +88,8 @@ export default function CreateReservationPage() {
 
             {restaurant && (
                 <div className="app-card overflow-hidden p-0">
-                    {getImageUrl(restaurant.imageUrl) && (
-                        <img src={getImageUrl(restaurant.imageUrl) ?? ''} alt={restaurant.name} className="h-48 w-full object-cover" />
+                    {getImageUrl(restaurant.mainImageUrl) && (
+                        <img src={getImageUrl(restaurant.mainImageUrl) ?? ''} alt={restaurant.name} className="h-48 w-full object-cover" />
                     )}
                     <div className="p-6">
                         <h2 className="text-xl font-black text-brand-dark">{restaurant.name}</h2>

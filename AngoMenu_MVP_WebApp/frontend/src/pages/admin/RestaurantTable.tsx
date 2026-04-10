@@ -26,9 +26,9 @@ export default function RestaurantTable({
                     {restaurants.map((restaurant) => (
                         <tr key={restaurant.id} className="border-t">
                             <td className="p-3">
-                                {getImageUrl(restaurant.mainImageUrl ?? restaurant.imageUrl) ? (
+                                {getImageUrl(restaurant.mainImageUrl) ? (
                                     <img
-                                        src={getImageUrl(restaurant.mainImageUrl ?? restaurant.imageUrl) ?? ''}
+                                        src={getImageUrl(restaurant.mainImageUrl) ?? ''}
                                         alt={restaurant.name}
                                         className="h-12 w-20 rounded-md object-cover"
                                     />

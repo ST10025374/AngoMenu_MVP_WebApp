@@ -49,9 +49,9 @@ export default function ManagerDashboardPage() {
 
                 {!loading && !error && restaurant && (
                     <div className="space-y-4">
-                        {getImageUrl(restaurant.imageUrl) && (
+                        {getImageUrl(restaurant.mainImageUrl) && (
                             <img
-                                src={getImageUrl(restaurant.imageUrl) ?? ""}
+                                src={getImageUrl(restaurant.mainImageUrl) ?? ""}
                                 alt={restaurant.name}
                                 className="h-52 w-full rounded-xl object-cover"
                             />

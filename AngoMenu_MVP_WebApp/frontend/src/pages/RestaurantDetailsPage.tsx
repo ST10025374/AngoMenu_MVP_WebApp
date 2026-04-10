@@ -49,8 +49,8 @@ export default function RestaurantDetailsPage() {
     }, [restaurantId]);
 
     const heroImage = useMemo(
-        () => getImageUrl(restaurant?.mainImageUrl ?? restaurant?.imageUrl) ?? 'https://placehold.co/1200x600?text=Sem+Imagem',
-        [restaurant?.imageUrl, restaurant?.mainImageUrl]
+        () => getImageUrl(restaurant?.mainImageUrl) ?? 'https://placehold.co/1200x600?text=Sem+Imagem',
+        [restaurant?.mainImageUrl]
     );
     const galleryImages = useMemo(
         () =>
