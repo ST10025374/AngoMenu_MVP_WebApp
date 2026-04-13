@@ -29,7 +29,7 @@ export default function ManagerDashboardPage() {
     return (
         <section className="space-y-6">
             <h1 className="text-3xl font-black text-brand-dark">Painel de Gestor</h1>
-            <p className="text-sm text-slate-600">Gerir apenas o restaurante associado Ã  sua conta.</p>
+            <p className="text-sm text-slate-600">Gerir apenas o restaurante associado à sua conta.</p>
 
             <div className="grid gap-4 md:grid-cols-2">
                 <Link to="/manager/menu" className="app-card block p-5 hover:border-brand-red">
@@ -62,7 +62,7 @@ export default function ManagerDashboardPage() {
                             {restaurant.description && (
                                 <p className="mt-2 text-sm text-slate-700">{restaurant.description}</p>
                             )}
-                            <p className="mt-2 text-sm text-slate-600">LocalizaÃ§Ã£o: {restaurant.location}</p>
+                            <p className="mt-2 text-sm text-slate-600">Localização: {restaurant.location}</p>
                         </div>
 
                         <div className="flex flex-wrap gap-3">

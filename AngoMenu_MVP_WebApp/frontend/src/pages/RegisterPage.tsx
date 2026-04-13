@@ -39,13 +39,13 @@ export default function RegisterPage() {
                 </span>
                 <h1 className="mt-4 text-3xl font-black text-brand-dark">Crie a sua conta em minutos.</h1>
                 <p className="mt-3 text-slate-600">
-                    Tenha uma experiÃªncia de reserva mais fluida com descoberta personalizada de restaurantes e reservas mais rÃ¡pidas.
+                    Tenha uma experiência de reserva mais fluida com descoberta personalizada de restaurantes e reservas mais rápidas.
                 </p>
 
                 <div className="mt-8 space-y-4 text-sm text-slate-700">
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Descubra restaurantes por localizaÃ§Ã£o e disponibilidade</p>
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Veja os menus antes de reservar</p>
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Gira os seus planos gastronÃ³micos com confianÃ§a</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4"> Descubra restaurantes por localização e disponibilidade</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4"> Veja os menus antes de reservar</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4">  Gira os seus planos gastronómicos com confiança</p>
                 </div>
             </section>
 
@@ -71,7 +71,7 @@ export default function RegisterPage() {
 
                         <div>
                             <label htmlFor="lastName" className="label">
-                                Ãšltimo nome
+                                Último nome
                             </label>
                             <input
                                 id="lastName"
@@ -101,7 +101,7 @@ export default function RegisterPage() {
 
                     <div>
                         <label htmlFor="phoneNumber" className="label">
-                            NÃºmero de telefone
+                            Número de telefone
                         </label>
                         <input
                             id="phoneNumber"
@@ -141,7 +141,7 @@ export default function RegisterPage() {
                 </form>
 
                 <p className="mt-5 text-sm text-slate-600">
-                    JÃ¡ tem conta?{' '}
+                    Já tem conta?{' '}
                     <Link to="/login" className="font-semibold text-brand-red hover:underline">
                         Entrar
                     </Link>

@@ -114,7 +114,7 @@ export default function ManagerMenuPage() {
             <form onSubmit={handleSubmit} className="app-card grid gap-4 p-6 md:grid-cols-2">
                 <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
                     <p className={`text-sm font-semibold ${isEditMode ? "text-amber-700" : "text-emerald-700"}`}>
-                        {isEditMode ? "Modo de ediÃ§Ã£o" : "Modo de adiÃ§Ã£o"}
+                        {isEditMode ? "Modo de edição" : "Modo de adição"}
                     </p>
                     <div className="flex gap-2">
                         {isEditMode && (
@@ -130,7 +130,7 @@ export default function ManagerMenuPage() {
                     </div>
                 </div>
                 <input className="input" placeholder="Nome do prato" required value={form.name} onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))} />
-                <input className="input" type="number" min={0.01} step="0.01" placeholder="PreÃ§o" required value={form.price} onChange={(event) => setForm((prev) => ({ ...prev, price: Number(event.target.value) }))} />
+                <input className="input" type="number" min={0.01} step="0.01" placeholder="Preço" required value={form.price} onChange={(event) => setForm((prev) => ({ ...prev, price: Number(event.target.value) }))} />
                 <select className="input" value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value as MenuItemUpsertPayload["category"] }))}>
                     {MENU_CATEGORIES.map((category) => (
                         <option key={category} value={category}>{getMenuCategoryLabel(category)}</option>
@@ -146,7 +146,7 @@ export default function ManagerMenuPage() {
                     <span className="font-semibold text-slate-700">Disponibilidade do prato</span>
                     <span className="inline-flex items-center gap-2">
                         <span className={`${form.isAvailable ? "text-emerald-700" : "text-amber-700"} font-semibold`}>
-                            {form.isAvailable ? "DisponÃ­vel" : "IndisponÃ­vel no momento"}
+                            {form.isAvailable ? "Disponível" : "Indisponível no momento"}
                         </span>
                         <input
                             type="checkbox"
@@ -172,14 +172,14 @@ export default function ManagerMenuPage() {
                         </div>
                     </div>
                 )}
-                <input className="input md:col-span-2" placeholder="DescriÃ§Ã£o" value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} />
+                <input className="input md:col-span-2" placeholder="Descrição" value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} />
                 <button className="btn-primary md:col-span-2" disabled={saving}>{saving ? "A guardar..." : isEditMode ? "Atualizar prato" : "Adicionar prato"}</button>
             </form>
 
             {loading ? (
                 <p className="text-sm text-slate-600">A carregar menu...</p>
             ) : items.length === 0 ? (
-                <p className="text-sm text-slate-600">Nenhum prato disponÃ­vel.</p>
+                    <p className="text-sm text-slate-600">Nenhum prato disponível.</p>
             ) : (
                         <div className="space-y-3">
                             {items.map((item) => (
@@ -190,7 +190,7 @@ export default function ManagerMenuPage() {
                                         <p className="font-semibold text-brand-dark">{item.name}</p>
                                         <p className="text-sm text-slate-600">{item.description}</p>
                                         <p className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${item.isAvailable ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
-                                            {item.isAvailable ? "DisponÃ­vel" : "IndisponÃ­vel no momento"}
+                                            {item.isAvailable ? "Disponível" : "Indisponível no momento"}
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-4 md:flex-col md:items-end">

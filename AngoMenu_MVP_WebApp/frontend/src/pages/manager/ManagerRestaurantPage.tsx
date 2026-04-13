@@ -73,7 +73,7 @@ export default function ManagerRestaurantPage() {
     }
 
     if (!form) {
-        return <p className="text-sm text-red-600">NÃ£o foi possÃ­vel carregar os dados do restaurante.</p>;
+        return <p className="text-sm text-red-600">Não foi possível carregar os dados do restaurante.</p>;
     }
 
     return (
@@ -90,10 +90,10 @@ export default function ManagerRestaurantPage() {
 
             <form onSubmit={handleSubmit} className="app-card grid gap-4 p-6 md:grid-cols-2">
                 <div><label className="label">Nome</label><input className="input" required value={form.name} onChange={(event) => setForm((prev) => prev ? { ...prev, name: event.target.value } : prev)} /></div>
-                <div><label className="label">LocalizaÃ§Ã£o</label><input className="input" required value={form.location} onChange={(event) => setForm((prev) => prev ? { ...prev, location: event.target.value } : prev)} /></div>
+                <div><label className="label">Localização</label><input className="input" required value={form.location} onChange={(event) => setForm((prev) => prev ? { ...prev, location: event.target.value } : prev)} /></div>
                 <div><label className="label">Cidade</label><input className="input" required value={form.city} onChange={(event) => setForm((prev) => prev ? { ...prev, city: event.target.value } : prev)} /></div>
-                <div><label className="label">ProvÃ­ncia</label><input className="input" required value={form.province} onChange={(event) => setForm((prev) => prev ? { ...prev, province: event.target.value } : prev)} /></div>
-                <div><label className="label">MunicÃ­pio</label><input className="input" required value={form.municipality} onChange={(event) => setForm((prev) => prev ? { ...prev, municipality: event.target.value } : prev)} /></div>
+                <div><label className="label">Província</label><input className="input" required value={form.province} onChange={(event) => setForm((prev) => prev ? { ...prev, province: event.target.value } : prev)} /></div>
+                <div><label className="label">Município</label><input className="input" required value={form.municipality} onChange={(event) => setForm((prev) => prev ? { ...prev, municipality: event.target.value } : prev)} /></div>
                 <div><label className="label">Bairro</label><input className="input" required value={form.neighborhood} onChange={(event) => setForm((prev) => prev ? { ...prev, neighborhood: event.target.value } : prev)} /></div>
                 <div><label className="label">Rua</label><input className="input" required value={form.streetName} onChange={(event) => setForm((prev) => prev ? { ...prev, streetName: event.target.value } : prev)} /></div>
                 <div><label className="label">Telefone</label><input className="input" required value={form.phone} onChange={(event) => setForm((prev) => prev ? { ...prev, phone: event.target.value } : prev)} /></div>
@@ -108,7 +108,7 @@ export default function ManagerRestaurantPage() {
                 </div>
 
                 <div className="md:col-span-2">
-                    <label className="label">DescriÃ§Ã£o</label>
+                    <label className="label">Descrição</label>
                     <input className="input" value={form.description ?? ""} onChange={(event) => setForm((prev) => prev ? { ...prev, description: event.target.value } : prev)} />
                 </div>
 

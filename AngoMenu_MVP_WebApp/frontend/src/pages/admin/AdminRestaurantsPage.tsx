@@ -54,7 +54,7 @@ export default function AdminRestaurantsPage() {
     );
 
     if (!isAdmin()) {
-        return <p className="text-sm text-red-600">NÃ£o autorizado</p>
+        return <p className="text-sm text-red-600">Não autorizado</p>
     }
 
     async function loadRestaurants() {
@@ -161,7 +161,7 @@ export default function AdminRestaurantsPage() {
         event.preventDefault();
 
         if (!editingRestaurant && formValues.createManager && formValues.managerPassword !== formValues.managerConfirmPassword) {
-            setError("A confirmaÃ§Ã£o da palavra-passe do gestor nÃ£o coincide.");
+            setError("A confirmação da palavra-passe do gestor não coincide.");
             return;
         }
 

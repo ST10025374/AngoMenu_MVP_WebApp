@@ -44,7 +44,7 @@ export default function RestaurantForm({
             </div>
 
             <div>
-                <label className="label" htmlFor="restaurant-location">LocalizaÃ§Ã£o</label>
+                    <label className="label" htmlFor="restaurant-location">Localização</label>
                 <input
                     id="restaurant-location"
                     className="input"
@@ -66,7 +66,7 @@ export default function RestaurantForm({
             </div>
 
             <div>
-                <label className="label" htmlFor="restaurant-province">ProvÃ­ncia</label>
+                    <label className="label" htmlFor="restaurant-province">Província</label>
                 <input
                     id="restaurant-province"
                     className="input"
@@ -77,7 +77,7 @@ export default function RestaurantForm({
             </div>
 
             <div>
-                <label className="label" htmlFor="restaurant-municipality">MunicÃ­pio</label>
+                    <label className="label" htmlFor="restaurant-municipality">Município</label>
                 <input
                     id="restaurant-municipality"
                     className="input"
@@ -145,7 +145,7 @@ export default function RestaurantForm({
             </div>
 
             <div className="md:col-span-2">
-                <label className="label" htmlFor="restaurant-description">DescriÃ§Ã£o</label>
+                    <label className="label" htmlFor="restaurant-description">Descrição</label>
                 <input
                     id="restaurant-description"
                     className="input"

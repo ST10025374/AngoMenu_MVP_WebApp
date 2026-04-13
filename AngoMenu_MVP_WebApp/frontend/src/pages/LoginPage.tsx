@@ -23,7 +23,7 @@ export default function LoginPage() {
             const role = getUserRole();
             navigate(getDefaultRouteForRole(role), { replace: true });
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Falha ao iniciar sessÃ£o');
+            setError(err instanceof Error ? err.message : 'Falha ao iniciar sessão');
         } finally {
             setLoading(false);
         }
@@ -41,9 +41,9 @@ export default function LoginPage() {
                 </p>
 
                 <div className="mt-8 space-y-4 text-sm text-slate-700">
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? AutenticaÃ§Ã£o rÃ¡pida e segura</p>
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Pesquisa de restaurantes em tempo real</p>
-                    <p className="rounded-xl border border-slate-200 bg-white p-4">? Interface limpa com layouts responsivos</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4"> Autenticação rápida e segura</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4"> Pesquisa de restaurantes em tempo real</p>
+                    <p className="rounded-xl border border-slate-200 bg-white p-4"> Interface limpa com layouts responsivos</p>
                 </div>
             </section>
 
@@ -90,7 +90,7 @@ export default function LoginPage() {
                 </form>
 
                 <p className="mt-5 text-sm text-slate-600">
-                    Ainda nÃ£o tem conta?{' '}
+                    Ainda não tem conta?{' '}
                     <Link to="/register" className="font-semibold text-brand-red hover:underline">
                         Crie uma conta
                     </Link>

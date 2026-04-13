@@ -26,7 +26,7 @@ export default function CreateReservationPage() {
     useEffect(() => {
         async function loadRestaurant() {
             if (!restaurantId || Number.isNaN(restaurantId)) {
-                setError("Restaurante invÃ¡lido.");
+                setError("Restaurante inválido.");
                 return;
             }
 
@@ -45,7 +45,7 @@ export default function CreateReservationPage() {
         e.preventDefault();
 
         if (!restaurantId || Number.isNaN(restaurantId)) {
-            setError("Restaurante invÃ¡lido.");
+            setError("Restaurante inválido.");
             return;
         }
 
@@ -107,7 +107,7 @@ export default function CreateReservationPage() {
                 </h1>
 
                 <p className="mt-1 text-sm text-slate-600">
-                    Selecione a data, hora e nÃºmero de pessoas pretendidos.
+                    Selecione a data, hora e número de pessoas pretendidos.
                 </p>
 
                 <form
@@ -137,7 +137,7 @@ export default function CreateReservationPage() {
                     </div>
 
                     <div className="sm:col-span-2">
-                        <label className="label">NÃºmero de pessoas</label>
+                        <label className="label">Número de pessoas</label>
 
                         <input
                             type="number"

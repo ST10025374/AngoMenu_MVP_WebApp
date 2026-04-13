@@ -40,13 +40,13 @@ function FullscreenImageModal({ imageUrl, altText, onClose }: FullscreenImageMod
             onClick={onClose}
             role="dialog"
             aria-modal="true"
-            aria-label="VisualizaÃ§Ã£o ampliada da imagem"
+            aria-label="Visualização ampliada da imagem"
         >
             <button
                 type="button"
                 onClick={onClose}
                 className="absolute right-4 top-4 rounded-full bg-white/90 p-2 text-slate-800 shadow-lg transition hover:bg-white"
-                aria-label="Fechar visualizaÃ§Ã£o da imagem"
+                aria-label="Fechar visualização da imagem"
             >
                 <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M5 5L15 15M15 5L5 15" />
@@ -89,7 +89,7 @@ export default function RestaurantDetailsPage() {
     useEffect(() => {
         async function load() {
             if (!restaurantId || Number.isNaN(restaurantId)) {
-                setError('ID de restaurante invÃ¡lido.');
+                setError('ID de restaurante inválido.');
                 setLoading(false);
                 return;
             }
@@ -231,7 +231,7 @@ export default function RestaurantDetailsPage() {
     if (!restaurant) {
         return (
             <div className="app-card p-6">
-                <p className="text-sm text-slate-600">Restaurante nÃ£o encontrado.</p>
+                <p className="text-sm text-slate-600">Restaurante não encontrado.</p>
             </div>
         );
     }
@@ -251,7 +251,7 @@ export default function RestaurantDetailsPage() {
                 <div className="border-b border-slate-200 bg-gradient-to-r from-brand-dark to-slate-900 p-6 text-white">
                     <h1 className="text-3xl font-black">{restaurant.name}</h1>
                     <p className="mt-2 max-w-3xl text-sm text-slate-200">
-                        {restaurant.description ?? 'Um destino premium para refeiÃ§Ãµes memorÃ¡veis e serviÃ§o de qualidade.'}
+                        {restaurant.description ?? 'Um destino premium para refeições memoráveis e serviço de qualidade.'}
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2">
                         <Link
@@ -286,7 +286,7 @@ export default function RestaurantDetailsPage() {
 
                 <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="rounded-xl bg-slate-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">LocalizaÃ§Ã£o</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Localização</p>
                         <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.location}</p>
                     </div>
 
@@ -317,7 +317,7 @@ export default function RestaurantDetailsPage() {
 
                 {menuItems.length === 0 ? (
                     <div className="mt-4 rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500">
-                        Ainda nÃ£o existem itens de menu disponÃ­veis.
+                        Ainda não existem itens de menu disponíveis.
                     </div>
                 ) : (
                         <div className="mt-5 space-y-8">
@@ -379,7 +379,7 @@ export default function RestaurantDetailsPage() {
                                                             </span>
                                                         </div>
                                                         <p className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.isAvailable ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
-                                                            {item.isAvailable ? "DisponÃ­vel" : "IndisponÃ­vel no momento"}
+                                                            {item.isAvailable ? "DisponÃ­vel" : "Indisponível no momento"}
                                                         </p>
                                                         <p className="mt-2 text-sm text-slate-600">
                                                             {item.description ?? 'Item de menu criado pelo chef com ingredientes de qualidade.'}

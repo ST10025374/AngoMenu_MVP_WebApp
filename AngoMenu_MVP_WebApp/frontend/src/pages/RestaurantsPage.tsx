@@ -45,8 +45,8 @@ export default function RestaurantsPage() {
             <div className="app-card p-5 sm:p-6">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
-                        <h1 className="text-2xl font-black text-brand-dark sm:text-3xl">Encontre o seu prÃ³ximo restaurante</h1>
-                        <p className="mt-1 text-sm text-slate-600">Pesquise restaurantes por nome ou localizaÃ§Ã£o e abra os detalhes instantaneamente.</p>
+                        <h1 className="text-2xl font-black text-brand-dark sm:text-3xl">Encontre o seu próximo restaurante</h1>
+                        <p className="mt-1 text-sm text-slate-600">Pesquise restaurantes por nome ou localização e abra os detalhes instantaneamente.</p>
                     </div>
 
                     <div className="flex w-full max-w-xl gap-2">
@@ -60,7 +60,7 @@ export default function RestaurantsPage() {
                                     void loadRestaurants(1);
                                 }
                             }}
-                            placeholder="Pesquisar por nome ou localizaÃ§Ã£o"
+                            placeholder="Pesquisar por nome ou localização"
                             aria-label="Pesquisar restaurantes"
                         />
                         <button className="btn-primary shrink-0" onClick={() => void loadRestaurants(1)}>
@@ -108,18 +108,18 @@ export default function RestaurantsPage() {
                                 </div>
 
                                 <p className="mt-2 min-h-12 text-sm text-slate-600">
-                                    {restaurant.description ?? 'Uma experiÃªncia gastronÃ³mica selecionada com serviÃ§o de qualidade e comida deliciosa.'}
+                                    {restaurant.description ?? 'Uma experiência gastronómica selecionada com serviço de qualidade e comida deliciosa.'}
                                 </p>
 
                                 <div className="mt-4 space-y-1 text-sm text-slate-700">
                                     <p>
-                                        <span className="font-semibold text-slate-900">LocalizaÃ§Ã£o:</span> {restaurant.location}
+                                        <span className="font-semibold text-slate-900">Localização:</span> {restaurant.location}
                                     </p>
                                     <p>
                                         <span className="font-semibold text-slate-900">Telefone:</span> {restaurant.phone}
                                     </p>
                                     <p>
-                                        <span className="font-semibold text-slate-900">HorÃ¡rio:</span> {restaurant.openingHour} - {restaurant.closingHour}
+                                        <span className="font-semibold text-slate-900">Horário:</span> {restaurant.openingHour} - {restaurant.closingHour}
                                     </p>
                                 </div>
 
@@ -134,7 +134,7 @@ export default function RestaurantsPage() {
 
                     <div className="app-card flex flex-wrap items-center justify-center gap-3 p-4 sm:justify-between">
                         <p className="text-sm font-medium text-slate-600">
-                            A mostrar pÃ¡gina <span className="font-bold text-brand-dark">{pageNumber}</span> de{' '}
+                            A mostrar página <span className="font-bold text-brand-dark">{pageNumber}</span> de{' '}
                             <span className="font-bold text-brand-dark">{totalPages}</span>
                         </p>
 

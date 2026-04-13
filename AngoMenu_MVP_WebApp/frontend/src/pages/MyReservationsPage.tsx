@@ -79,7 +79,7 @@ export default function MyReservationsPage() {
             {!loading && reservations.length === 0 && (
                 <div className="app-card p-8 text-center">
                     <h2 className="text-lg font-bold text-brand-dark">
-                        Ainda nÃ£o existem reservas
+                        Ainda não existem reservas
                     </h2>
 
                     <p className="mt-2 text-sm text-slate-500">
@@ -105,7 +105,7 @@ export default function MyReservationsPage() {
                                 </h2>
 
                                 <p className="text-sm text-slate-600">
-                                    {r.date} Ã s {r.time}
+                                    {r.date} às {r.time}
                                 </p>
 
                                 <p className="text-sm text-slate-600">

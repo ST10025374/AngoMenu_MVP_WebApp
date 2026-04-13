@@ -23,7 +23,7 @@ export default function AdminReservationsPage() {
     const [success, setSuccess] = useState("");
 
     if (!isAdmin()) {
-        return <p className="text-sm text-red-600">NÃ£o autorizado</p>
+        return <p className="text-sm text-red-600">Não autorizado</p>
     }
 
     async function load() {
@@ -108,7 +108,7 @@ export default function AdminReservationsPage() {
                                 <th className="p-3 text-left">Data</th>
                                 <th className="p-3 text-left">Pessoas</th>
                                 <th className="p-3 text-left">Estado</th>
-                                <th className="p-3 text-right">AÃ§Ãµes</th>
+                                <th className="p-3 text-right">Ações</th>
                             </tr>
                         </thead>
 
