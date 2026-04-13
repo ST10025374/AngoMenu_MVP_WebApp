@@ -21,5 +21,6 @@ namespace AngoMenu_MVP_WebApp.DTOs.Menu
         public MenuCategory Category { get; set; } = MenuCategory.Other;
 
         public IFormFile? Image { get; set; }
+        public bool RemoveImage { get; set; }
     }
 }

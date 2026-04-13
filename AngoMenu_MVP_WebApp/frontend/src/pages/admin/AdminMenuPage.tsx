@@ -34,6 +34,7 @@ export default function AdminMenuPage() {
 
     const [form, setForm] = useState<MenuItemUpsertPayload>(defaultForm);
     const [editingId, setEditingId] = useState<number | null>(null);
+    const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
 
     if (!isAdmin()) {
         return <p className="text-sm text-red-600">Não autorizado</p>;
@@ -70,9 +71,16 @@ export default function AdminMenuPage() {
         setSelectedRestaurant(id);
         setSuccess("");
         setError("");
+        switchToAddMode();
+        void loadMenu(id);
+    }
+
+    const isEditMode = editingId !== null;
+
+    function switchToAddMode() {
         setForm(defaultForm);
         setEditingId(null);
-        void loadMenu(id);
+        setEditingImageUrl(null);
     }
 
     async function handleSubmit(e: React.FormEvent) {
@@ -93,9 +101,7 @@ export default function AdminMenuPage() {
                 setSuccess("Item do menu criado com sucesso.");
             }
 
-            setForm(defaultForm);
-
-            setEditingId(null);
+            switchToAddMode();
             await loadMenu(selectedRestaurant);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Erro ao guardar item do menu");
@@ -111,9 +117,11 @@ export default function AdminMenuPage() {
             description: item.description ?? "",
             category: item.category,
             imageFile: null,
+            removeImage: false,
         });
 
         setEditingId(item.id);
+        setEditingImageUrl(getImageUrl(item.imageUrl));
     }
 
     async function handleDelete(id: number) {
@@ -165,6 +173,21 @@ export default function AdminMenuPage() {
 
             {selectedRestaurant && (
                 <form onSubmit={handleSubmit} className="app-card grid gap-4 p-6 md:grid-cols-2">
+                    <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
+                        <p className={`text-sm font-semibold ${isEditMode ? "text-amber-700" : "text-emerald-700"}`}>
+                            {isEditMode ? "Modo de edição" : "Modo de adição"}
+                        </p>
+                        {isEditMode && (
+                            <div className="flex gap-2">
+                                <button type="button" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={switchToAddMode}>
+                                    Cancelar
+                                </button>
+                                <button type="button" className="rounded-xl border border-brand-red px-4 py-2 text-sm font-semibold text-brand-red hover:bg-red-50" onClick={switchToAddMode}>
+                                    Adicionar novo item
+                                </button>
+                            </div>
+                        )}
+                    </div>
                     <input
                         name="name"
                         placeholder="Nome"
@@ -203,8 +226,25 @@ export default function AdminMenuPage() {
                         type="file"
                         accept="image/*"
                         className="input"
-                        onChange={(e) => setForm((prev) => ({ ...prev, imageFile: e.target.files?.[0] ?? null }))}
+                        onChange={(e) => setForm((prev) => ({ ...prev, imageFile: e.target.files?.[0] ?? null, removeImage: false }))}
                     />
+
+                    {isEditMode && editingImageUrl && (
+                        <div className="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Imagem atual</p>
+                            <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-center">
+                                <img src={editingImageUrl} alt="Imagem atual do item" className="h-24 w-full rounded-lg object-cover md:w-40" />
+                                <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                                    <input
+                                        type="checkbox"
+                                        checked={Boolean(form.removeImage)}
+                                        onChange={(e) => setForm((prev) => ({ ...prev, removeImage: e.target.checked }))}
+                                    />
+                                    Remover imagem atual
+                                </label>
+                            </div>
+                        </div>
+                    )}
 
                     <input
                         name="description"
@@ -215,7 +255,7 @@ export default function AdminMenuPage() {
                     />
 
                     <button className="btn-primary md:col-span-2" disabled={saving}>
-                        {saving ? "A guardar..." : editingId ? "Atualizar Item" : "Adicionar Item"}
+                        {saving ? "A guardar..." : isEditMode ? "Atualizar Item" : "Adicionar Item"}
                     </button>
                 </form>
             )}

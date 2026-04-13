@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
     getImageUrl,
@@ -10,6 +10,69 @@ import {
 import { formatKwanza } from '../lib/currency';
 import { getMenuCategoryLabel, MENU_CATEGORIES } from '../lib/menuCategories';
 
+type FullscreenImageModalProps = {
+    imageUrl: string;
+    altText: string;
+    onClose: () => void;
+};
+
+function FullscreenImageModal({ imageUrl, altText, onClose }: FullscreenImageModalProps) {
+    const [isVisible, setIsVisible] = useState(false);
+    const [isZoomed, setIsZoomed] = useState(false);
+
+    useEffect(() => {
+        const frame = window.requestAnimationFrame(() => setIsVisible(true));
+        return () => window.cancelAnimationFrame(frame);
+    }, []);
+
+    useEffect(() => {
+        setIsZoomed(false);
+    }, [imageUrl]);
+
+    function handleImageDoubleClick() {
+        setIsZoomed((current) => !current);
+    }
+
+    return (
+        <div
+            className={`fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-[2px] transition-opacity duration-200 ${isVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            onClick={onClose}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Visualização ampliada da imagem"
+        >
+            <button
+                type="button"
+                onClick={onClose}
+                className="absolute right-4 top-4 rounded-full bg-white/90 p-2 text-slate-800 shadow-lg transition hover:bg-white"
+                aria-label="Fechar visualização da imagem"
+            >
+                <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 5L15 15M15 5L5 15" />
+                </svg>
+            </button>
+
+            <div
+                className={`max-h-[90vh] w-full max-w-4xl transform transition duration-200 ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+                    }`}
+                onClick={(event) => event.stopPropagation()}
+            >
+                <img
+                    src={imageUrl}
+                    alt={altText}
+                    onDoubleClick={handleImageDoubleClick}
+                    className={`max-h-[90vh] w-full rounded-2xl object-contain shadow-2xl transition-transform duration-300 ${isZoomed ? 'scale-[1.85] cursor-zoom-out' : 'scale-100 cursor-zoom-in'
+                        }`}
+                />
+                <p className="mt-3 text-center text-xs text-slate-200">
+                    Duplo clique na imagem para {isZoomed ? 'reduzir' : 'ampliar'}.
+                </p>
+            </div>
+        </div>
+    );
+}
+
 export default function RestaurantDetailsPage() {
     const { id } = useParams();
     const restaurantId = Number(id);
@@ -19,6 +82,9 @@ export default function RestaurantDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [selectedImageAlt, setSelectedImageAlt] = useState('Imagem do menu');
+    const [activeCategory, setActiveCategory] = useState<string>('');
+    const categoryRefs = useRef<Record<string, HTMLElement | null>>({});
 
     useEffect(() => {
         async function load() {
@@ -68,6 +134,74 @@ export default function RestaurantDetailsPage() {
 
         return Array.from(groups.entries()).filter(([, items]) => items.length > 0);
     }, [menuItems]);
+
+    useEffect(() => {
+        if (groupedMenuItems.length === 0) {
+            setActiveCategory('');
+            return;
+        }
+
+        setActiveCategory((current) => {
+            if (current && groupedMenuItems.some(([category]) => category === current)) {
+                return current;
+            }
+
+            return groupedMenuItems[0][0];
+        });
+    }, [groupedMenuItems]);
+
+    useEffect(() => {
+        if (groupedMenuItems.length === 0) {
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const visibleEntries = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+                if (visibleEntries.length > 0) {
+                    setActiveCategory(visibleEntries[0].target.id.replace('menu-category-', ''));
+                }
+            },
+            {
+                root: null,
+                rootMargin: '-140px 0px -55% 0px',
+                threshold: 0.1,
+            }
+        );
+
+        for (const [category] of groupedMenuItems) {
+            const section = categoryRefs.current[category];
+            if (section) {
+                observer.observe(section);
+            }
+        }
+
+        return () => observer.disconnect();
+    }, [groupedMenuItems]);
+
+    function scrollToCategory(category: string) {
+        const target = categoryRefs.current[category];
+        if (!target) {
+            return;
+        }
+
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    useEffect(() => {
+        const previousOverflow = document.body.style.overflow;
+
+        if (selectedImage) {
+            document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+        };
+    }, [selectedImage]);
 
     const galleryImages = useMemo(
         () =>
@@ -134,7 +268,15 @@ export default function RestaurantDetailsPage() {
                         <h2 className="text-base font-bold text-brand-dark">Mais imagens</h2>
                         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                             {galleryImages.map((image) => (
-                                <button key={image.id} type="button" onClick={() => setSelectedImage(getImageUrl(image.imageUrl))} className="overflow-hidden rounded-lg border border-slate-200">
+                                <button
+                                    key={image.id}
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedImage(getImageUrl(image.imageUrl));
+                                        setSelectedImageAlt(`Imagem da galeria de ${restaurant.name}`);
+                                    }}
+                                    className="overflow-hidden rounded-lg border border-slate-200"
+                                >
                                     <img src={getImageUrl(image.imageUrl) ?? ''} alt="Galeria do restaurante" className="h-24 w-full object-cover" />
                                 </button>
                             ))}
@@ -179,27 +321,68 @@ export default function RestaurantDetailsPage() {
                     </div>
                 ) : (
                         <div className="mt-5 space-y-8">
+                            <nav className="sticky top-2 z-20 -mx-2 overflow-x-auto rounded-xl border border-slate-200 bg-white/95 px-2 py-2 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+                                <ul className="flex min-w-max items-center gap-2">
+                                    {groupedMenuItems.map(([category, items]) => (
+                                        <li key={`tab-${category}`}>
+                                            <button
+                                                type="button"
+                                                onClick={() => scrollToCategory(category)}
+                                                className={`rounded-full border px-4 py-2 text-sm font-semibold whitespace-nowrap transition ${activeCategory === category
+                                                        ? 'border-brand-dark bg-brand-dark text-white shadow-sm'
+                                                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-slate-100'
+                                                    }`}
+                                            >
+                                                {getMenuCategoryLabel(category)} ({items.length})
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
+
                             {groupedMenuItems.map(([category, items]) => (
-                                <section key={category} className="space-y-3">
-                                    <h3 className="border-b border-slate-200 pb-2 text-lg font-bold text-brand-dark">
+                                <section
+                                    key={category}
+                                    id={`menu-category-${category}`}
+                                    ref={(element) => {
+                                        categoryRefs.current[category] = element;
+                                    }}
+                                    className="scroll-mt-28 space-y-4"
+                                >
+                                    <h3 className="border-b border-slate-200 pb-2 text-xl font-black text-brand-dark">
                                         {getMenuCategoryLabel(category)}
                                     </h3>
                                     <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         {items.map((item) => (
-                                            <li key={item.id} className="rounded-xl border border-slate-200 bg-white p-4 transition hover:shadow-md">
-                                                {getImageUrl(item.imageUrl) && (
-                                                    <img src={getImageUrl(item.imageUrl) ?? ''} alt={item.name} className="mb-3 h-40 w-full rounded-lg object-cover" />
-                                                )}
-                                                <div className="flex items-start justify-between gap-3">
-                                                    <h4 className="text-base font-bold text-brand-dark">{item.name}</h4>
-                                                    <span className="rounded-full bg-brand-red/10 px-3 py-1 text-sm font-semibold text-brand-red">
-                                                        {formatKwanza(item.price)}
-                                                    </span>
-                                                </div>
-
-                                                <p className="mt-2 text-sm text-slate-600">
-                                                    {item.description ?? 'Item de menu criado pelo chef com ingredientes de qualidade.'}
-                                                </p>
+                                            <li key={item.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg">
+                                                <div className="flex gap-4 p-4">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setSelectedImage(getImageUrl(item.imageUrl) ?? 'https://placehold.co/800x800?text=Menu');
+                                                            setSelectedImageAlt(item.name);
+                                                        }}
+                                                        className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-28 sm:w-28"
+                                                        aria-label={`Ampliar imagem de ${item.name}`}
+                                                    >
+                                                        <img
+                                                            src={getImageUrl(item.imageUrl) ?? 'https://placehold.co/240x240?text=Menu'}
+                                                            alt={item.name}
+                                                            className="h-full w-full object-cover transition duration-300 hover:scale-105"
+                                                        />
+                                                    </button>
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="flex items-start justify-between gap-3">
+                                                            <h4 className="text-base font-bold text-brand-dark">{item.name}</h4>
+                                                            <span className="shrink-0 rounded-full bg-brand-red/10 px-3 py-1 text-sm font-semibold text-brand-red">
+                                                                {formatKwanza(item.price)}
+                                                            </span>
+                                                        </div>
+                                                        <p className="mt-2 text-sm text-slate-600">
+                                                            {item.description ?? 'Item de menu criado pelo chef com ingredientes de qualidade.'}
+                                                        </p>
+                                                    </div>
+                                                </div>                                  
                                             </li>
                                         ))}
                                     </ul>
@@ -210,9 +393,11 @@ export default function RestaurantDetailsPage() {
             </article>
 
             {selectedImage && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setSelectedImage(null)}>
-                    <img src={selectedImage} alt="Visualização da imagem" className="max-h-[90vh] max-w-[90vw] rounded-xl" />
-                </div>
+                <FullscreenImageModal
+                    imageUrl={selectedImage}
+                    altText={selectedImageAlt}
+                    onClose={() => setSelectedImage(null)}
+                />
             )}
         </section>
     );

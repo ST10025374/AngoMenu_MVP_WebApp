@@ -123,12 +123,14 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
             ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category);
 
+            if (dto.RemoveImage && dto.Image is null)
+            {
+                await RemoveMenuItemImage(menuItem);
+            }
+
             if (dto.Image is not null && dto.Image.Length > 0)
             {
-                if (!string.IsNullOrWhiteSpace(menuItem.PublicId))
-                {
-                    await _cloudinaryService.DeleteImage(menuItem.PublicId);
-                }
+                await RemoveMenuItemImage(menuItem);
 
                 var uploadResult = await _cloudinaryService.UploadMenuItemImage(dto.Image);
                 if (uploadResult.Error is not null)
@@ -161,12 +163,14 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
             ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category);
 
+            if (dto.RemoveImage && dto.Image is null)
+            {
+                await RemoveMenuItemImage(menuItem);
+            }
+
             if (dto.Image is not null && dto.Image.Length > 0)
             {
-                if (!string.IsNullOrWhiteSpace(menuItem.PublicId))
-                {
-                    await _cloudinaryService.DeleteImage(menuItem.PublicId);
-                }
+                await RemoveMenuItemImage(menuItem);
 
                 var uploadResult = await _cloudinaryService.UploadMenuItemImage(dto.Image);
                 if (uploadResult.Error is not null)
@@ -223,6 +227,17 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             menuItem.Price = price;
             menuItem.Description = description;
             menuItem.Category = category;
+        }
+
+        private async Task RemoveMenuItemImage(MenuItem menuItem)
+        {
+            if (!string.IsNullOrWhiteSpace(menuItem.PublicId))
+            {
+                await _cloudinaryService.DeleteImage(menuItem.PublicId);
+            }
+
+            menuItem.ImageUrl = null;
+            menuItem.PublicId = null;
         }
     }
 }

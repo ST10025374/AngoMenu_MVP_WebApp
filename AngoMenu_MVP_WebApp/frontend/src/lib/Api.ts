@@ -122,6 +122,7 @@ export type MenuItemUpsertPayload = {
     price: number;
     category: MenuCategory;
     imageFile?: File | null;
+    removeImage?: boolean;
 };
 
 export type AdminMenuItem = MenuItem;
@@ -204,6 +205,10 @@ function buildMenuItemFormData(payload: MenuItemUpsertPayload & { restaurantId?:
 
     if (payload.imageFile) {
         formData.append('image', payload.imageFile);
+    }
+
+    if (payload.removeImage) {
+        formData.append('removeImage', 'true');
     }
 
     return formData;

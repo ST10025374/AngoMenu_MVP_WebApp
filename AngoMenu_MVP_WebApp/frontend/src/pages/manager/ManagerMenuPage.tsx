@@ -23,6 +23,7 @@ export default function ManagerMenuPage() {
     const [items, setItems] = useState<MenuItem[]>([]);
     const [form, setForm] = useState<MenuItemUpsertPayload>(defaultForm);
     const [editingId, setEditingId] = useState<number | null>(null);
+    const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
@@ -45,6 +46,27 @@ export default function ManagerMenuPage() {
         load();
     }, []);
 
+    const isEditMode = editingId !== null;
+
+    function switchToAddMode() {
+        setEditingId(null);
+        setEditingImageUrl(null);
+        setForm(defaultForm);
+    }
+
+    function startEdit(item: MenuItem) {
+        setEditingId(item.id);
+        setEditingImageUrl(getImageUrl(item.imageUrl));
+        setForm({
+            name: item.name,
+            price: item.price,
+            description: item.description ?? "",
+            category: item.category,
+            imageFile: null,
+            removeImage: false,
+        });
+    }
+
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
         setSaving(true);
@@ -60,8 +82,7 @@ export default function ManagerMenuPage() {
                 setSuccess("Prato adicionado com sucesso.");
             }
 
-            setForm(defaultForm);
-            setEditingId(null);
+            switchToAddMode();
             await load();
         } catch (err) {
             setError(err instanceof Error ? err.message : "Falha ao guardar prato.");
@@ -89,6 +110,23 @@ export default function ManagerMenuPage() {
             {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
             <form onSubmit={handleSubmit} className="app-card grid gap-4 p-6 md:grid-cols-2">
+                <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
+                    <p className={`text-sm font-semibold ${isEditMode ? "text-amber-700" : "text-emerald-700"}`}>
+                        {isEditMode ? "Modo de edição" : "Modo de adição"}
+                    </p>
+                    <div className="flex gap-2">
+                        {isEditMode && (
+                            <>
+                                <button type="button" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={switchToAddMode}>
+                                    Cancelar
+                                </button>
+                                <button type="button" className="rounded-xl border border-brand-red px-4 py-2 text-sm font-semibold text-brand-red hover:bg-red-50" onClick={switchToAddMode}>
+                                    Adicionar novo item
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
                 <input className="input" placeholder="Nome do prato" required value={form.name} onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))} />
                 <input className="input" type="number" min={0.01} step="0.01" placeholder="Preço" required value={form.price} onChange={(event) => setForm((prev) => ({ ...prev, price: Number(event.target.value) }))} />
                 <select className="input" value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value as MenuItemUpsertPayload["category"] }))}>
@@ -96,9 +134,30 @@ export default function ManagerMenuPage() {
                         <option key={category} value={category}>{getMenuCategoryLabel(category)}</option>
                     ))}
                 </select>
-                <input className="input" type="file" accept="image/*" onChange={(event) => setForm((prev) => ({ ...prev, imageFile: event.target.files?.[0] ?? null }))} />
+                <input
+                    className="input"
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => setForm((prev) => ({ ...prev, imageFile: event.target.files?.[0] ?? null, removeImage: false }))}
+                />
+                {isEditMode && editingImageUrl && (
+                    <div className="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Imagem atual</p>
+                        <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-center">
+                            <img src={editingImageUrl} alt="Imagem atual do prato" className="h-24 w-full rounded-lg object-cover md:w-40" />
+                            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                    type="checkbox"
+                                    checked={Boolean(form.removeImage)}
+                                    onChange={(event) => setForm((prev) => ({ ...prev, removeImage: event.target.checked }))}
+                                />
+                                Remover imagem atual
+                            </label>
+                        </div>
+                    </div>
+                )}
                 <input className="input md:col-span-2" placeholder="Descrição" value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} />
-                <button className="btn-primary md:col-span-2" disabled={saving}>{saving ? "A guardar..." : editingId ? "Editar Prato" : "Adicionar Prato"}</button>
+                <button className="btn-primary md:col-span-2" disabled={saving}>{saving ? "A guardar..." : isEditMode ? "Atualizar prato" : "Adicionar prato"}</button>
             </form>
 
             {loading ? (
@@ -118,7 +177,7 @@ export default function ManagerMenuPage() {
                                     <div className="flex items-center gap-4 md:flex-col md:items-end">
                                         <p className="font-semibold text-brand-red">{formatKwanza(item.price)}</p>
                                         <div className="space-x-3 text-sm">
-                                            <button type="button" className="text-brand-red hover:underline" onClick={() => { setEditingId(item.id); setForm({ name: item.name, price: item.price, description: item.description ?? "", category: item.category, imageFile: null }); }}>Editar</button>
+                                            <button type="button" className="text-brand-red hover:underline" onClick={() => startEdit(item)}>Editar</button>
                                             <button type="button" className="text-red-600 hover:underline" onClick={() => handleDelete(item.id)}>Eliminar</button>
                                         </div>
                                     </div>
