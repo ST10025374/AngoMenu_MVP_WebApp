@@ -379,7 +379,7 @@ export default function RestaurantDetailsPage() {
                                                             </span>
                                                         </div>
                                                         <p className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.isAvailable ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
-                                                            {item.isAvailable ? "DisponÃ­vel" : "Indisponível no momento"}
+                                                            {item.isAvailable ? "Disponi­vel" : "Indisponível no momento"}
                                                         </p>
                                                         <p className="mt-2 text-sm text-slate-600">
                                                             {item.description ?? 'Item de menu criado pelo chef com ingredientes de qualidade.'}

@@ -39,7 +39,7 @@ function Dropdown({ title, items, onNavigate }: { title: string; items: { to: st
                 aria-haspopup="menu"
             >
                 {title}
-                <span className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true">â–¼</span>
+                <span className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true">▼</span>
             </button>
 
             {open && (
