@@ -29,7 +29,7 @@ export default function RestaurantImageManagementPage() {
 
     async function loadData() {
         if (!restaurantId || Number.isNaN(restaurantId)) {
-            setError('Restaurante inv·lido.');
+            setError('Restaurante inv√°lido.');
             setLoading(false);
             return;
         }
@@ -67,7 +67,7 @@ export default function RestaurantImageManagementPage() {
         }
 
         if (!canUpload) {
-            setError('O restaurante j· possui 5 imagens.');
+            setError('O restaurante j√° possui 5 imagens.');
             return;
         }
 
@@ -188,7 +188,7 @@ export default function RestaurantImageManagementPage() {
                     ))}
                         {images.length === 0 && (
                             <div className="app-card p-4 text-sm text-slate-500">
-                                Este restaurante ainda n„o possui imagens.
+                                Este restaurante ainda n√£o possui imagens.
                             </div>
                         )}
                 </div>

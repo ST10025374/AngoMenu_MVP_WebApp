@@ -36,7 +36,7 @@ export default function RestaurantModal({
                             className="rounded-lg px-2 py-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
                             aria-label="Fechar modal"
                         >
-                            ×
+                            Ã—
                         </button>
                     </div>
                     <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{children}</div>

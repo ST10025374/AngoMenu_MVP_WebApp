@@ -39,7 +39,7 @@ function Dropdown({ title, items, onNavigate }: { title: string; items: { to: st
                 aria-haspopup="menu"
             >
                 {title}
-                <span className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true">▼</span>
+                <span className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true">â–¼</span>
             </button>
 
             {open && (
@@ -160,7 +160,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                             </>
                         ) : (
                             <button onClick={handleLogout} className="btn-primary text-sm">
-                                Terminar sessão
+                                Terminar sessÃ£o
                             </button>
                         )}
                     </div>
@@ -225,7 +225,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                                 </>
                             ) : (
                                 <button onClick={handleLogout} className="btn-primary w-full text-sm">
-                                        Terminar sessão
+                                        Terminar sessÃ£o
                                 </button>
                             )}
                         </div>

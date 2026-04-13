@@ -38,7 +38,7 @@ export default function AdminMenuPage() {
     const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
 
     if (!isAdmin()) {
-        return <p className="text-sm text-red-600">Não autorizado</p>;
+        return <p className="text-sm text-red-600">NÃ£o autorizado</p>;
     }
 
     useEffect(() => {
@@ -177,7 +177,7 @@ export default function AdminMenuPage() {
                 <form onSubmit={handleSubmit} className="app-card grid gap-4 p-6 md:grid-cols-2">
                     <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
                         <p className={`text-sm font-semibold ${isEditMode ? "text-amber-700" : "text-emerald-700"}`}>
-                            {isEditMode ? "Modo de edição" : "Modo de adição"}
+                            {isEditMode ? "Modo de ediÃ§Ã£o" : "Modo de adiÃ§Ã£o"}
                         </p>
                         {isEditMode && (
                             <div className="flex gap-2">
@@ -204,7 +204,7 @@ export default function AdminMenuPage() {
                         type="number"
                         min={0.01}
                         step="0.01"
-                        placeholder="Preço (AOA)"
+                        placeholder="PreÃ§o (AOA)"
                         value={form.price}
                         onChange={(e) => setForm((prev) => ({ ...prev, price: Number(e.target.value) }))}
                         className="input"
@@ -235,7 +235,7 @@ export default function AdminMenuPage() {
                         <span className="font-semibold text-slate-700">Disponibilidade do prato</span>
                         <span className="inline-flex items-center gap-2">
                             <span className={`${form.isAvailable ? "text-emerald-700" : "text-amber-700"} font-semibold`}>
-                                {form.isAvailable ? "Disponível" : "Indisponível no momento"}
+                                {form.isAvailable ? "DisponÃ­vel" : "IndisponÃ­vel no momento"}
                             </span>
                             <input
                                 type="checkbox"
@@ -265,7 +265,7 @@ export default function AdminMenuPage() {
 
                     <input
                         name="description"
-                        placeholder="Descrição"
+                        placeholder="DescriÃ§Ã£o"
                         value={form.description}
                         onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
                         className="input md:col-span-2"
@@ -296,7 +296,7 @@ export default function AdminMenuPage() {
                                             <p className="font-semibold text-brand-dark">{item.name}</p>
                                             <p className="text-sm text-slate-600">{item.description}</p>
                                             <p className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${item.isAvailable ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
-                                                {item.isAvailable ? "Disponível" : "Indisponível no momento"}
+                                                {item.isAvailable ? "DisponÃ­vel" : "IndisponÃ­vel no momento"}
                                             </p>
                                         </div>
                                         <div className="flex items-center gap-4 md:flex-col md:items-end">

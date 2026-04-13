@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-console.log('DEBUG:', 'rápido confiança ação');
+console.log('DEBUG:', 'rÃ¡pido confianÃ§a aÃ§Ã£o');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
