@@ -354,7 +354,7 @@ export default function RestaurantDetailsPage() {
                                     </h3>
                                     <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         {items.map((item) => (
-                                            <li key={item.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg">
+                                            <li key={item.id} className={`overflow-hidden rounded-2xl border transition hover:-translate-y-0.5 hover:shadow-lg ${item.isAvailable ? "border-slate-200 bg-white" : "border-amber-200 bg-amber-50/40"}`}>
                                                 <div className="flex gap-4 p-4">
                                                     <button
                                                         type="button"
@@ -378,6 +378,9 @@ export default function RestaurantDetailsPage() {
                                                                 {formatKwanza(item.price)}
                                                             </span>
                                                         </div>
+                                                        <p className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.isAvailable ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                                                            {item.isAvailable ? "Disponível" : "Indisponível no momento"}
+                                                        </p>
                                                         <p className="mt-2 text-sm text-slate-600">
                                                             {item.description ?? 'Item de menu criado pelo chef com ingredientes de qualidade.'}
                                                         </p>

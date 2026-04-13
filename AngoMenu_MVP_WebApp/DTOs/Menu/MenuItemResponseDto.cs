@@ -11,5 +11,6 @@ namespace AngoMenu_MVP_WebApp.DTOs.Menu
         public string Description { get; set; } = string.Empty;
         public MenuCategory Category { get; set; } = MenuCategory.Other;
         public string? ImageUrl { get; set; }
+        public bool IsAvailable { get; set; }
     }
 }

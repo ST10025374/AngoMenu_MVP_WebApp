@@ -19,6 +19,7 @@ const defaultForm: MenuItemUpsertPayload = {
     description: "",
     price: 0,
     category: "Other",
+    isAvailable: true,
     imageFile: null,
 };
 
@@ -116,6 +117,7 @@ export default function AdminMenuPage() {
             price: item.price,
             description: item.description ?? "",
             category: item.category,
+            isAvailable: item.isAvailable,
             imageFile: null,
             removeImage: false,
         });
@@ -229,6 +231,21 @@ export default function AdminMenuPage() {
                         onChange={(e) => setForm((prev) => ({ ...prev, imageFile: e.target.files?.[0] ?? null, removeImage: false }))}
                     />
 
+                    <label className="md:col-span-2 inline-flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                        <span className="font-semibold text-slate-700">Disponibilidade do prato</span>
+                        <span className="inline-flex items-center gap-2">
+                            <span className={`${form.isAvailable ? "text-emerald-700" : "text-amber-700"} font-semibold`}>
+                                {form.isAvailable ? "Disponível" : "Indisponível no momento"}
+                            </span>
+                            <input
+                                type="checkbox"
+                                className="h-4 w-4"
+                                checked={form.isAvailable}
+                                onChange={(e) => setForm((prev) => ({ ...prev, isAvailable: e.target.checked }))}
+                            />
+                        </span>
+                    </label>
+
                     {isEditMode && editingImageUrl && (
                         <div className="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
                             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Imagem atual</p>
@@ -278,6 +295,9 @@ export default function AdminMenuPage() {
                                             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{getMenuCategoryLabel(item.category)}</p>
                                             <p className="font-semibold text-brand-dark">{item.name}</p>
                                             <p className="text-sm text-slate-600">{item.description}</p>
+                                            <p className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${item.isAvailable ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                                                {item.isAvailable ? "Disponível" : "Indisponível no momento"}
+                                            </p>
                                         </div>
                                         <div className="flex items-center gap-4 md:flex-col md:items-end">
                                             <p className="font-semibold text-brand-red">{formatKwanza(item.price)}</p>

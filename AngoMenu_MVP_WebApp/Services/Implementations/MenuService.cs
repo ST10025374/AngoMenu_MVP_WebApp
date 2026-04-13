@@ -31,7 +31,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 RestaurantId = dto.RestaurantId
             };
 
-            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category);
+            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category, dto.IsAvailable);
 
             if (dto.Image is not null && dto.Image.Length > 0)
             {
@@ -70,7 +70,8 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 Price = dto.Price,
                 Description = dto.Description,
                 Category = dto.Category,
-                Image = dto.Image
+                Image = dto.Image,
+                IsAvailable = dto.IsAvailable
             });
         }
 
@@ -92,7 +93,8 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                     Price = m.Price,
                     Description = m.Description ?? string.Empty,
                     Category = m.Category,
-                    ImageUrl = m.ImageUrl
+                    ImageUrl = m.ImageUrl,
+                    IsAvailable = m.IsAvailable
                 })
                 .ToListAsync();
 
@@ -121,7 +123,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             if (menuItem == null)
                 return Result.Fail("Menu item not found.");
 
-            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category);
+            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category, dto.IsAvailable);
 
             if (dto.RemoveImage && dto.Image is null)
             {
@@ -161,7 +163,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 return Result.Fail("Not authorized to update this menu item.");
             }
 
-            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category);
+            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category, dto.IsAvailable);
 
             if (dto.RemoveImage && dto.Image is null)
             {
@@ -221,12 +223,13 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             return await DeleteMenuItem(id);
         }
 
-        private static void ApplyMenuItemChanges(MenuItem menuItem, string name, decimal price, string description, MenuCategory category)
+        private static void ApplyMenuItemChanges(MenuItem menuItem, string name, decimal price, string description, MenuCategory category, bool isAvailable)
         {
             menuItem.Name = name;
             menuItem.Price = price;
             menuItem.Description = description;
             menuItem.Category = category;
+            menuItem.IsAvailable = isAvailable;
         }
 
         private async Task RemoveMenuItemImage(MenuItem menuItem)

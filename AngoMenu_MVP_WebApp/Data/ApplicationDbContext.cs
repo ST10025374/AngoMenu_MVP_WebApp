@@ -34,6 +34,10 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<RestaurantImage>()
             .HasIndex(i => new { i.RestaurantId, i.DisplayOrder });
 
+        modelBuilder.Entity<MenuItem>()
+            .Property(m => m.IsAvailable)
+            .HasDefaultValue(true);
+
         base.OnModelCreating(modelBuilder);
     }
 

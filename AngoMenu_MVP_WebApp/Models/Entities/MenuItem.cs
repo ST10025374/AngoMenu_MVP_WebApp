@@ -32,5 +32,8 @@ namespace AngoMenu_MVP_WebApp.Models
 
         [MaxLength(255)]
         public string? PublicId { get; set; }
+
+        [Required]
+        public bool IsAvailable { get; set; } = true;
     }
 }

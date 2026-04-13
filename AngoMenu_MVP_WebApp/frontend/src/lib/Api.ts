@@ -80,6 +80,7 @@ export type MenuItem = {
     price: number;
     category: MenuCategory;
     imageUrl?: string | null;
+    isAvailable: boolean;
 };
 
 export type UserReservation = {
@@ -121,6 +122,7 @@ export type MenuItemUpsertPayload = {
     description?: string;
     price: number;
     category: MenuCategory;
+    isAvailable: boolean;
     imageFile?: File | null;
     removeImage?: boolean;
 };
@@ -202,6 +204,7 @@ function buildMenuItemFormData(payload: MenuItemUpsertPayload & { restaurantId?:
     formData.append('description', payload.description ?? '');
     formData.append('price', String(payload.price));
     formData.append('category', payload.category);
+    formData.append('isAvailable', String(payload.isAvailable));
 
     if (payload.imageFile) {
         formData.append('image', payload.imageFile);
