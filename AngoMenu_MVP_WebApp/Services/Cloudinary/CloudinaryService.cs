@@ -33,6 +33,20 @@ namespace AngoMenu_MVP_WebApp.Services.Cloudinary
             return await _cloudinary.UploadAsync(uploadParams);
         }
 
+        public async Task<ImageUploadResult> UploadMenuItemImage(IFormFile imageFile)
+        {
+            await using var stream = imageFile.OpenReadStream();
+
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(imageFile.FileName, stream),
+                Folder = "menu-items",
+                PublicId = $"menu_item_{Guid.NewGuid():N}"
+            };
+
+            return await _cloudinary.UploadAsync(uploadParams);
+        }
+
         public async Task<DeletionResult> DeleteImage(string publicId)
         {
             if (string.IsNullOrWhiteSpace(publicId))

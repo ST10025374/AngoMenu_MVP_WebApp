@@ -1,3 +1,4 @@
+import type { MenuCategory } from './menuCategories';
 import { clearToken, getToken } from './auth';
 
 export type LoginPayload = {
@@ -77,6 +78,8 @@ export type MenuItem = {
     name: string;
     description?: string | null;
     price: number;
+    category: MenuCategory;
+    imageUrl?: string | null;
 };
 
 export type UserReservation = {
@@ -117,6 +120,8 @@ export type MenuItemUpsertPayload = {
     name: string;
     description?: string;
     price: number;
+    category: MenuCategory;
+    imageFile?: File | null;
 };
 
 export type AdminMenuItem = MenuItem;
@@ -180,6 +185,25 @@ function buildRestaurantFormData(payload: RestaurantUpsertPayload): FormData {
         formData.append('manager.lastName', payload.manager.lastName);
         formData.append('manager.email', payload.manager.email);
         formData.append('manager.password', payload.manager.password);
+    }
+
+    return formData;
+}
+
+function buildMenuItemFormData(payload: MenuItemUpsertPayload & { restaurantId?: number }): FormData {
+    const formData = new FormData();
+
+    if (typeof payload.restaurantId === 'number') {
+        formData.append('restaurantId', String(payload.restaurantId));
+    }
+
+    formData.append('name', payload.name);
+    formData.append('description', payload.description ?? '');
+    formData.append('price', String(payload.price));
+    formData.append('category', payload.category);
+
+    if (payload.imageFile) {
+        formData.append('image', payload.imageFile);
     }
 
     return formData;
@@ -447,10 +471,9 @@ export async function createMenuItem(payload: { restaurantId: number } & MenuIte
     const res = await fetch('/api/menu', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             ...authHeaders(),
         },
-        body: JSON.stringify(payload),
+        body: buildMenuItemFormData(payload),
     });
 
     return parseResponse<string>(res);
@@ -460,10 +483,9 @@ export async function createManagerMenuItem(payload: MenuItemUpsertPayload): Pro
     const res = await fetch('/api/menu/manager', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             ...authHeaders(),
         },
-        body: JSON.stringify(payload),
+        body: buildMenuItemFormData(payload),
     });
 
     return parseResponse<string>(res);
@@ -473,10 +495,9 @@ export async function updateMenuItem(id: number, payload: MenuItemUpsertPayload)
     const res = await fetch(`/api/menu/${id}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json',
             ...authHeaders(),
         },
-        body: JSON.stringify(payload),
+        body: buildMenuItemFormData(payload),
     });
 
     return parseResponse<string>(res);
@@ -486,10 +507,9 @@ export async function updateManagerMenuItem(id: number, payload: MenuItemUpsertP
     const res = await fetch(`/api/menu/manager/${id}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json',
             ...authHeaders(),
         },
-        body: JSON.stringify(payload),
+        body: buildMenuItemFormData(payload),
     });
 
     return parseResponse<string>(res);

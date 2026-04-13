@@ -1,4 +1,6 @@
-﻿namespace AngoMenu_MVP_WebApp.DTOs.Menu
+﻿using AngoMenu_MVP_WebApp.Models.Enums;
+
+namespace AngoMenu_MVP_WebApp.DTOs.Menu
 {
     public class MenuItemResponseDto
     {
@@ -7,5 +9,7 @@
         public string Name { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public string Description { get; set; } = string.Empty;
+        public MenuCategory Category { get; set; } = MenuCategory.Other;
+        public string? ImageUrl { get; set; }
     }
 }

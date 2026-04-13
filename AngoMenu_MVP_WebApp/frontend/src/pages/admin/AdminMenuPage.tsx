@@ -5,17 +5,21 @@ import {
     updateMenuItem,
     deleteMenuItem,
     getAllRestaurantsAdmin,
+    getImageUrl,
     type AdminMenuItem,
     type AdminRestaurant,
     type MenuItemUpsertPayload,
 } from "../../lib/api";
 import { isAdmin } from "../../lib/auth";
 import { formatKwanza } from "../../lib/currency";
+import { getMenuCategoryLabel, MENU_CATEGORIES } from "../../lib/menuCategories";
 
 const defaultForm: MenuItemUpsertPayload = {
     name: "",
     description: "",
     price: 0,
+    category: "Other",
+    imageFile: null,
 };
 
 export default function AdminMenuPage() {
@@ -71,44 +75,6 @@ export default function AdminMenuPage() {
         void loadMenu(id);
     }
 
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const { name, value } = e.target;
-
-        if (name === "price") {
-            const digitsOnly = value.replace(/\D/g, "");
-
-            setForm((prev) => ({
-                ...prev,
-                price: digitsOnly === "" ? 0 : parseInt(digitsOnly, 10),
-            }));
-
-            return;
-        }
-
-        setForm((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    }
-
-    function handlePriceKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-        const allowedKeys = new Set([
-            "Backspace",
-            "Delete",
-            "Tab",
-            "ArrowLeft",
-            "ArrowRight",
-            "Home",
-            "End",
-        ]);
-
-        if (allowedKeys.has(e.key) || (e.ctrlKey || e.metaKey)) return;
-
-        if (!/^\d$/.test(e.key)) {
-            e.preventDefault();
-        }
-    }
-
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
@@ -143,6 +109,8 @@ export default function AdminMenuPage() {
             name: item.name,
             price: item.price,
             description: item.description ?? "",
+            category: item.category,
+            imageFile: null,
         });
 
         setEditingId(item.id);
@@ -165,9 +133,7 @@ export default function AdminMenuPage() {
 
     return (
         <section className="space-y-6">
-            <h1 className="text-3xl font-black text-brand-dark">
-                Gerir Menu
-            </h1>
+            <h1 className="text-3xl font-black text-brand-dark">Gerir Menu</h1>
 
             {success && (
                 <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
@@ -203,29 +169,48 @@ export default function AdminMenuPage() {
                         name="name"
                         placeholder="Nome"
                         value={form.name}
-                        onChange={handleChange}
+                        onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                         className="input"
                         required
                     />
 
                     <input
                         name="price"
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        placeholder="Preço  (AOA)"
+                        type="number"
+                        min={0.01}
+                        step="0.01"
+                        placeholder="Preço (AOA)"
                         value={form.price}
-                        onChange={handleChange}
-                        onKeyDown={handlePriceKeyDown}
+                        onChange={(e) => setForm((prev) => ({ ...prev, price: Number(e.target.value) }))}
                         className="input"
                         required
+                    />
+
+                    <select
+                        className="input"
+                        value={form.category}
+                        onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value as MenuItemUpsertPayload["category"] }))}
+                        required
+                    >
+                        {MENU_CATEGORIES.map((category) => (
+                            <option key={category} value={category}>
+                                {getMenuCategoryLabel(category)}
+                            </option>
+                        ))}
+                    </select>
+
+                    <input
+                        type="file"
+                        accept="image/*"
+                        className="input"
+                        onChange={(e) => setForm((prev) => ({ ...prev, imageFile: e.target.files?.[0] ?? null }))}
                     />
 
                     <input
                         name="description"
                         placeholder="Descrição"
                         value={form.description}
-                        onChange={handleChange}
+                        onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
                         className="input md:col-span-2"
                     />
 
@@ -243,45 +228,26 @@ export default function AdminMenuPage() {
                 ) : menuItems.length === 0 ? (
                         <div className="app-card p-6 text-center text-sm text-slate-600">Nenhum item de menu encontrado para este restaurante.</div>
                 ) : (
-                    <div className="app-card overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead className="bg-slate-50">
-                                <tr>
-                                            <th className="p-3 text-left">Nome</th>
-                                            <th className="p-3 text-left">Preço</th>
-                                            <th className="p-3 text-left">Descrição</th>
-                                            <th className="p-3 text-right">Ações</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
+                            <div className="space-y-3">
                                 {menuItems.map((item) => (
-                                    <tr key={item.id} className="border-t">
-                                        <td className="p-3 font-semibold text-brand-dark">{item.name}</td>
-                                        <td className="p-3">{formatKwanza(item.price)}</td>
-                                        <td className="p-3">{item.description}</td>
-
-                                        <td className="space-x-3 p-3 text-right">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleEdit(item)}
-                                                className="text-brand-red hover:underline"
-                                            >
-                                                Editar
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                onClick={() => handleDelete(item.id)}
-                                                className="text-red-600 hover:underline"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </td>
-                                    </tr>
+                                    <div key={item.id} className="app-card flex flex-col gap-4 p-4 md:flex-row md:items-center">
+                                        {getImageUrl(item.imageUrl) && (
+                                            <img src={getImageUrl(item.imageUrl) ?? ""} alt={item.name} className="h-20 w-full rounded-lg object-cover md:w-28" />
+                                        )}
+                                        <div className="flex-1">
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{getMenuCategoryLabel(item.category)}</p>
+                                            <p className="font-semibold text-brand-dark">{item.name}</p>
+                                            <p className="text-sm text-slate-600">{item.description}</p>
+                                        </div>
+                                        <div className="flex items-center gap-4 md:flex-col md:items-end">
+                                            <p className="font-semibold text-brand-red">{formatKwanza(item.price)}</p>
+                                            <div className="space-x-3 text-sm">
+                                                <button type="button" onClick={() => handleEdit(item)} className="text-brand-red hover:underline">Editar</button>
+                                                <button type="button" onClick={() => handleDelete(item.id)} className="text-red-600 hover:underline">Eliminar</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
                     </div>
                 )
             )}

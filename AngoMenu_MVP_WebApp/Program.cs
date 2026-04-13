@@ -14,7 +14,10 @@ using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
-builder.Services.AddControllers(); // <-- Use API controllers
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+}); // <-- Use API controllers
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IMenuService, MenuService>();

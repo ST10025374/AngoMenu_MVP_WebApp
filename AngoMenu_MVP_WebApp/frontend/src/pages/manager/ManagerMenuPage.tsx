@@ -2,17 +2,21 @@ import { useEffect, useState } from "react";
 import {
     createManagerMenuItem,
     deleteManagerMenuItem,
+    getImageUrl,
     getManagerMenu,
     updateManagerMenuItem,
     type MenuItem,
     type MenuItemUpsertPayload,
 } from "../../lib/api";
 import { formatKwanza } from "../../lib/currency";
+import { getMenuCategoryLabel, MENU_CATEGORIES } from "../../lib/menuCategories";
 
 const defaultForm: MenuItemUpsertPayload = {
     name: "",
     description: "",
     price: 0,
+    category: "Other",
+    imageFile: null,
 };
 
 export default function ManagerMenuPage() {
@@ -86,7 +90,13 @@ export default function ManagerMenuPage() {
 
             <form onSubmit={handleSubmit} className="app-card grid gap-4 p-6 md:grid-cols-2">
                 <input className="input" placeholder="Nome do prato" required value={form.name} onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))} />
-                <input className="input" type="number" min={0} placeholder="Preço" required value={form.price} onChange={(event) => setForm((prev) => ({ ...prev, price: Number(event.target.value) }))} />
+                <input className="input" type="number" min={0.01} step="0.01" placeholder="Preço" required value={form.price} onChange={(event) => setForm((prev) => ({ ...prev, price: Number(event.target.value) }))} />
+                <select className="input" value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value as MenuItemUpsertPayload["category"] }))}>
+                    {MENU_CATEGORIES.map((category) => (
+                        <option key={category} value={category}>{getMenuCategoryLabel(category)}</option>
+                    ))}
+                </select>
+                <input className="input" type="file" accept="image/*" onChange={(event) => setForm((prev) => ({ ...prev, imageFile: event.target.files?.[0] ?? null }))} />
                 <input className="input md:col-span-2" placeholder="Descrição" value={form.description} onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))} />
                 <button className="btn-primary md:col-span-2" disabled={saving}>{saving ? "A guardar..." : editingId ? "Editar Prato" : "Adicionar Prato"}</button>
             </form>
@@ -96,30 +106,24 @@ export default function ManagerMenuPage() {
             ) : items.length === 0 ? (
                 <p className="text-sm text-slate-600">Nenhum prato disponível.</p>
             ) : (
-                <div className="app-card overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead className="bg-slate-50">
-                            <tr>
-                                <th className="p-3 text-left">Prato</th>
-                                <th className="p-3 text-left">Preço</th>
-                                <th className="p-3 text-left">Descrição</th>
-                                <th className="p-3 text-right">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                        <div className="space-y-3">
                             {items.map((item) => (
-                                <tr key={item.id} className="border-t">
-                                    <td className="p-3">{item.name}</td>
-                                    <td className="p-3">{formatKwanza(item.price)}</td>
-                                    <td className="p-3">{item.description}</td>
-                                    <td className="space-x-3 p-3 text-right">
-                                        <button type="button" className="text-brand-red hover:underline" onClick={() => { setEditingId(item.id); setForm({ name: item.name, price: item.price, description: item.description ?? "" }); }}>Editar</button>
-                                        <button type="button" className="text-red-600 hover:underline" onClick={() => handleDelete(item.id)}>Eliminar</button>
-                                    </td>
-                                </tr>
+                                <div key={item.id} className="app-card flex flex-col gap-4 p-4 md:flex-row md:items-center">
+                                    {getImageUrl(item.imageUrl) && <img src={getImageUrl(item.imageUrl) ?? ""} alt={item.name} className="h-20 w-full rounded-lg object-cover md:w-28" />}
+                                    <div className="flex-1">
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{getMenuCategoryLabel(item.category)}</p>
+                                        <p className="font-semibold text-brand-dark">{item.name}</p>
+                                        <p className="text-sm text-slate-600">{item.description}</p>
+                                    </div>
+                                    <div className="flex items-center gap-4 md:flex-col md:items-end">
+                                        <p className="font-semibold text-brand-red">{formatKwanza(item.price)}</p>
+                                        <div className="space-x-3 text-sm">
+                                            <button type="button" className="text-brand-red hover:underline" onClick={() => { setEditingId(item.id); setForm({ name: item.name, price: item.price, description: item.description ?? "", category: item.category, imageFile: null }); }}>Editar</button>
+                                            <button type="button" className="text-red-600 hover:underline" onClick={() => handleDelete(item.id)}>Eliminar</button>
+                                        </div>
+                                    </div>
+                                </div>
                             ))}
-                        </tbody>
-                    </table>
                 </div>
             )}
         </section>

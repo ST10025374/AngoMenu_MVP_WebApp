@@ -5,6 +5,7 @@ namespace AngoMenu_MVP_WebApp.Services.Interfaces
     public interface ICloudinaryService
     {
         Task<ImageUploadResult> UploadRestaurantImage(IFormFile imageFile);
+        Task<ImageUploadResult> UploadMenuItemImage(IFormFile imageFile);
         Task<DeletionResult> DeleteImage(string publicId);
     }
 }

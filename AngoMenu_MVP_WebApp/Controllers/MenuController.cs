@@ -20,7 +20,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
         // ADMIN: Create menu item
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create(MenuItemCreateDto dto)
+        public async Task<IActionResult> Create([FromForm] MenuItemCreateDto dto)
         {
             var result = await _menuService.CreateMenuItem(dto);
 
@@ -32,7 +32,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
 
         [Authorize(Roles = "Manager")]
         [HttpPost("manager")]
-        public async Task<IActionResult> CreateManagerMenuItem(MenuItemUpdateDto dto)
+        public async Task<IActionResult> CreateManagerMenuItem([FromForm] MenuItemUpdateDto dto)
         {
             var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _menuService.CreateManagerMenuItem(managerId, dto);
@@ -75,7 +75,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
         // ADMIN: Update menu item
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, MenuItemUpdateDto dto)
+        public async Task<IActionResult> Update(int id, [FromForm] MenuItemUpdateDto dto)
         {
             var result = await _menuService.UpdateMenuItem(id, dto);
 
@@ -87,7 +87,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
 
         [Authorize(Roles = "Manager")]
         [HttpPut("manager/{id}")]
-        public async Task<IActionResult> UpdateManagerMenuItem(int id, MenuItemUpdateDto dto)
+        public async Task<IActionResult> UpdateManagerMenuItem(int id, [FromForm] MenuItemUpdateDto dto)
         {
             var managerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _menuService.UpdateManagerMenuItem(managerId, id, dto);

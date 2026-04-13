@@ -3,19 +3,21 @@ using AngoMenu_MVP_WebApp.DTOs.Menu;
 using AngoMenu_MVP_WebApp.Models;
 using AngoMenu_MVP_WebApp.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using AngoMenu_MVP_WebApp.Models.Enums;
 
 namespace AngoMenu_MVP_WebApp.Services.Implementations
 {
     public class MenuService : IMenuService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public MenuService(ApplicationDbContext context)
+        public MenuService(ApplicationDbContext context, ICloudinaryService cloudinaryService)
         {
             _context = context;
+            _cloudinaryService = cloudinaryService;
         }
 
-        // Create a new menu item for a restaurant
         public async Task<Result> CreateMenuItem(MenuItemCreateDto dto)
         {
             var restaurant = await _context.Restaurants
@@ -29,7 +31,19 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 RestaurantId = dto.RestaurantId
             };
 
-            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description);
+            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category);
+
+            if (dto.Image is not null && dto.Image.Length > 0)
+            {
+                var uploadResult = await _cloudinaryService.UploadMenuItemImage(dto.Image);
+                if (uploadResult.Error is not null)
+                {
+                    return Result.Fail(uploadResult.Error.Message);
+                }
+
+                menuItem.ImageUrl = uploadResult.SecureUrl.ToString();
+                menuItem.PublicId = uploadResult.PublicId;
+            }
 
             _context.MenuItems.Add(menuItem);
             await _context.SaveChangesAsync();
@@ -49,17 +63,15 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 return Result.Fail("Restaurant not found for manager.");
             }
 
-            var menuItem = new MenuItem
+            return await CreateMenuItem(new MenuItemCreateDto
             {
-                RestaurantId = restaurantId
-            };
-
-            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description);
-
-            _context.MenuItems.Add(menuItem);
-            await _context.SaveChangesAsync();
-
-            return Result.Ok("Menu item created successfully.");
+                RestaurantId = restaurantId,
+                Name = dto.Name,
+                Price = dto.Price,
+                Description = dto.Description,
+                Category = dto.Category,
+                Image = dto.Image
+            });
         }
 
         public async Task<Result<List<MenuItemResponseDto>>> GetMenuByRestaurant(int restaurantId)
@@ -78,7 +90,9 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                     RestaurantId = m.RestaurantId,
                     Name = m.Name,
                     Price = m.Price,
-                    Description = m.Description ?? string.Empty
+                    Description = m.Description ?? string.Empty,
+                    Category = m.Category,
+                    ImageUrl = m.ImageUrl
                 })
                 .ToListAsync();
 
@@ -107,7 +121,25 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             if (menuItem == null)
                 return Result.Fail("Menu item not found.");
 
-            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description);
+            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category);
+
+            if (dto.Image is not null && dto.Image.Length > 0)
+            {
+                if (!string.IsNullOrWhiteSpace(menuItem.PublicId))
+                {
+                    await _cloudinaryService.DeleteImage(menuItem.PublicId);
+                }
+
+                var uploadResult = await _cloudinaryService.UploadMenuItemImage(dto.Image);
+                if (uploadResult.Error is not null)
+                {
+                    return Result.Fail(uploadResult.Error.Message);
+                }
+
+                menuItem.ImageUrl = uploadResult.SecureUrl.ToString();
+                menuItem.PublicId = uploadResult.PublicId;
+            }
+
             await _context.SaveChangesAsync();
 
             return Result.Ok("Menu item updated successfully.");
@@ -127,7 +159,27 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 return Result.Fail("Not authorized to update this menu item.");
             }
 
-            return await UpdateMenuItem(id, dto);
+            ApplyMenuItemChanges(menuItem, dto.Name, dto.Price, dto.Description, dto.Category);
+
+            if (dto.Image is not null && dto.Image.Length > 0)
+            {
+                if (!string.IsNullOrWhiteSpace(menuItem.PublicId))
+                {
+                    await _cloudinaryService.DeleteImage(menuItem.PublicId);
+                }
+
+                var uploadResult = await _cloudinaryService.UploadMenuItemImage(dto.Image);
+                if (uploadResult.Error is not null)
+                {
+                    return Result.Fail(uploadResult.Error.Message);
+                }
+
+                menuItem.ImageUrl = uploadResult.SecureUrl.ToString();
+                menuItem.PublicId = uploadResult.PublicId;
+            }
+
+            await _context.SaveChangesAsync();
+            return Result.Ok("Menu item updated successfully.");
         }
 
         public async Task<Result> DeleteMenuItem(int id)
@@ -136,6 +188,11 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
 
             if (menuItem == null)
                 return Result.Fail("Menu item not found.");
+
+            if (!string.IsNullOrWhiteSpace(menuItem.PublicId))
+            {
+                await _cloudinaryService.DeleteImage(menuItem.PublicId);
+            }
 
             _context.MenuItems.Remove(menuItem);
             await _context.SaveChangesAsync();
@@ -160,11 +217,12 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             return await DeleteMenuItem(id);
         }
 
-        private static void ApplyMenuItemChanges(MenuItem menuItem, string name, decimal price, string description)
+        private static void ApplyMenuItemChanges(MenuItem menuItem, string name, decimal price, string description, MenuCategory category)
         {
             menuItem.Name = name;
             menuItem.Price = price;
             menuItem.Description = description;
+            menuItem.Category = category;
         }
     }
 }
