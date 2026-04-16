@@ -216,6 +216,23 @@ export default function RestaurantDetailsPage() {
         () => (restaurant ? formatRestaurantLocation(restaurant) : { multiline: [], singleLine: '' }),
         [restaurant]
     );
+    const googleMapsUrl = useMemo(() => {
+        const rawUrl = restaurant?.googleMapsUrl?.trim();
+        if (!rawUrl) {
+            return null;
+        }
+
+        try {
+            const parsedUrl = new URL(rawUrl);
+            if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+                return null;
+            }
+
+            return parsedUrl.toString();
+        } catch {
+            return null;
+        }
+    }, [restaurant?.googleMapsUrl]);
 
     if (loading) {
         return (
@@ -265,6 +282,16 @@ export default function RestaurantDetailsPage() {
                         >
                             Reserva Mesa
                         </Link>
+                        {googleMapsUrl && (
+                            <a
+                                href={googleMapsUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn-secondary"
+                            >
+                                Ver localização
+                            </a>
+                        )}
                     </div>
                 </div>
 
