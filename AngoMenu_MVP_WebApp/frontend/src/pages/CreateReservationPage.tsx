@@ -3,6 +3,9 @@ import type { FormEvent } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { createReservation, getImageUrl, getRestaurantById, type Restaurant } from "../lib/api";
 import { getUserRole } from "../lib/auth";
+import { buildTimeOptions } from "../lib/time";
+
+const timeOptions = buildTimeOptions(10);
 
 export default function CreateReservationPage() {
     const { id } = useParams();
@@ -127,13 +130,21 @@ export default function CreateReservationPage() {
 
                     <div>
                         <label className="label">Hora</label>
-                        <input
-                            type="time"
+                        <select
                             className="input"
                             value={time}
                             onChange={(e) => setTime(e.target.value)}
                             required
-                        />
+                        >
+                            <option value="" disabled>
+                                Selecione a hora
+                            </option>
+                            {timeOptions.map((timeValue) => (
+                                <option key={timeValue} value={timeValue}>
+                                    {timeValue}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="sm:col-span-2">

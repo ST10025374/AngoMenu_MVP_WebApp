@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getImageUrl, getRestaurants, type PagedResult, type Restaurant } from '../lib/api';
+import { formatRestaurantLocation } from '../lib/restaurantLocation';
 
 export default function RestaurantsPage() {
     const [data, setData] = useState<PagedResult<Restaurant> | null>(null);
@@ -92,44 +93,48 @@ export default function RestaurantsPage() {
             {!loading && !error && data && data.items.length > 0 && (
                 <>
                     <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                        {data.items.map((restaurant) => (
-                            <li key={restaurant.id} className="app-card overflow-hidden p-5 transition duration-200 hover:-translate-y-1 hover:shadow-lg">
-                                <img
-                                    src={getImageUrl(restaurant.mainImageUrl) ?? "https://placehold.co/600x400?text=Sem+Imagem"}
-                                    alt={restaurant.name}
-                                    className="mb-4 h-40 w-full rounded-xl object-cover"
-                                />
+                        {data.items.map((restaurant) => {
+                            const locationDisplay = formatRestaurantLocation(restaurant);
 
-                                <div className="flex items-center justify-between">
-                                    <h2 className="text-lg font-bold text-brand-dark">{restaurant.name}</h2>
-                                    <span className="rounded-full bg-brand-yellow/30 px-2.5 py-1 text-xs font-semibold text-brand-dark">
-                                        Aberto
-                                    </span>
-                                </div>
+                            return (
+                                <li key={restaurant.id} className="app-card overflow-hidden p-5 transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+                                    <img
+                                        src={getImageUrl(restaurant.mainImageUrl) ?? "https://placehold.co/600x400?text=Sem+Imagem"}
+                                        alt={restaurant.name}
+                                        className="mb-4 h-40 w-full rounded-xl object-cover"
+                                    />
 
-                                <p className="mt-2 min-h-12 text-sm text-slate-600">
-                                    {restaurant.description ?? 'Uma experiência gastronómica selecionada com serviço de qualidade e comida deliciosa.'}
-                                </p>
+                                    <div className="flex items-center justify-between">
+                                        <h2 className="text-lg font-bold text-brand-dark">{restaurant.name}</h2>
+                                        <span className="rounded-full bg-brand-yellow/30 px-2.5 py-1 text-xs font-semibold text-brand-dark">
+                                            Aberto
+                                        </span>
+                                    </div>
 
-                                <div className="mt-4 space-y-1 text-sm text-slate-700">
-                                    <p>
-                                        <span className="font-semibold text-slate-900">Localização:</span> {restaurant.location}
+                                    <p className="mt-2 min-h-12 text-sm text-slate-600">
+                                        {restaurant.description ?? 'Uma experiência gastronómica selecionada com serviço de qualidade e comida deliciosa.'}
                                     </p>
-                                    <p>
-                                        <span className="font-semibold text-slate-900">Telefone:</span> {restaurant.phone}
-                                    </p>
-                                    <p>
-                                        <span className="font-semibold text-slate-900">Horário:</span> {restaurant.openingHour} - {restaurant.closingHour}
-                                    </p>
-                                </div>
 
-                                <div className="mt-5">
-                                    <Link className="btn-secondary w-full" to={`/restaurants/${restaurant.id}`}>
-                                        Ver detalhes
-                                    </Link>
-                                </div>
-                            </li>
-                        ))}
+                                    <div className="mt-4 space-y-1 text-sm text-slate-700">
+                                        <p>
+                                            <span className="font-semibold text-slate-900">Localização:</span> {locationDisplay.singleLine}
+                                        </p>
+                                        <p>
+                                            <span className="font-semibold text-slate-900">Telefone:</span> {restaurant.phone}
+                                        </p>
+                                        <p>
+                                            <span className="font-semibold text-slate-900">Horário:</span> {restaurant.openingHour} - {restaurant.closingHour}
+                                        </p>
+                                    </div>
+
+                                    <div className="mt-5">
+                                        <Link className="btn-secondary w-full" to={`/restaurants/${restaurant.id}`}>
+                                            Ver detalhes
+                                        </Link>
+                                    </div>
+                                </li>
+                            );
+                        })}
                     </ul>
 
                     <div className="app-card flex flex-wrap items-center justify-center gap-3 p-4 sm:justify-between">

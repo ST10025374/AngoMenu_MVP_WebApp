@@ -5,6 +5,7 @@ import {
     cancelReservation,
     type UserReservation
 } from "../lib/api";
+import { formatReservationTime24 } from "../lib/time";
 
 export default function MyReservationsPage() {
     const statusLabels: Record<string, string> = {
@@ -105,7 +106,7 @@ export default function MyReservationsPage() {
                                 </h2>
 
                                 <p className="text-sm text-slate-600">
-                                    {r.date} às {r.time}
+                                    {r.date} às {formatReservationTime24(r.time)}
                                 </p>
 
                                 <p className="text-sm text-slate-600">

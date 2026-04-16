@@ -5,6 +5,7 @@ import {
     type AdminReservation,
     type ReservationStatus,
 } from "../../lib/api";
+import { formatReservationTime24 } from "../../lib/time";
 
 const statuses: ReservationStatus[] = ["Pending", "Confirmed", "Cancelled"];
 const statusLabels: Record<ReservationStatus, string> = {
@@ -76,7 +77,7 @@ export default function ManagerReservationsPage() {
                                 <tr key={reservation.id} className="border-t">
                                     <td className="p-3">{reservation.userEmail}</td>
                                     <td className="p-3">{reservation.date}</td>
-                                    <td className="p-3">{reservation.time}</td>
+                                    <td className="p-3">{formatReservationTime24(reservation.time)}</td>
                                     <td className="p-3">{reservation.numberOfPeople}</td>
                                     <td className="p-3">
                                         <select

@@ -9,6 +9,7 @@ import {
 } from '../lib/api';
 import { formatKwanza } from '../lib/currency';
 import { getMenuCategoryLabel, MENU_CATEGORIES } from '../lib/menuCategories';
+import { formatRestaurantLocation } from '../lib/restaurantLocation';
 
 type FullscreenImageModalProps = {
     imageUrl: string;
@@ -211,6 +212,10 @@ export default function RestaurantDetailsPage() {
             }),
         [restaurant?.images, heroImage]
     );
+    const locationDisplay = useMemo(
+        () => (restaurant ? formatRestaurantLocation(restaurant) : { multiline: [], singleLine: '' }),
+        [restaurant]
+    );
 
     if (loading) {
         return (
@@ -287,7 +292,11 @@ export default function RestaurantDetailsPage() {
                 <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="rounded-xl bg-slate-50 p-4">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Localização</p>
-                        <p className="mt-1 text-sm font-semibold text-brand-dark">{restaurant.location}</p>
+                        <div className="mt-1 space-y-0.5 text-sm font-semibold text-brand-dark">
+                            {locationDisplay.multiline.map((line) => (
+                                <p key={line}>{line}</p>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="rounded-xl bg-slate-50 p-4">
