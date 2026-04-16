@@ -43,6 +43,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 Municipality = dto.Municipality,
                 Neighborhood = dto.Neighborhood,
                 StreetName = dto.StreetName,
+                GoogleMapsUrl = NormalizeGoogleMapsUrl(dto.GoogleMapsUrl),
                 Phone = dto.Phone,
                 OpeningHour = dto.OpeningHour,
                 ClosingHour = dto.ClosingHour,
@@ -108,6 +109,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
             restaurant.Municipality = dto.Municipality;
             restaurant.Neighborhood = dto.Neighborhood;
             restaurant.StreetName = dto.StreetName;
+            restaurant.GoogleMapsUrl = NormalizeGoogleMapsUrl(dto.GoogleMapsUrl);
             restaurant.Phone = dto.Phone;
             restaurant.OpeningHour = dto.OpeningHour;
             restaurant.ClosingHour = dto.ClosingHour;
@@ -224,6 +226,7 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 Municipality = restaurant.Municipality,
                 Neighborhood = restaurant.Neighborhood,
                 StreetName = restaurant.StreetName,
+                GoogleMapsUrl = restaurant.GoogleMapsUrl,
                 Phone = restaurant.Phone,
                 OpeningHour = restaurant.OpeningHour,
                 ClosingHour = restaurant.ClosingHour,
@@ -242,6 +245,16 @@ namespace AngoMenu_MVP_WebApp.Services.Implementations
                 ManagerName = restaurant.Manager is null ? null : $"{restaurant.Manager.FirstName} {restaurant.Manager.LastName}",
                 ManagerEmail = restaurant.Manager?.Email,
             };
+        }
+
+        private static string? NormalizeGoogleMapsUrl(string? googleMapsUrl)
+        {
+            if (string.IsNullOrWhiteSpace(googleMapsUrl))
+            {
+                return null;
+            }
+
+            return googleMapsUrl.Trim();
         }
     }
 }

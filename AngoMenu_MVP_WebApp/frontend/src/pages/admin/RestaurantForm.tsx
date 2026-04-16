@@ -52,7 +52,19 @@ export default function RestaurantForm({
                     value={values.location}
                     onChange={(event) => onChange("location", event.target.value)}
                 />
-            </div>
+                </div>
+
+                <div>
+                    <label className="label" htmlFor="restaurant-google-maps-url">Localização no Google Maps</label>
+                    <input
+                        id="restaurant-google-maps-url"
+                        className="input"
+                        type="url"
+                        placeholder="https://maps.google.com/..."
+                        value={values.googleMapsUrl ?? ""}
+                        onChange={(event) => onChange("googleMapsUrl", event.target.value)}
+                    />
+                </div>
 
             <div>
                 <label className="label" htmlFor="restaurant-city">Cidade</label>

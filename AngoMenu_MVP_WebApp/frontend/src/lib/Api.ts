@@ -41,6 +41,7 @@ export type Restaurant = {
     name: string;
     description?: string | null;
     location: string;
+    googleMapsUrl?: string | null;
     city: string;
     province: string;
     municipality: string;
@@ -104,6 +105,7 @@ export type RestaurantUpsertPayload = {
     name: string;
     description?: string;
     location: string;
+    googleMapsUrl?: string;
     city: string;
     province: string;
     municipality: string;
@@ -174,6 +176,7 @@ function buildRestaurantFormData(payload: RestaurantUpsertPayload): FormData {
     formData.append('name', payload.name);
     formData.append('description', payload.description ?? '');
     formData.append('location', payload.location);
+    formData.append('googleMapsUrl', payload.googleMapsUrl ?? '');
     formData.append('city', payload.city);
     formData.append('province', payload.province);
     formData.append('municipality', payload.municipality);

@@ -13,6 +13,7 @@ namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
         public string Municipality { get; set; } = string.Empty;
         public string Neighborhood { get; set; } = string.Empty;
         public string StreetName { get; set; } = string.Empty;
+        public string? GoogleMapsUrl { get; set; }
         public string Phone { get; set; } = string.Empty;
         public TimeOnly OpeningHour { get; set; }
         public TimeOnly ClosingHour { get; set; }

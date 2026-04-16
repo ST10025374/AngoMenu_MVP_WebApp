@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AngoMenu_MVP_WebApp.DTOs.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
 {
@@ -26,6 +27,10 @@ namespace AngoMenu_MVP_WebApp.DTOs.Restaurant
 
         [Required]
         public string StreetName { get; set; } = string.Empty;
+
+        [MaxLength(2048)]
+        [GoogleMapsUrl]
+        public string? GoogleMapsUrl { get; set; }
 
         [Required]
         public string Phone { get; set; } = string.Empty;

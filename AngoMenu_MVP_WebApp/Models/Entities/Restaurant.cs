@@ -37,6 +37,9 @@ namespace AngoMenu_MVP_WebApp.Models
         [MaxLength(180)]
         public string StreetName { get; set; } = string.Empty;
 
+        [MaxLength(2048)]
+        public string? GoogleMapsUrl { get; set; }
+
         [Required]
         public string Phone { get; set; } = string.Empty;
 

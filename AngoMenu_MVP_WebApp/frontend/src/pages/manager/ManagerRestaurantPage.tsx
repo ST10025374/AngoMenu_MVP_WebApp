@@ -9,6 +9,7 @@ function mapRestaurantToForm(restaurant: Restaurant): FormState {
         name: restaurant.name,
         description: restaurant.description ?? "",
         location: restaurant.location,
+        googleMapsUrl: restaurant.googleMapsUrl ?? "",
         city: restaurant.city,
         province: restaurant.province,
         municipality: restaurant.municipality,
@@ -91,6 +92,7 @@ export default function ManagerRestaurantPage() {
             <form onSubmit={handleSubmit} className="app-card grid gap-4 p-6 md:grid-cols-2">
                 <div><label className="label">Nome</label><input className="input" required value={form.name} onChange={(event) => setForm((prev) => prev ? { ...prev, name: event.target.value } : prev)} /></div>
                 <div><label className="label">Localização</label><input className="input" required value={form.location} onChange={(event) => setForm((prev) => prev ? { ...prev, location: event.target.value } : prev)} /></div>
+                <div><label className="label">Localização no Google Maps</label><input className="input" type="url" placeholder="https://maps.google.com/..." value={form.googleMapsUrl ?? ""} onChange={(event) => setForm((prev) => prev ? { ...prev, googleMapsUrl: event.target.value } : prev)} /></div>
                 <div><label className="label">Cidade</label><input className="input" required value={form.city} onChange={(event) => setForm((prev) => prev ? { ...prev, city: event.target.value } : prev)} /></div>
                 <div><label className="label">Província</label><input className="input" required value={form.province} onChange={(event) => setForm((prev) => prev ? { ...prev, province: event.target.value } : prev)} /></div>
                 <div><label className="label">Município</label><input className="input" required value={form.municipality} onChange={(event) => setForm((prev) => prev ? { ...prev, municipality: event.target.value } : prev)} /></div>
