@@ -139,7 +139,7 @@ builder.Services.AddRateLimiter(options =>
 var cs = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(cs));
+    options.UseNpgsql(cs));
 
 // Connection String for SQL Server
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>

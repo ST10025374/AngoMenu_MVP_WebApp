@@ -28,7 +28,7 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<RestaurantImage>()
             .HasIndex(i => new { i.RestaurantId, i.IsMain })
-            .HasFilter("[IsMain] = 1")
+            .HasFilter("\"IsMain\" = true")
             .IsUnique();
 
         modelBuilder.Entity<RestaurantImage>()
