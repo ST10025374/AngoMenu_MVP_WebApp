@@ -61,6 +61,8 @@ var allowedOrigins = builder.Configuration
     .Get<string[]>()?
     .Where(origin => !string.IsNullOrWhiteSpace(origin))
     .Select(origin => origin.Trim().TrimEnd('/'))
+    .Where(origin => Uri.TryCreate(origin, UriKind.Absolute, out var uri)
+        && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
     .Distinct(StringComparer.OrdinalIgnoreCase)
     .ToArray() ?? Array.Empty<string>();
 
@@ -137,6 +139,10 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var cs = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(cs))
+{
+    throw new InvalidOperationException("Missing configuration: ConnectionStrings__DefaultConnection");
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(cs));
@@ -146,6 +152,24 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // <-- Changed DefaultConn.. to Dev (User Secrets)
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var jwtKey = jwtSettings["Key"];
+var jwtIssuer = jwtSettings["Issuer"];
+var jwtAudience = jwtSettings["Audience"];
+
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    throw new InvalidOperationException("Missing configuration: JwtSettings__Key");
+}
+
+if (string.IsNullOrWhiteSpace(jwtIssuer))
+{
+    throw new InvalidOperationException("Missing configuration: JwtSettings__Issuer");
+}
+
+if (string.IsNullOrWhiteSpace(jwtAudience))
+{
+    throw new InvalidOperationException("Missing configuration: JwtSettings__Audience");
+}
 
 builder.Services.AddAuthentication(options =>
 {
@@ -160,13 +184,13 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
         RoleClaimType = ClaimTypes.Role,
         NameClaimType = ClaimTypes.NameIdentifier,
         ClockSkew = TimeSpan.Zero,
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
+            Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 
@@ -179,8 +203,8 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
-// Swagger enabled in development
-if (app.Environment.IsDevelopment())
+var enableSwagger = app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Swagger:Enabled");
+if (enableSwagger)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
