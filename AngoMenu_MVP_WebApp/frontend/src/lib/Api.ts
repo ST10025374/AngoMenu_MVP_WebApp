@@ -220,6 +220,19 @@ function buildMenuItemFormData(payload: MenuItemUpsertPayload & { restaurantId?:
     return formData;
 }
 
+const API_BASE_URL = (((import.meta as any).env?.VITE_API_BASE_URL as string | undefined) ?? '')
+    .trim()
+    .replace(/\/+$/, '');
+
+function apiUrl(path: string): string {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
+
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return `${API_BASE_URL}${normalizedPath}`;
+}
+
 export function getImageUrl(path?: string | null): string | null {
     if (!path) return null;
     if (path.startsWith('http://') || path.startsWith('https://')) {
@@ -230,7 +243,8 @@ export function getImageUrl(path?: string | null): string | null {
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
-    const res = await fetch('/api/auth/login', {
+    /*const res = await fetch('/api/auth/login', {*/
+    const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -240,7 +254,8 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
 }
 
 export async function register(payload: RegisterPayload): Promise<string> {
-    const res = await fetch('/api/auth/register', {
+    /*const res = await fetch('/api/auth/register', {*/
+    const res = await fetch(apiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -259,7 +274,8 @@ export async function getRestaurants(params: {
     if (params.pageSize) query.set('pageSize', String(params.pageSize));
     if (params.search) query.set('search', params.search);
 
-    const res = await fetch(`/api/restaurants?${query.toString()}`, {
+    /*const res = await fetch(`/api/restaurants?${query.toString()}`, {*/
+    const res = await fetch(apiUrl(`/api/restaurants?${query.toString()}`), {
         method: 'GET',
         headers: {
             ...authHeaders(),
@@ -270,7 +286,8 @@ export async function getRestaurants(params: {
 }
 
 export async function getRestaurantById(id: number): Promise<Restaurant> {
-    const res = await fetch(`/api/restaurants/${id}`, {
+    /*const res = await fetch(`/api/restaurants/${id}`, {*/
+    const res = await fetch(apiUrl(`/api/restaurants/${id}`), {
         method: 'GET',
         headers: {
             ...authHeaders(),
@@ -281,7 +298,8 @@ export async function getRestaurantById(id: number): Promise<Restaurant> {
 }
 
 export async function getManagerRestaurant(): Promise<Restaurant> {
-    const res = await fetch('/api/restaurants/manager/my-restaurant', {
+    /*const res = await fetch('/api/restaurants/manager/my-restaurant', {*/
+    const res = await fetch(apiUrl('/api/restaurants/manager/my-restaurant'), {
         headers: {
             ...authHeaders(),
         },
@@ -291,7 +309,8 @@ export async function getManagerRestaurant(): Promise<Restaurant> {
 }
 
 export async function updateManagerRestaurant(payload: RestaurantUpsertPayload): Promise<string> {
-    const res = await fetch('/api/restaurants/manager/my-restaurant', {
+    /*const res = await fetch('/api/restaurants/manager/my-restaurant', {*/
+    const res = await fetch(apiUrl('/api/restaurants/manager/my-restaurant'), {
         method: 'PUT',
         headers: {
             ...authHeaders(),
@@ -303,7 +322,8 @@ export async function updateManagerRestaurant(payload: RestaurantUpsertPayload):
 }
 
 export async function getMenuByRestaurant(restaurantId: number): Promise<MenuItem[]> {
-    const res = await fetch(`/api/menu/restaurant/${restaurantId}`, {
+    /*const res = await fetch(`/api/menu/restaurant/${restaurantId}`, {*/
+    const res = await fetch(apiUrl(`/api/menu/restaurant/${restaurantId}`), {
         method: 'GET',
     });
 
@@ -311,7 +331,8 @@ export async function getMenuByRestaurant(restaurantId: number): Promise<MenuIte
 }
 
 export async function getManagerMenu(): Promise<MenuItem[]> {
-    const res = await fetch('/api/menu/manager', {
+    /*const res = await fetch('/api/menu/manager', {*/
+    const res = await fetch(apiUrl('/api/menu/manager'), {
         headers: {
             ...authHeaders(),
         },
@@ -326,7 +347,8 @@ export async function createReservation(payload: {
     time: string;
     numberOfPeople: number;
 }): Promise<string> {
-    const res = await fetch('/api/reservations', {
+    /*const res = await fetch('/api/reservations', {*/
+    const res = await fetch(apiUrl('/api/reservations'), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -339,7 +361,8 @@ export async function createReservation(payload: {
 }
 
 export async function getMyReservations(): Promise<UserReservation[]> {
-    const res = await fetch('/api/reservations/my', {
+    /*const res = await fetch('/api/reservations/my', {*/
+    const res = await fetch(apiUrl('/api/reservations/my'), {
         headers: {
             ...authHeaders(),
         },
@@ -349,7 +372,8 @@ export async function getMyReservations(): Promise<UserReservation[]> {
 }
 
 export async function cancelReservation(reservationId: number): Promise<string> {
-    const res = await fetch(`/api/reservations/${reservationId}/cancel`, {
+    /*const res = await fetch(`/api/reservations/${reservationId}/cancel`, {*/
+    const res = await fetch(apiUrl(`/api/reservations/${reservationId}/cancel`), {
         method: 'PUT',
         headers: {
             ...authHeaders(),
@@ -360,7 +384,8 @@ export async function cancelReservation(reservationId: number): Promise<string> 
 }
 
 export async function getAllReservations(): Promise<AdminReservation[]> {
-    const res = await fetch('/api/reservations', {
+    /*const res = await fetch('/api/reservations', {*/
+    const res = await fetch(apiUrl('/api/reservations'), {
         headers: {
             ...authHeaders(),
         },
@@ -370,7 +395,8 @@ export async function getAllReservations(): Promise<AdminReservation[]> {
 }
 
 export async function getManagerReservations(): Promise<AdminReservation[]> {
-    const res = await fetch('/api/reservations/manager', {
+    /*const res = await fetch('/api/reservations/manager', {*/
+    const res = await fetch(apiUrl('/api/reservations/manager'), {
         headers: {
             ...authHeaders(),
         },
@@ -383,7 +409,8 @@ export async function updateReservationStatus(
     id: number,
     status: ReservationStatus
 ): Promise<string> {
-    const res = await fetch(`/api/reservations/${id}/status`, {
+    /*const res = await fetch(`/api/reservations/${id}/status`, {*/
+    const res = await fetch(apiUrl(`/api/reservations/${id}/status`), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -399,7 +426,8 @@ export async function updateManagerReservationStatus(
     id: number,
     status: ReservationStatus
 ): Promise<string> {
-    const res = await fetch(`/api/reservations/manager/${id}/status`, {
+    /*const res = await fetch(`/api/reservations/manager/${id}/status`, {*/
+    const res = await fetch(apiUrl(`/api/reservations/manager/${id}/status`), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -412,7 +440,8 @@ export async function updateManagerReservationStatus(
 }
 
 export async function deleteReservation(id: number): Promise<string> {
-    const res = await fetch(`/api/reservations/${id}`, {
+    /*const res = await fetch(`/api/reservations/${id}`, {*/
+    const res = await fetch(apiUrl(`/api/reservations/${id}`), {
         method: 'DELETE',
         headers: {
             ...authHeaders(),
@@ -423,7 +452,8 @@ export async function deleteReservation(id: number): Promise<string> {
 }
 
 export async function getAllRestaurantsAdmin(): Promise<AdminRestaurant[]> {
-    const res = await fetch('/api/restaurants', {
+    /*const res = await fetch('/api/restaurants', {*/
+    const res = await fetch(apiUrl('/api/restaurants'), {
         headers: {
             ...authHeaders(),
         },
@@ -434,7 +464,8 @@ export async function getAllRestaurantsAdmin(): Promise<AdminRestaurant[]> {
 }
 
 export async function createRestaurant(payload: RestaurantUpsertPayload): Promise<string> {
-    const res = await fetch('/api/restaurants', {
+    /*const res = await fetch('/api/restaurants', {*/
+    const res = await fetch(apiUrl('/api/restaurants'), {
         method: 'POST',
         headers: {
             ...authHeaders(),
@@ -446,7 +477,8 @@ export async function createRestaurant(payload: RestaurantUpsertPayload): Promis
 }
 
 export async function updateRestaurant(id: number, payload: RestaurantUpsertPayload): Promise<string> {
-    const res = await fetch(`/api/restaurants/${id}`, {
+    /*const res = await fetch(`/api/restaurants/${id}`, {*/
+    const res = await fetch(apiUrl(`/api/restaurants/${id}`), {
         method: 'PUT',
         headers: {
             ...authHeaders(),
@@ -458,7 +490,8 @@ export async function updateRestaurant(id: number, payload: RestaurantUpsertPayl
 }
 
 export async function deleteRestaurant(id: number): Promise<string> {
-    const res = await fetch(`/api/restaurants/${id}`, {
+    /*const res = await fetch(`/api/restaurants/${id}`, {*/
+    const res = await fetch(apiUrl(`/api/restaurants/${id}`), {
         method: 'DELETE',
         headers: {
             ...authHeaders(),
@@ -469,7 +502,8 @@ export async function deleteRestaurant(id: number): Promise<string> {
 }
 
 export async function getMenuByRestaurantAdmin(restaurantId: number): Promise<AdminMenuItem[]> {
-    const res = await fetch(`/api/menu/restaurant/${restaurantId}`, {
+    /*const res = await fetch(`/api/menu/restaurant/${restaurantId}`, {*/
+    const res = await fetch(apiUrl(`/api/menu/restaurant/${restaurantId}`), {
         headers: {
             ...authHeaders(),
         },
@@ -479,7 +513,8 @@ export async function getMenuByRestaurantAdmin(restaurantId: number): Promise<Ad
 }
 
 export async function createMenuItem(payload: { restaurantId: number } & MenuItemUpsertPayload): Promise<string> {
-    const res = await fetch('/api/menu', {
+    /*const res = await fetch('/api/menu', {*/
+    const res = await fetch(apiUrl('/api/menu'), {
         method: 'POST',
         headers: {
             ...authHeaders(),
@@ -491,7 +526,8 @@ export async function createMenuItem(payload: { restaurantId: number } & MenuIte
 }
 
 export async function createManagerMenuItem(payload: MenuItemUpsertPayload): Promise<string> {
-    const res = await fetch('/api/menu/manager', {
+    /*const res = await fetch('/api/menu/manager', {*/
+    const res = await fetch(apiUrl('/api/menu/manager'), {
         method: 'POST',
         headers: {
             ...authHeaders(),
@@ -503,7 +539,8 @@ export async function createManagerMenuItem(payload: MenuItemUpsertPayload): Pro
 }
 
 export async function updateMenuItem(id: number, payload: MenuItemUpsertPayload): Promise<string> {
-    const res = await fetch(`/api/menu/${id}`, {
+    /*const res = await fetch(`/api/menu/${id}`, {*/
+    const res = await fetch(apiUrl(`/api/menu/${id}`), {
         method: 'PUT',
         headers: {
             ...authHeaders(),
@@ -515,7 +552,8 @@ export async function updateMenuItem(id: number, payload: MenuItemUpsertPayload)
 }
 
 export async function updateManagerMenuItem(id: number, payload: MenuItemUpsertPayload): Promise<string> {
-    const res = await fetch(`/api/menu/manager/${id}`, {
+    /*const res = await fetch(`/api/menu/manager/${id}`, {*/
+    const res = await fetch(apiUrl(`/api/menu/manager/${id}`), {
         method: 'PUT',
         headers: {
             ...authHeaders(),
@@ -527,7 +565,8 @@ export async function updateManagerMenuItem(id: number, payload: MenuItemUpsertP
 }
 
 export async function deleteMenuItem(id: number): Promise<string> {
-    const res = await fetch(`/api/menu/${id}`, {
+    /*const res = await fetch(`/api/menu/${id}`, {*/
+    const res = await fetch(apiUrl(`/api/menu/${id}`), {
         method: 'DELETE',
         headers: {
             ...authHeaders(),
@@ -538,7 +577,8 @@ export async function deleteMenuItem(id: number): Promise<string> {
 }
 
 export async function deleteManagerMenuItem(id: number): Promise<string> {
-    const res = await fetch(`/api/menu/manager/${id}`, {
+    /*const res = await fetch(`/api/menu/manager/${id}`, {*/
+    const res = await fetch(apiUrl(`/api/menu/manager/${id}`), {
         method: 'DELETE',
         headers: {
             ...authHeaders(),
@@ -549,7 +589,8 @@ export async function deleteManagerMenuItem(id: number): Promise<string> {
 }
 
 export async function getRestaurantImages(restaurantId: number): Promise<RestaurantImage[]> {
-    const res = await fetch(`/api/restaurants/${restaurantId}/images`, {
+    /*const res = await fetch(`/api/restaurants/${restaurantId}/images`, {*/
+    const res = await fetch(apiUrl(`/api/restaurants/${restaurantId}/images`), {
         method: 'GET',
         headers: {
             ...authHeaders(),
@@ -569,7 +610,8 @@ export async function uploadRestaurantImage(
         formData.append('isMain', 'true');
     }
 
-    const res = await fetch(`/api/restaurants/${restaurantId}/images`, {
+    /*const res = await fetch(`/api/restaurants/${restaurantId}/images`, {*/
+    const res = await fetch(apiUrl(`/api/restaurants/${restaurantId}/images`), {
         method: 'POST',
         headers: {
             ...authHeaders(),
@@ -581,7 +623,8 @@ export async function uploadRestaurantImage(
 }
 
 export async function deleteRestaurantImage(restaurantId: number, imageId: number): Promise<RestaurantImage[]> {
-    const res = await fetch(`/api/restaurants/${restaurantId}/images/${imageId}`, {
+    /*const res = await fetch(`/api/restaurants/${restaurantId}/images/${imageId}`, {*/
+    const res = await fetch(apiUrl(`/api/restaurants/${restaurantId}/images/${imageId}`), {
         method: 'DELETE',
         headers: {
             ...authHeaders(),
@@ -592,7 +635,8 @@ export async function deleteRestaurantImage(restaurantId: number, imageId: numbe
 }
 
 export async function setMainRestaurantImage(restaurantId: number, imageId: number): Promise<RestaurantImage[]> {
-    const res = await fetch(`/api/restaurants/${restaurantId}/images/${imageId}/set-main`, {
+    /*const res = await fetch(`/api/restaurants/${restaurantId}/images/${imageId}/set-main`, {*/
+    const res = await fetch(apiUrl(`/api/restaurants/${restaurantId}/images/${imageId}/set-main`), {
         method: 'PUT',
         headers: {
             ...authHeaders(),
@@ -603,7 +647,8 @@ export async function setMainRestaurantImage(restaurantId: number, imageId: numb
 }
 
 export async function reorderRestaurantImages(restaurantId: number, orderedImageIds: number[]): Promise<RestaurantImage[]> {
-    const res = await fetch(`/api/restaurants/${restaurantId}/images/reorder`, {
+    /*const res = await fetch(`/api/restaurants/${restaurantId}/images/reorder`, {*/
+    const res = await fetch(apiUrl(`/api/restaurants/${restaurantId}/images/reorder`), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
