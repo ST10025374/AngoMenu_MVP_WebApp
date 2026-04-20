@@ -194,12 +194,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -239,5 +234,6 @@ app.UseRateLimiter();
 app.UseMiddleware<AngoMenu_MVP_WebApp.Middleware.ExceptionMiddleware>();
 app.UseAuthentication();   // <-- VERY IMPORTANT
 app.UseAuthorization();
+app.MapGet("/", () => Results.Redirect("/swagger")).AllowAnonymous();
 app.MapControllers();  // <-- Use API routing
 app.Run();
