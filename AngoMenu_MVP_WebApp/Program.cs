@@ -198,12 +198,8 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-var enableSwagger = app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Swagger:Enabled");
-if (enableSwagger)
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseMiddleware<AngoMenu_MVP_WebApp.Middleware.SecurityHeadersMiddleware>();
 app.Use(async (context, next) =>

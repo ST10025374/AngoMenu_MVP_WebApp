@@ -26,6 +26,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
             _authService = authService;
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
@@ -37,6 +38,7 @@ namespace AngoMenu_MVP_WebApp.Controllers
             return Ok(result.Message);
         }
 
+        [AllowAnonymous]
         [EnableRateLimiting("loginLimiter")]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
